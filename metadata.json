@@ -1,0 +1,8 @@
+{
+  "name": "Remix: MOVIQ",
+  "description": "Premium luxury fashion e-commerce storefront with curated Dior \u0026 Apple inspired design, wishlist, cart, and quick view features.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
