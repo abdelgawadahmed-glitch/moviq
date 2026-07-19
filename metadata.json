@@ -1,6 +1,6 @@
 {
-  "name": "Remix: MOVIQ",
-  "description": "Premium luxury fashion e-commerce storefront with curated Dior \u0026 Apple inspired design, wishlist, cart, and quick view features.",
+  "name": "MOVIQ: Premium Luxury Sneakers",
+  "description": "Premium dark luxury e-commerce storefront for sneakers in Egypt, featuring custom animations, interactive AI assistant, and curated sneaker brands.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

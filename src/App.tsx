@@ -4,6 +4,7 @@ import { Heart, ShoppingBag, ArrowRight, ShieldCheck, HelpCircle, Eye, RefreshCw
 
 import Header from './components/Header';
 import Hero from './components/Hero';
+import BenefitsBar from './components/BenefitsBar';
 import Filters from './components/Filters';
 import ProductCard from './components/ProductCard';
 import QuickViewModal from './components/QuickViewModal';
@@ -20,11 +21,11 @@ import { Product, CartItem, FilterState, Review } from './types';
 
 function SkeletonCard() {
   return (
-    <div className="bg-white rounded-3xl overflow-hidden border border-neutral-100/70 p-6 flex flex-col h-full space-y-4 shadow-[0_4px_20px_rgba(0,0,0,0.015)] relative">
+    <div className="bg-neutral-900/50 rounded-3xl overflow-hidden border border-neutral-800/80 p-6 flex flex-col h-full space-y-4 shadow-2xl relative">
       {/* Image skeleton */}
-      <div className="relative aspect-[4/5] bg-neutral-50 rounded-2xl overflow-hidden flex items-center justify-center p-5">
+      <div className="relative aspect-[4/5] bg-neutral-950 rounded-2xl overflow-hidden flex items-center justify-center p-5">
         <motion.div
-          className="absolute inset-0 bg-gradient-to-r from-transparent via-neutral-100/60 to-transparent"
+          className="absolute inset-0 bg-gradient-to-r from-transparent via-neutral-800/45 to-transparent"
           initial={{ x: '-100%' }}
           animate={{ x: '100%' }}
           transition={{ repeat: Infinity, duration: 1.5, ease: 'linear' }}
@@ -33,17 +34,17 @@ function SkeletonCard() {
       
       {/* Brand & Name skeleton */}
       <div className="space-y-2">
-        <div className="h-3 w-1/4 bg-neutral-100 rounded-md relative overflow-hidden">
+        <div className="h-3 w-1/4 bg-neutral-800/80 rounded-md relative overflow-hidden">
           <motion.div
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-neutral-100/60 to-transparent"
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-neutral-800/45 to-transparent"
             initial={{ x: '-100%' }}
             animate={{ x: '100%' }}
             transition={{ repeat: Infinity, duration: 1.5, ease: 'linear' }}
           />
         </div>
-        <div className="h-4.5 w-3/4 bg-neutral-100 rounded-md relative overflow-hidden">
+        <div className="h-4.5 w-3/4 bg-neutral-800/80 rounded-md relative overflow-hidden">
           <motion.div
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-neutral-100/60 to-transparent"
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-neutral-800/45 to-transparent"
             initial={{ x: '-100%' }}
             animate={{ x: '100%' }}
             transition={{ repeat: Infinity, duration: 1.5, ease: 'linear' }}
@@ -54,23 +55,23 @@ function SkeletonCard() {
       {/* Stars rating skeleton */}
       <div className="flex gap-1">
         {[1, 2, 3, 4, 5].map((i) => (
-          <div key={i} className="w-2.5 h-2.5 bg-neutral-100 rounded-full" />
+          <div key={i} className="w-2.5 h-2.5 bg-neutral-800/60 rounded-full" />
         ))}
       </div>
 
       {/* Available sizes skeleton */}
-      <div className="space-y-2 pt-3 border-t border-neutral-100/70">
-        <div className="h-2 w-1/4 bg-neutral-100 rounded-md" />
+      <div className="space-y-2 pt-3 border-t border-neutral-800/60">
+        <div className="h-2 w-1/4 bg-neutral-800/85 rounded-md" />
         <div className="flex gap-1.5">
-          <div className="h-5 w-8 bg-neutral-100 rounded-md" />
-          <div className="h-5 w-8 bg-neutral-100 rounded-md" />
-          <div className="h-5 w-8 bg-neutral-100 rounded-md" />
+          <div className="h-5 w-8 bg-neutral-800/60 rounded-md" />
+          <div className="h-5 w-8 bg-neutral-800/60 rounded-md" />
+          <div className="h-5 w-8 bg-neutral-800/60 rounded-md" />
         </div>
       </div>
 
       {/* Price skeleton */}
-      <div className="pt-4 border-t border-neutral-100/70 flex justify-between items-center mt-auto">
-        <div className="h-4 w-20 bg-neutral-100 rounded-md" />
+      <div className="pt-4 border-t border-neutral-800/60 flex justify-between items-center mt-auto">
+        <div className="h-4 w-20 bg-neutral-800/85 rounded-md" />
       </div>
     </div>
   );
@@ -389,7 +390,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-white text-black flex flex-col font-sans selection:bg-black selection:text-white relative" id="moviq-app-root">
+    <div className="min-h-screen bg-neutral-950 text-white flex flex-col font-sans selection:bg-white selection:text-black relative animate-none" id="moviq-app-root">
       
       {/* 1. Navbar */}
       <Header
@@ -412,6 +413,9 @@ export default function App() {
         selectedBrand={filters.brand}
         onScrollToCatalog={handleScrollToCatalog}
       />
+
+      {/* Luxury Brand Benefits Bar */}
+      <BenefitsBar />
 
       {/* 3. Homepage Custom Premium Sections OR Catalog Showcase */}
       {activeTab === 'Home' ? (
@@ -495,18 +499,18 @@ export default function App() {
       )}
 
       {/* 5. Luxury Brand Philosophy Accent Banner */}
-      <section className="bg-neutral-50 py-16 border-t border-b border-neutral-100" id="brand-philosophy">
+      <section className="bg-neutral-900/40 backdrop-blur-md py-20 border-t border-b border-neutral-900" id="brand-philosophy">
         <div className="max-w-3xl mx-auto text-center px-4 space-y-6">
-          <span className="text-[10px] tracking-[0.3em] font-bold text-neutral-400 uppercase">
+          <span className="text-[10px] tracking-[0.3em] font-bold text-amber-500/80 uppercase">
             Moviq Luxury Sneaker Philosophy
           </span>
-          <p className="font-serif text-2xl sm:text-3xl font-extralight tracking-wide leading-relaxed text-black italic">
+          <p className="font-serif text-2xl sm:text-3xl font-extralight tracking-wide leading-relaxed text-neutral-200 italic">
             &ldquo;Luxury is not about standing out, but about being remembered. It lies in the purity of geometric proportions and the absolute honesty of materials.&rdquo;
           </p>
-          <div className="flex justify-center items-center gap-1.5 text-neutral-400">
-            <span className="w-6 h-[1.5px] bg-neutral-300" />
-            <span className="text-[10px] tracking-widest uppercase font-bold text-black">Founder of MOVIQ</span>
-            <span className="w-6 h-[1.5px] bg-neutral-300" />
+          <div className="flex justify-center items-center gap-1.5 text-neutral-500">
+            <span className="w-6 h-[1.5px] bg-neutral-800" />
+            <span className="text-[10px] tracking-widest uppercase font-bold text-white">Founder of MOVIQ</span>
+            <span className="w-6 h-[1.5px] bg-neutral-800" />
           </div>
         </div>
       </section>

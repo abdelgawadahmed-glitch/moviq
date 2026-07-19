@@ -11,7 +11,7 @@
 
 @layer base {
   body {
-    @apply bg-white text-black antialiased selection:bg-black selection:text-white;
+    @apply bg-neutral-950 text-white antialiased selection:bg-white selection:text-black;
   }
 }
 
@@ -22,11 +22,11 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #ffffff;
+  background: #0a0a0a;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #000000;
+  background: #333333;
   border-radius: 0px;
 }
 

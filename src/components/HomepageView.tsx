@@ -71,10 +71,10 @@ export default function HomepageView({
     }
   ];
 
-  // Filtering products for different sections
-  const newArrivals = products.filter(p => p.isNew).slice(0, 4);
-  const bestSellers = products.filter(p => p.isBestSeller).slice(0, 4);
-  const luxuryCollection = products.filter(p => p.isLuxury).slice(0, 4);
+  // Filtering products for different sections (showing 5 items for 5-card row layouts)
+  const newArrivals = products.filter(p => p.isNew).slice(0, 5);
+  const bestSellers = products.filter(p => p.isBestSeller).slice(0, 5);
+  const luxuryCollection = products.filter(p => p.isLuxury).slice(0, 5);
 
   // Trending this week: items with rating >= 4.8
   const trendingThisWeek = products
@@ -116,16 +116,33 @@ export default function HomepageView({
   return (
     <div className="space-y-32 pb-24" id="homepage-custom-view">
       
+      {/* Brand Section: Minimal Black Background with Horizontal Logos */}
+      <section className="bg-black py-10 border-b border-neutral-900" id="horizontal-brand-section">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-wrap items-center justify-between gap-x-8 gap-y-6 text-neutral-500 font-sans tracking-[0.25em] text-xs sm:text-sm font-black select-none">
+            {['Nike', 'Jordan', 'Adidas', 'New Balance', 'Puma', 'Asics', 'Converse', 'Vans'].map((brand) => (
+              <button
+                key={brand}
+                onClick={() => onSelectBrand(brand)}
+                className="hover:text-white transition-colors uppercase font-bold text-center flex-1 min-w-[90px] cursor-pointer"
+              >
+                {brand}
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* 1. Featured Brands Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12" id="featured-brands-section">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6" id="featured-brands-section">
         <div className="text-center space-y-4 mb-16">
-          <span className="text-[10px] tracking-[0.3em] font-bold text-neutral-400 uppercase">
+          <span className="text-[10px] tracking-[0.3em] font-bold text-neutral-500 uppercase">
             Curated Fashion Houses
           </span>
-          <h2 className="font-serif text-3.5xl sm:text-4.5xl font-extralight tracking-wide leading-tight text-black uppercase">
+          <h2 className="font-serif text-3.5xl sm:text-4.5xl font-extralight tracking-wide leading-tight text-white uppercase">
             Featured Brands
           </h2>
-          <div className="w-12 h-[1px] bg-black mx-auto mt-2" />
+          <div className="w-12 h-[1px] bg-white/20 mx-auto mt-2" />
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -137,13 +154,13 @@ export default function HomepageView({
               viewport={{ once: true, margin: '-100px' }}
               transition={{ duration: 0.6, delay: idx * 0.08, ease: [0.16, 1, 0.3, 1] }}
               onClick={() => onSelectBrand(brand.name)}
-              className="group relative h-[320px] sm:h-[380px] bg-neutral-900 overflow-hidden cursor-pointer border border-neutral-100"
+              className="group relative h-[320px] sm:h-[380px] bg-neutral-900 overflow-hidden cursor-pointer border border-neutral-800"
               id={`brand-card-${brand.name.toLowerCase()}`}
             >
               <img
                 src={brand.image}
                 alt={brand.name}
-                className="w-full h-full object-cover object-center opacity-70 group-hover:opacity-50 group-hover:scale-105 transition-all duration-[1.2s] ease-out"
+                className="w-full h-full object-cover object-center opacity-60 group-hover:opacity-40 group-hover:scale-105 transition-all duration-[1.2s] ease-out"
                 referrerPolicy="no-referrer"
                 loading="lazy"
                 decoding="async"
@@ -151,7 +168,7 @@ export default function HomepageView({
               <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent" />
               
               <div className="absolute inset-x-0 bottom-0 p-8 flex flex-col justify-end text-white">
-                <span className="text-[9px] tracking-[0.25em] text-neutral-400 font-bold uppercase mb-2">
+                <span className="text-[9px] tracking-[0.25em] text-neutral-500 font-bold uppercase mb-2">
                   Explore Atelier
                 </span>
                 <h3 className="font-serif text-2xl tracking-wider font-light uppercase mb-1">
@@ -174,23 +191,23 @@ export default function HomepageView({
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" id="new-arrivals-section">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-16">
           <div className="space-y-2 text-center md:text-left">
-            <span className="text-[10px] tracking-[0.3em] font-bold text-neutral-400 uppercase block">
+            <span className="text-[10px] tracking-[0.3em] font-bold text-neutral-500 uppercase block">
               The Latest Releases
             </span>
-            <h2 className="font-serif text-3.5xl sm:text-4.5xl font-extralight tracking-wide leading-tight text-black uppercase">
+            <h2 className="font-serif text-3.5xl sm:text-4.5xl font-extralight tracking-wide leading-tight text-white uppercase">
               New Arrivals
             </h2>
           </div>
           <button
             onClick={() => onNavigateTab('New Arrivals')}
-            className="text-black hover:text-neutral-600 font-bold text-[11px] uppercase tracking-[0.25em] flex items-center gap-2 border-b border-black/10 pb-1 hover:border-black transition-all cursor-pointer"
+            className="text-white hover:text-neutral-300 font-bold text-[11px] uppercase tracking-[0.25em] flex items-center gap-2 border-b border-white/10 pb-1 hover:border-white transition-all cursor-pointer"
           >
             <span>View Full Collection</span>
             <ArrowRight size={13} />
           </button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-6 gap-y-12">
           {newArrivals.map((product, idx) => (
             <motion.div
               key={product.id}
@@ -215,23 +232,23 @@ export default function HomepageView({
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" id="best-sellers-section">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-16">
           <div className="space-y-2 text-center md:text-left">
-            <span className="text-[10px] tracking-[0.3em] font-bold text-neutral-400 uppercase block">
+            <span className="text-[10px] tracking-[0.3em] font-bold text-neutral-500 uppercase block">
               The Most Coveted Grails
             </span>
-            <h2 className="font-serif text-3.5xl sm:text-4.5xl font-extralight tracking-wide leading-tight text-black uppercase">
+            <h2 className="font-serif text-3.5xl sm:text-4.5xl font-extralight tracking-wide leading-tight text-white uppercase">
               Best Sellers
             </h2>
           </div>
           <button
             onClick={() => onNavigateTab('Best Sellers')}
-            className="text-black hover:text-neutral-600 font-bold text-[11px] uppercase tracking-[0.25em] flex items-center gap-2 border-b border-black/10 pb-1 hover:border-black transition-all cursor-pointer"
+            className="text-white hover:text-neutral-300 font-bold text-[11px] uppercase tracking-[0.25em] flex items-center gap-2 border-b border-white/10 pb-1 hover:border-white transition-all cursor-pointer"
           >
             <span>View All Bestsellers</span>
             <ArrowRight size={13} />
           </button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-6 gap-y-12">
           {bestSellers.map((product, idx) => (
             <motion.div
               key={product.id}
@@ -397,23 +414,23 @@ export default function HomepageView({
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" id="luxury-collection-section">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-16">
           <div className="space-y-2 text-center md:text-left">
-            <span className="text-[10px] tracking-[0.3em] font-bold text-neutral-400 uppercase block">
+            <span className="text-[10px] tracking-[0.3em] font-bold text-neutral-500 uppercase block">
               Atelier Couture Selection
             </span>
-            <h2 className="font-serif text-3.5xl sm:text-4.5xl font-extralight tracking-wide leading-tight text-black uppercase">
+            <h2 className="font-serif text-3.5xl sm:text-4.5xl font-extralight tracking-wide leading-tight text-white uppercase">
               Luxury Collection
             </h2>
           </div>
           <button
             onClick={() => onNavigateTab('Luxury Collection')}
-            className="text-black hover:text-neutral-600 font-bold text-[11px] uppercase tracking-[0.25em] flex items-center gap-2 border-b border-black/10 pb-1 hover:border-black transition-all cursor-pointer"
+            className="text-white hover:text-neutral-300 font-bold text-[11px] uppercase tracking-[0.25em] flex items-center gap-2 border-b border-white/10 pb-1 hover:border-white transition-all cursor-pointer"
           >
             <span>Explore High-End Pairs</span>
             <ArrowRight size={13} />
           </button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-x-6 gap-y-12">
           {luxuryCollection.map((product, idx) => (
             <motion.div
               key={product.id}
@@ -435,66 +452,66 @@ export default function HomepageView({
       </section>
 
       {/* 6. Why Choose MOVIQ Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-b border-neutral-100 py-24" id="why-choose-section">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-b border-neutral-900 py-24" id="why-choose-section">
         <div className="text-center space-y-4 mb-20">
-          <span className="text-[10px] tracking-[0.3em] font-bold text-neutral-400 uppercase block">
+          <span className="text-[10px] tracking-[0.3em] font-bold text-neutral-500 uppercase block">
             Our Core Pillars
           </span>
-          <h2 className="font-serif text-3.5xl sm:text-4.5xl font-extralight tracking-wide leading-tight text-black uppercase">
+          <h2 className="font-serif text-3.5xl sm:text-4.5xl font-extralight tracking-wide leading-tight text-white uppercase">
             Why Choose MOVIQ
           </h2>
-          <div className="w-12 h-[1px] bg-black mx-auto mt-2" />
+          <div className="w-12 h-[1px] bg-white/20 mx-auto mt-2" />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 text-center">
           {/* Pillar 1 */}
           <div className="space-y-4 flex flex-col items-center">
-            <div className="p-4 bg-neutral-50 rounded-full border border-neutral-100 text-black">
+            <div className="p-4 bg-neutral-900 rounded-full border border-neutral-800 text-white">
               <ShieldCheck size={28} className="stroke-[1.25]" />
             </div>
-            <h3 className="font-serif text-[17px] tracking-wide font-light uppercase text-black">
+            <h3 className="font-serif text-[17px] tracking-wide font-light uppercase text-white">
               100% Certified Verification
             </h3>
-            <p className="text-xs text-neutral-500 font-light leading-relaxed max-w-xs">
+            <p className="text-xs text-neutral-400 font-light leading-relaxed max-w-xs">
               Every single pair undergoes a rigorous multi-point physical verification audit by our expert authenticators prior to dispatch.
             </p>
           </div>
 
           {/* Pillar 2 */}
           <div className="space-y-4 flex flex-col items-center">
-            <div className="p-4 bg-neutral-50 rounded-full border border-neutral-100 text-black">
+            <div className="p-4 bg-neutral-900 rounded-full border border-neutral-800 text-white">
               <Truck size={28} className="stroke-[1.25]" />
             </div>
-            <h3 className="font-serif text-[17px] tracking-wide font-light uppercase text-black">
+            <h3 className="font-serif text-[17px] tracking-wide font-light uppercase text-white">
               White-Glove Egyptian Delivery
             </h3>
-            <p className="text-xs text-neutral-500 font-light leading-relaxed max-w-xs">
+            <p className="text-xs text-neutral-400 font-light leading-relaxed max-w-xs">
               Hand-delivered directly to your doorstep in Cairo, Giza, Alexandria, and all major Egyptian Governorates with premium security.
             </p>
           </div>
 
           {/* Pillar 3 */}
           <div className="space-y-4 flex flex-col items-center">
-            <div className="p-4 bg-neutral-50 rounded-full border border-neutral-100 text-black">
+            <div className="p-4 bg-neutral-900 rounded-full border border-neutral-800 text-white">
               <Lock size={28} className="stroke-[1.25]" />
             </div>
-            <h3 className="font-serif text-[17px] tracking-wide font-light uppercase text-black">
+            <h3 className="font-serif text-[17px] tracking-wide font-light uppercase text-white">
               Encrypted Luxury Checkout
             </h3>
-            <p className="text-xs text-neutral-500 font-light leading-relaxed max-w-xs">
+            <p className="text-xs text-neutral-400 font-light leading-relaxed max-w-xs">
               State-of-the-art secure payment structures. Safe cash on delivery options or direct card handling for stress-free shopping.
             </p>
           </div>
 
           {/* Pillar 4 */}
           <div className="space-y-4 flex flex-col items-center">
-            <div className="p-4 bg-neutral-50 rounded-full border border-neutral-100 text-black">
+            <div className="p-4 bg-neutral-900 rounded-full border border-neutral-800 text-white">
               <Gift size={28} className="stroke-[1.25]" />
             </div>
-            <h3 className="font-serif text-[17px] tracking-wide font-light uppercase text-black">
+            <h3 className="font-serif text-[17px] tracking-wide font-light uppercase text-white">
               Bespoke Custom Packaging
             </h3>
-            <p className="text-xs text-neutral-500 font-light leading-relaxed max-w-xs">
+            <p className="text-xs text-neutral-400 font-light leading-relaxed max-w-xs">
               Your sneakers are packaged inside customized archival box protectors, wrapped meticulously in soft luxury monogram tissue paper.
             </p>
           </div>
@@ -504,13 +521,13 @@ export default function HomepageView({
       {/* 7. Customer Reviews Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" id="customer-reviews-section">
         <div className="text-center space-y-4 mb-20">
-          <span className="text-[10px] tracking-[0.3em] font-bold text-neutral-400 uppercase block">
+          <span className="text-[10px] tracking-[0.3em] font-bold text-neutral-500 uppercase block">
             Client Testimonials
           </span>
-          <h2 className="font-serif text-3.5xl sm:text-4.5xl font-extralight tracking-wide leading-tight text-black uppercase">
+          <h2 className="font-serif text-3.5xl sm:text-4.5xl font-extralight tracking-wide leading-tight text-white uppercase">
             Customer Reviews
           </h2>
-          <div className="w-12 h-[1px] bg-black mx-auto mt-2" />
+          <div className="w-12 h-[1px] bg-white/20 mx-auto mt-2" />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -521,7 +538,7 @@ export default function HomepageView({
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: idx * 0.1, ease: [0.16, 1, 0.3, 1] }}
-              className="bg-neutral-50 border border-neutral-100/80 p-8 sm:p-10 flex flex-col justify-between space-y-8 relative"
+              className="bg-neutral-900/40 border border-neutral-800 p-8 sm:p-10 flex flex-col justify-between space-y-8 relative rounded-2xl"
               id={`review-card-${idx}`}
             >
               {/* Gold Stars */}
@@ -532,26 +549,26 @@ export default function HomepageView({
               </div>
 
               {/* Review Quote text */}
-              <p className="text-xs sm:text-[13px] text-neutral-600 font-light leading-relaxed italic font-serif">
+              <p className="text-xs sm:text-[13px] text-neutral-300 font-light leading-relaxed italic font-serif">
                 &ldquo;{review.quote}&rdquo;
               </p>
 
               {/* Reviewer Meta Details */}
-              <div className="flex items-center justify-between pt-6 border-t border-neutral-200/50">
+              <div className="flex items-center justify-between pt-6 border-t border-neutral-800">
                 <div>
-                  <span className="text-[11.5px] uppercase tracking-[0.12em] text-black font-semibold block">
+                  <span className="text-[11.5px] uppercase tracking-[0.12em] text-white font-semibold block">
                     {review.name}
                   </span>
-                  <span className="text-[9px] uppercase tracking-[0.15em] text-neutral-400 font-medium">
+                  <span className="text-[9px] uppercase tracking-[0.15em] text-neutral-500 font-medium">
                     {review.location}
                   </span>
                 </div>
                 
                 <div className="text-right">
-                  <span className="bg-neutral-200/60 text-black text-[8px] uppercase tracking-[0.18em] font-bold px-2.5 py-1 block w-fit ml-auto">
+                  <span className="bg-neutral-800 text-neutral-300 text-[8px] uppercase tracking-[0.18em] font-bold px-2.5 py-1 block w-fit ml-auto rounded-sm">
                     VERIFIED BUYER
                   </span>
-                  <span className="text-[8.5px] text-neutral-400 font-semibold uppercase mt-1 block">
+                  <span className="text-[8.5px] text-neutral-500 font-semibold uppercase mt-1 block">
                     {review.product}
                   </span>
                 </div>

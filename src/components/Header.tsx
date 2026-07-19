@@ -41,19 +41,14 @@ export default function Header({
   const [joinedLoyalty, setJoinedLoyalty] = useState(false);
   const [email, setEmail] = useState('');
 
-  // Luxury Announcement Cycling
+  // Luxury Announcement Static Bar
   const announcements = [
-    "FREE SHIPPING ACROSS EGYPT",
-    "100% AUTHENTIC SNEAKERS",
-    "30 DAYS RETURN POLICY"
+    "FREE SHIPPING ACROSS EGYPT | 100% AUTHENTIC | 30 DAYS RETURNS"
   ];
   const [announcementIdx, setAnnouncementIdx] = useState(0);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setAnnouncementIdx((prev) => (prev + 1) % announcements.length);
-    }, 4500);
-    return () => clearInterval(interval);
+    // Single static announcement
   }, []);
 
   const navItems = [
@@ -63,8 +58,7 @@ export default function Header({
     { label: 'Brands', value: 'Brands' },
     { label: 'New Arrivals', value: 'New Arrivals' },
     { label: 'Best Sellers', value: 'Best Sellers' },
-    { label: 'Sale', value: 'Sale' },
-    { label: 'Contact', value: 'Contact' }
+    { label: 'Sale', value: 'Sale' }
   ];
 
   const handleNavClick = (val: string) => {
@@ -96,43 +90,11 @@ export default function Header({
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-neutral-200/60 transition-all duration-300 shadow-xs" id="moviq-header">
+    <header className="sticky top-0 z-50 bg-neutral-950/90 backdrop-blur-md border-b border-neutral-900 transition-all duration-300 shadow-xl text-white" id="moviq-header">
       {/* Black Top Announcement Bar */}
-      <div className="w-full bg-black py-2.5 px-4 relative overflow-hidden" id="announcement-bar">
-        <div className="max-w-7xl mx-auto flex items-center justify-between text-[11px] font-medium text-white tracking-[0.25em] uppercase select-none">
-          {/* Left Arrow */}
-          <button
-            onClick={() => setAnnouncementIdx((prev) => (prev - 1 + announcements.length) % announcements.length)}
-            className="p-1 hover:text-neutral-400 transition-colors focus:outline-none"
-            aria-label="Previous announcement"
-          >
-            <ChevronLeft size={13} />
-          </button>
-
-          {/* Announcement text slide/fade carousel */}
-          <div className="relative h-4 flex items-center justify-center overflow-hidden w-full text-center">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={announcementIdx}
-                initial={{ y: 15, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                exit={{ y: -15, opacity: 0 }}
-                transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                className="absolute text-[10px] sm:text-[11px] tracking-[0.25em] font-medium text-neutral-100 font-sans"
-              >
-                {announcements[announcementIdx]}
-              </motion.div>
-            </AnimatePresence>
-          </div>
-
-          {/* Right Arrow */}
-          <button
-            onClick={() => setAnnouncementIdx((prev) => (prev + 1) % announcements.length)}
-            className="p-1 hover:text-neutral-400 transition-colors focus:outline-none"
-            aria-label="Next announcement"
-          >
-            <ChevronRight size={13} />
-          </button>
+      <div className="w-full bg-black py-2.5 px-4 relative overflow-hidden border-b border-neutral-900" id="announcement-bar">
+        <div className="max-w-7xl mx-auto flex items-center justify-center text-[10px] sm:text-[11px] font-medium text-neutral-200 tracking-[0.25em] uppercase select-none text-center">
+          {announcements[0]}
         </div>
       </div>
 
@@ -142,7 +104,7 @@ export default function Header({
         <div className="flex items-center gap-4">
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-1.5 text-black hover:text-neutral-600 transition-colors cursor-pointer"
+            className="md:hidden p-1.5 text-white hover:text-neutral-300 transition-colors cursor-pointer"
             aria-label="Toggle mobile menu"
             id="mobile-menu-btn"
           >
@@ -155,7 +117,7 @@ export default function Header({
               setActiveTab('Home');
               setSelectedBrand('');
             }}
-            className="text-2xl sm:text-3xl font-serif font-black tracking-[0.2em] text-black select-none cursor-pointer hover:opacity-80 transition-opacity"
+            className="text-2xl sm:text-3xl font-serif font-black tracking-[0.2em] text-white select-none cursor-pointer hover:opacity-80 transition-opacity"
             id="logo-brand"
           >
             MOVIQ
@@ -164,7 +126,7 @@ export default function Header({
 
         {/* Center: Improved Navigation Options with Luxury Layout */}
         <nav 
-          className="hidden md:flex items-center gap-1 lg:gap-2.5 xl:gap-4 text-[12px] uppercase tracking-[0.18em] font-medium text-neutral-500" 
+          className="hidden md:flex items-center gap-1 lg:gap-2.5 xl:gap-4 text-[12px] uppercase tracking-[0.18em] font-medium text-neutral-400" 
           id="desktop-nav"
         >
           {navItems.map((item) => {
@@ -180,8 +142,8 @@ export default function Header({
                     onClick={() => {
                       setIsBrandsDropdownOpen(!isBrandsDropdownOpen);
                     }}
-                    className={`px-3 py-2.5 flex items-center gap-1.5 hover:text-black transition-colors cursor-pointer ${
-                      activeTab === 'Brands' ? 'text-black font-bold' : ''
+                    className={`px-3 py-2.5 flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer ${
+                      activeTab === 'Brands' ? 'text-white font-bold' : ''
                     }`}
                     id={`nav-item-${item.value.toLowerCase()}`}
                   >
@@ -197,9 +159,9 @@ export default function Header({
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 8, scale: 0.99 }}
                         transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                        className="absolute top-full left-1/2 -translate-x-1/2 mt-1 w-[460px] bg-white border border-neutral-200/80 shadow-2xl p-6 rounded-none z-50"
+                        className="absolute top-full left-1/2 -translate-x-1/2 mt-1 w-[460px] bg-neutral-900 border border-neutral-800 shadow-2xl p-6 rounded-none z-50"
                       >
-                        <div className="pb-3 border-b border-neutral-100 text-[10px] text-neutral-400 font-bold tracking-[0.15em] uppercase">
+                        <div className="pb-3 border-b border-neutral-800 text-[10px] text-neutral-500 font-bold tracking-[0.15em] uppercase">
                           Our Curated Fashion Houses
                         </div>
                         <div className="grid grid-cols-3 gap-x-4 gap-y-2.5 pt-4">
@@ -207,7 +169,7 @@ export default function Header({
                             <button
                               key={brand}
                               onClick={() => handleBrandSelect(brand)}
-                              className="text-left py-1 text-[11px] text-neutral-600 hover:text-black hover:translate-x-1.5 transition-all font-medium uppercase tracking-[0.12em]"
+                              className="text-left py-1 text-[11px] text-neutral-400 hover:text-white hover:translate-x-1.5 transition-all font-medium uppercase tracking-[0.12em]"
                             >
                               {brand}
                             </button>
@@ -225,8 +187,8 @@ export default function Header({
               <button
                 key={item.value}
                 onClick={() => handleNavClick(item.value)}
-                className={`px-3 py-2.5 relative hover:text-black transition-colors cursor-pointer ${
-                  isActive ? 'text-black font-bold' : ''
+                className={`px-3 py-2.5 relative hover:text-white transition-colors cursor-pointer ${
+                  isActive ? 'text-white font-bold' : ''
                 }`}
                 id={`nav-item-${item.value.toLowerCase()}`}
               >
@@ -234,7 +196,7 @@ export default function Header({
                 {isActive && (
                   <motion.span
                     layoutId="activeNavUnderline"
-                    className="absolute bottom-0 left-3 right-3 h-[1.5px] bg-black"
+                    className="absolute bottom-0 left-3 right-3 h-[1.5px] bg-white"
                     transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                   />
                 )}
@@ -244,12 +206,12 @@ export default function Header({
         </nav>
 
         {/* Right Icons: Added Search, Wishlist, Account, Cart */}
-        <div className="flex items-center gap-1.5 sm:gap-3 text-black" id="right-actions">
+        <div className="flex items-center gap-1.5 sm:gap-3 text-white" id="right-actions">
           {/* Search Toggle Button */}
           <button
             onClick={() => setIsSearchOpen(!isSearchOpen)}
-            className={`p-2 hover:text-neutral-500 transition-all relative cursor-pointer hover:scale-105 active:scale-95 ${
-              isSearchOpen ? 'text-neutral-500' : ''
+            className={`p-2 hover:text-neutral-400 transition-all relative cursor-pointer hover:scale-105 active:scale-95 ${
+              isSearchOpen ? 'text-neutral-400' : ''
             }`}
             aria-label="Toggle search bar"
             id="search-toggle"
@@ -260,7 +222,7 @@ export default function Header({
           {/* Account Button */}
           <button
             onClick={() => setIsAccountOpen(true)}
-            className="p-2 hover:text-neutral-500 transition-all cursor-pointer hover:scale-105 active:scale-95"
+            className="p-2 hover:text-neutral-400 transition-all cursor-pointer hover:scale-105 active:scale-95"
             aria-label="Account details"
             id="account-btn"
           >
@@ -270,7 +232,7 @@ export default function Header({
           {/* Wishlist Button with Counter */}
           <button
             onClick={onWishlistClick}
-            className="p-2 hover:text-neutral-500 transition-all relative cursor-pointer hover:scale-105 active:scale-95"
+            className="p-2 hover:text-neutral-400 transition-all relative cursor-pointer hover:scale-105 active:scale-95"
             aria-label="Open wishlist"
             id="wishlist-btn"
           >
@@ -281,7 +243,7 @@ export default function Header({
                   initial={{ scale: 0.7, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   exit={{ scale: 0.7, opacity: 0 }}
-                  className="absolute -top-0.5 -right-0.5 w-[16px] h-[16px] bg-black text-white rounded-full flex items-center justify-center text-[9px] font-bold"
+                  className="absolute -top-0.5 -right-0.5 w-[16px] h-[16px] bg-white text-black rounded-full flex items-center justify-center text-[9px] font-extrabold"
                 >
                   {wishlistCount}
                 </motion.span>
@@ -292,7 +254,7 @@ export default function Header({
           {/* Cart Button with Counter */}
           <button
             onClick={onCartClick}
-            className="p-2 hover:text-neutral-500 transition-all relative cursor-pointer hover:scale-105 active:scale-95"
+            className="p-2 hover:text-neutral-400 transition-all relative cursor-pointer hover:scale-105 active:scale-95"
             aria-label="Open cart"
             id="cart-btn"
           >
@@ -303,7 +265,7 @@ export default function Header({
                   initial={{ scale: 0.7, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   exit={{ scale: 0.7, opacity: 0 }}
-                  className="absolute -top-0.5 -right-0.5 w-[16px] h-[16px] bg-black text-white rounded-full flex items-center justify-center text-[9px] font-bold"
+                  className="absolute -top-0.5 -right-0.5 w-[16px] h-[16px] bg-white text-black rounded-full flex items-center justify-center text-[9px] font-extrabold"
                 >
                   {cartCount}
                 </motion.span>
@@ -320,7 +282,7 @@ export default function Header({
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="bg-neutral-50 border-b border-neutral-200 overflow-hidden"
+            className="bg-neutral-900 border-b border-neutral-800 overflow-hidden"
             id="search-panel"
           >
             <div className="max-w-4xl mx-auto px-4 py-5 flex items-center gap-4">
@@ -331,14 +293,14 @@ export default function Header({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 aria-label="Search authentic sneakers"
-                className="w-full bg-transparent border-b border-neutral-300 focus:border-black py-2 text-sm outline-none text-black tracking-wide"
+                className="w-full bg-transparent border-b border-neutral-800 focus:border-white py-2 text-sm outline-none text-white tracking-wide placeholder:text-neutral-500"
                 autoFocus
                 id="search-input"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="text-xs uppercase tracking-wider text-neutral-500 hover:text-black font-semibold transition-colors"
+                  className="text-xs uppercase tracking-wider text-neutral-400 hover:text-white font-semibold transition-colors cursor-pointer"
                 >
                   Clear
                 </button>
@@ -347,7 +309,7 @@ export default function Header({
                 onClick={() => {
                   setIsSearchOpen(false);
                 }}
-                className="p-1.5 hover:bg-neutral-200 transition-colors rounded-full"
+                className="p-1.5 hover:bg-neutral-800 text-white transition-colors rounded-full cursor-pointer"
                 aria-label="Close search"
               >
                 <X size={18} />
@@ -355,11 +317,11 @@ export default function Header({
             </div>
 
             {/* Live Search Suggestions and Matches Dropdown */}
-            <div className="max-w-4xl mx-auto px-4 pb-6 pt-2 border-t border-neutral-100">
+            <div className="max-w-4xl mx-auto px-4 pb-6 pt-2 border-t border-neutral-800">
               <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
                 {/* Suggestions Section - 4 columns */}
                 <div className="md:col-span-4 space-y-3">
-                  <h4 className="text-[10px] text-neutral-400 font-bold uppercase tracking-[0.15em]">
+                  <h4 className="text-[10px] text-neutral-500 font-bold uppercase tracking-[0.15em]">
                     Suggestions
                   </h4>
                   <div className="flex flex-wrap md:flex-col gap-2">
@@ -367,7 +329,7 @@ export default function Header({
                       <button
                         key={term}
                         onClick={() => setSearchQuery(term)}
-                        className="text-left text-xs text-neutral-600 hover:text-black hover:translate-x-1 transition-all py-1.5 px-3 md:px-0 bg-neutral-200/50 md:bg-transparent rounded-full md:rounded-none"
+                        className="text-left text-xs text-neutral-400 hover:text-white hover:translate-x-1 transition-all py-1.5 px-3 md:px-0 bg-neutral-800/50 md:bg-transparent rounded-full md:rounded-none cursor-pointer"
                       >
                         🔎 {term}
                       </button>
@@ -377,7 +339,7 @@ export default function Header({
 
                 {/* Match Results Section - 8 columns */}
                 <div className="md:col-span-8 space-y-3">
-                  <h4 className="text-[10px] text-neutral-400 font-bold uppercase tracking-[0.15em]">
+                  <h4 className="text-[10px] text-neutral-500 font-bold uppercase tracking-[0.15em]">
                     {searchQuery ? 'Live Matches' : 'Featured Grails'}
                   </h4>
                   <div className="space-y-2">
@@ -391,7 +353,7 @@ export default function Header({
                         p.description.toLowerCase().includes(query)
                       );
                     }).slice(0, 5)).length === 0 ? (
-                      <p className="text-xs text-neutral-400 italic">No matching luxury sneakers found.</p>
+                      <p className="text-xs text-neutral-500 italic">No matching luxury sneakers found.</p>
                     ) : (
                       ((products || []).filter((p) => {
                         const query = searchQuery.toLowerCase().trim();
@@ -405,18 +367,18 @@ export default function Header({
                       }).slice(0, 5)).map((p) => (
                         <div
                           key={p.id}
-                          className="flex items-center justify-between p-2 hover:bg-neutral-100 transition-colors rounded-xl border border-neutral-200/40 group/item cursor-pointer"
+                          className="flex items-center justify-between p-2 hover:bg-neutral-850 transition-colors rounded-xl border border-neutral-800/50 group/item cursor-pointer"
                           onClick={() => {
                             if (onQuickView) {
-                              onQuickView(p);
-                              setIsSearchOpen(false);
+                               onQuickView(p);
+                               setIsSearchOpen(false);
                             } else {
                               setSearchQuery(p.name);
                             }
                           }}
                         >
                           <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 bg-white rounded-lg border border-neutral-100 overflow-hidden flex items-center justify-center p-1">
+                            <div className="w-12 h-12 bg-neutral-950 rounded-lg border border-neutral-800 overflow-hidden flex items-center justify-center p-1">
                               <img
                                 src={p.image}
                                 alt={p.name}
@@ -427,10 +389,10 @@ export default function Header({
                               />
                             </div>
                             <div>
-                              <span className="text-[9px] tracking-wider text-neutral-400 font-bold uppercase block">
+                              <span className="text-[9px] tracking-wider text-neutral-500 font-bold uppercase block">
                                 {p.brand}
                               </span>
-                              <span className="text-xs text-black font-medium line-clamp-1">
+                              <span className="text-xs text-white font-medium line-clamp-1">
                                 {p.name}
                               </span>
                             </div>
@@ -438,16 +400,16 @@ export default function Header({
                           
                           <div className="flex items-center gap-3">
                             <div className="text-right">
-                              <span className="text-xs font-bold font-serif text-black block">
+                              <span className="text-xs font-bold font-serif text-white block">
                                 {p.salePrice.toLocaleString()} EGP
                               </span>
                               {p.discount > 0 && (
-                                <span className="text-[9.5px] line-through text-neutral-400">
+                                <span className="text-[9.5px] line-through text-neutral-500">
                                   {p.originalPrice.toLocaleString()} EGP
                                 </span>
                               )}
                             </div>
-                            <span className="text-[9px] uppercase tracking-widest text-neutral-400 group-hover/item:text-black font-bold flex items-center gap-0.5 pl-1">
+                            <span className="text-[9px] uppercase tracking-widest text-neutral-500 group-hover/item:text-white font-bold flex items-center gap-0.5 pl-1">
                               <span>View</span>
                               <ArrowRight size={10} className="group-hover/item:translate-x-1 transition-transform" />
                             </span>
@@ -460,8 +422,8 @@ export default function Header({
               </div>
             </div>
             {searchQuery && (
-              <div className="max-w-4xl mx-auto px-4 pb-4 border-t border-neutral-100 pt-3">
-                <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-[0.15em]">
+              <div className="max-w-4xl mx-auto px-4 pb-4 border-t border-neutral-800 pt-3">
+                <span className="text-[10px] text-neutral-500 font-bold uppercase tracking-[0.15em]">
                   Filtering catalog by: &ldquo;{searchQuery}&rdquo;
                 </span>
               </div>
