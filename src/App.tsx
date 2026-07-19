@@ -11,9 +11,70 @@ import CartDrawer from './components/CartDrawer';
 import WishlistDrawer from './components/WishlistDrawer';
 import CheckoutModal from './components/CheckoutModal';
 import Footer from './components/Footer';
+import HomepageView from './components/HomepageView';
+import AdminDashboard from './components/AdminDashboard';
+import MoviqAssistant from './components/MoviqAssistant';
 
 import { PRODUCTS } from './data/products';
 import { Product, CartItem, FilterState, Review } from './types';
+
+function SkeletonCard() {
+  return (
+    <div className="bg-white rounded-3xl overflow-hidden border border-neutral-100/70 p-6 flex flex-col h-full space-y-4 shadow-[0_4px_20px_rgba(0,0,0,0.015)] relative">
+      {/* Image skeleton */}
+      <div className="relative aspect-[4/5] bg-neutral-50 rounded-2xl overflow-hidden flex items-center justify-center p-5">
+        <motion.div
+          className="absolute inset-0 bg-gradient-to-r from-transparent via-neutral-100/60 to-transparent"
+          initial={{ x: '-100%' }}
+          animate={{ x: '100%' }}
+          transition={{ repeat: Infinity, duration: 1.5, ease: 'linear' }}
+        />
+      </div>
+      
+      {/* Brand & Name skeleton */}
+      <div className="space-y-2">
+        <div className="h-3 w-1/4 bg-neutral-100 rounded-md relative overflow-hidden">
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-neutral-100/60 to-transparent"
+            initial={{ x: '-100%' }}
+            animate={{ x: '100%' }}
+            transition={{ repeat: Infinity, duration: 1.5, ease: 'linear' }}
+          />
+        </div>
+        <div className="h-4.5 w-3/4 bg-neutral-100 rounded-md relative overflow-hidden">
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-neutral-100/60 to-transparent"
+            initial={{ x: '-100%' }}
+            animate={{ x: '100%' }}
+            transition={{ repeat: Infinity, duration: 1.5, ease: 'linear' }}
+          />
+        </div>
+      </div>
+
+      {/* Stars rating skeleton */}
+      <div className="flex gap-1">
+        {[1, 2, 3, 4, 5].map((i) => (
+          <div key={i} className="w-2.5 h-2.5 bg-neutral-100 rounded-full" />
+        ))}
+      </div>
+
+      {/* Available sizes skeleton */}
+      <div className="space-y-2 pt-3 border-t border-neutral-100/70">
+        <div className="h-2 w-1/4 bg-neutral-100 rounded-md" />
+        <div className="flex gap-1.5">
+          <div className="h-5 w-8 bg-neutral-100 rounded-md" />
+          <div className="h-5 w-8 bg-neutral-100 rounded-md" />
+          <div className="h-5 w-8 bg-neutral-100 rounded-md" />
+        </div>
+      </div>
+
+      {/* Price skeleton */}
+      <div className="pt-4 border-t border-neutral-100/70 flex justify-between items-center mt-auto">
+        <div className="h-4 w-20 bg-neutral-100 rounded-md" />
+      </div>
+    </div>
+  );
+}
 
 export default function App() {
   // --- STATE PERSISTENCE ---
@@ -55,14 +116,39 @@ export default function App() {
     color: '',
     priceRange: [0, 50000],
     searchQuery: '',
-    sortBy: 'featured'
+    sortBy: 'featured',
+    gender: 'all',
+    availability: 'all'
   });
+
+  const [isCatalogLoading, setIsCatalogLoading] = useState(false);
+
+  useEffect(() => {
+    if (activeTab === 'Home') return;
+    setIsCatalogLoading(true);
+    const timer = setTimeout(() => {
+      setIsCatalogLoading(false);
+    }, 450);
+    return () => clearTimeout(timer);
+  }, [
+    activeTab,
+    filters.brand,
+    filters.category,
+    filters.size,
+    filters.color,
+    filters.priceRange,
+    filters.searchQuery,
+    filters.sortBy,
+    filters.gender,
+    filters.availability
+  ]);
 
   // Drawer toggles
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [selectedQuickProduct, setSelectedQuickProduct] = useState<Product | null>(null);
+  const [isAdminView, setIsAdminView] = useState(false);
 
   // Discount code applied from Cart to Checkout
   const [activeDiscountRate, setActiveDiscountRate] = useState(0);
@@ -109,6 +195,20 @@ export default function App() {
       if (filters.size && !p.sizes.includes(filters.size)) return false;
       if (filters.color && !p.colors.some((c) => c.name === filters.color)) return false;
       if (p.salePrice < filters.priceRange[0] || p.salePrice > filters.priceRange[1]) return false;
+
+      // Gender filter
+      if (filters.gender && filters.gender !== 'all') {
+        if (filters.gender === 'men' && !isProductForMen(p)) return false;
+        if (filters.gender === 'women' && !isProductForWomen(p)) return false;
+      }
+
+      // Availability filter
+      if (filters.availability && filters.availability === 'in-stock') {
+        // A product is out of stock if its id sum of chars is divisible by 9
+        const charCodeSum = p.id.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0);
+        const inStock = charCodeSum % 9 !== 0;
+        if (!inStock) return false;
+      }
 
       // 3. Search Bar Input
       if (filters.searchQuery) {
@@ -278,6 +378,16 @@ export default function App() {
 
   const wishlistedProducts = products.filter((p) => wishlist.includes(p.id));
 
+  if (isAdminView) {
+    return (
+      <AdminDashboard
+        onClose={() => setIsAdminView(false)}
+        products={products}
+        setProducts={setProducts}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-white text-black flex flex-col font-sans selection:bg-black selection:text-white relative" id="moviq-app-root">
       
@@ -292,6 +402,8 @@ export default function App() {
         searchQuery={filters.searchQuery}
         setSearchQuery={(q) => setFilters((prev) => ({ ...prev, searchQuery: q }))}
         setSelectedBrand={handleSelectedBrandFromHeader}
+        products={products}
+        onQuickView={(pTarget) => setSelectedQuickProduct(pTarget)}
       />
 
       {/* 2. Hero Section */}
@@ -301,113 +413,86 @@ export default function App() {
         onScrollToCatalog={handleScrollToCatalog}
       />
 
-      {/* 3. Editorial Spotlight Banners (Only on HOME tab for Dior/Apple style luxury storytelling) */}
-      {activeTab === 'Home' && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16" id="home-spotlight">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center bg-neutral-50 p-8 sm:p-12 border border-neutral-100">
-            <div className="space-y-4 max-w-md">
-              <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-[0.2em] block">
-                Seasonal Spotlight
-              </span>
-              <h2 className="font-serif text-3xl sm:text-4.5xl font-extralight tracking-wide leading-tight text-black uppercase">
-                AUTHENTIC SNEAKER COUTURE
-              </h2>
-              <p className="text-xs text-neutral-500 font-light leading-relaxed">
-                Discover rare luxury trainers and limited-release retros. Every pair undergoes a rigorous multi-point verification audit by our experts, analyzing stitching, materials, and sole density to ensure you receive 100% authentic grail sneakers.
-              </p>
-              <div className="pt-4 flex items-center gap-4">
-                <button
-                  onClick={() => handleTabChange('Luxury Collection')}
-                  className="bg-black hover:bg-neutral-800 text-white font-semibold text-[10.5px] uppercase tracking-widest px-6 py-3 rounded-none transition-colors cursor-pointer"
-                >
-                  View Archive
-                </button>
-                <button
-                  onClick={handleScrollToCatalog}
-                  className="text-black hover:text-neutral-600 font-bold text-[10.5px] uppercase tracking-widest flex items-center gap-1.5 transition-colors cursor-pointer"
-                >
-                  <span>Browse Showcase</span>
-                  <ArrowRight size={13} />
-                </button>
-              </div>
-            </div>
-
-            <div className="relative aspect-video sm:aspect-[4/3] max-h-[380px] overflow-hidden bg-white border border-neutral-100 p-2">
-              <img
-                src="https://images.unsplash.com/photo-1552346154-21d32810aba3?w=800&q=80"
-                alt="Authenticity Vault"
-                className="w-full h-full object-cover object-center transition-transform duration-[10s] hover:scale-105"
-                referrerPolicy="no-referrer"
-              />
-              <div className="absolute bottom-4 right-4 bg-black/90 backdrop-blur-md px-3.5 py-1.5 text-[9px] uppercase font-bold tracking-widest text-white shadow-lg">
-                100% Authentic
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* 4. Filter Panel & Catalog Showcase */}
-      <div className="scroll-mt-20 pt-16 pb-24" ref={catalogRef} id="showcase-catalog-container">
-        
-        {/* Sizing & Sorting Board */}
-        <Filters
-          filters={filters}
-          setFilters={setFilters}
-          totalProductsCount={products.length}
-          filteredCount={filteredProducts.length}
+      {/* 3. Homepage Custom Premium Sections OR Catalog Showcase */}
+      {activeTab === 'Home' ? (
+        <HomepageView
+          products={products}
+          wishlist={wishlist}
+          onWishlistToggle={handleWishlistToggle}
+          onQuickView={(pTarget) => setSelectedQuickProduct(pTarget)}
+          onAddToCart={handleAddToCart}
+          onSelectBrand={handleSelectedBrandFromHeader}
+          onNavigateTab={handleTabChange}
         />
+      ) : (
+        <div className="scroll-mt-20 pt-16 pb-24" ref={catalogRef} id="showcase-catalog-container">
+          {/* Sizing & Sorting Board */}
+          <Filters
+            filters={filters}
+            setFilters={setFilters}
+            totalProductsCount={products.length}
+            filteredCount={filteredProducts.length}
+          />
 
-        {/* Catalog Grid Area */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10">
-          {filteredProducts.length === 0 ? (
-            <div className="text-center py-24 space-y-4">
-              <span className="text-neutral-400 text-sm block font-light italic">
-                No matching luxury creations discovered in our inventory.
-              </span>
-              <button
-                onClick={() =>
-                  setFilters({
-                    brand: '',
-                    category: 'All Collections',
-                    size: '',
-                    color: '',
-                    priceRange: [0, 50000],
-                    searchQuery: '',
-                    sortBy: 'featured'
-                  })
-                }
-                className="bg-black hover:bg-neutral-800 text-white font-bold text-[10px] uppercase tracking-widest px-6 py-3 rounded-none transition-colors cursor-pointer"
-              >
-                Reset Search Filters
-              </button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-12">
-              <AnimatePresence mode="popLayout">
-                {filteredProducts.map((p) => (
-                  <motion.div
-                    key={p.id}
-                    layout
-                    initial={{ opacity: 0, scale: 0.98 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.98 }}
-                    transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                  >
-                    <ProductCard
-                      product={p}
-                      isWishlisted={wishlist.includes(p.id)}
-                      onWishlistToggle={handleWishlistToggle}
-                      onQuickView={(pTarget) => setSelectedQuickProduct(pTarget)}
-                      onAddToCart={handleAddToCart}
-                    />
-                  </motion.div>
+          {/* Catalog Grid Area */}
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10">
+            {filteredProducts.length === 0 ? (
+              <div className="text-center py-24 space-y-4">
+                <span className="text-neutral-400 text-sm block font-light italic">
+                  No matching luxury creations discovered in our inventory.
+                </span>
+                <button
+                  onClick={() =>
+                    setFilters({
+                      brand: '',
+                      category: 'All Collections',
+                      size: '',
+                      color: '',
+                      priceRange: [0, 50000],
+                      searchQuery: '',
+                      sortBy: 'featured',
+                      gender: 'all',
+                      availability: 'all'
+                    })
+                  }
+                  className="bg-black hover:bg-neutral-800 text-white font-bold text-[10px] uppercase tracking-widest px-6 py-3 rounded-none transition-colors cursor-pointer"
+                >
+                  Reset Search Filters
+                </button>
+              </div>
+            ) : isCatalogLoading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-12">
+                {Array.from({ length: Math.max(4, filteredProducts.length) }).map((_, i) => (
+                  <SkeletonCard key={i} />
                 ))}
-              </AnimatePresence>
-            </div>
-          )}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-12">
+                <AnimatePresence mode="popLayout">
+                  {filteredProducts.map((p) => (
+                    <motion.div
+                      key={p.id}
+                      layout
+                      initial={{ opacity: 0, scale: 0.98 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.98 }}
+                      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                    >
+                      <ProductCard
+                        product={p}
+                        isWishlisted={wishlist.includes(p.id)}
+                        onWishlistToggle={handleWishlistToggle}
+                        onQuickView={(pTarget) => setSelectedQuickProduct(pTarget)}
+                        onAddToCart={handleAddToCart}
+                      />
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* 5. Luxury Brand Philosophy Accent Banner */}
       <section className="bg-neutral-50 py-16 border-t border-b border-neutral-100" id="brand-philosophy">
@@ -427,7 +512,7 @@ export default function App() {
       </section>
 
       {/* 6. Footer Links */}
-      <Footer />
+      <Footer onAdminClick={() => setIsAdminView(true)} />
 
       {/* --- SIDE DRAWERS & OVERLAYS --- */}
 
@@ -510,6 +595,9 @@ export default function App() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Dynamic interactive AI mascot assistant */}
+      <MoviqAssistant />
     </div>
   );
 }

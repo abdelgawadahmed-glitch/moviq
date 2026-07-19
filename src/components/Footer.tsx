@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import { Mail, ArrowRight, Instagram, Twitter, Facebook, Check, Globe, HelpCircle } from 'lucide-react';
 
-export default function Footer() {
+interface FooterProps {
+  onAdminClick?: () => void;
+}
+
+export default function Footer({ onAdminClick }: FooterProps) {
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
 
@@ -104,6 +108,7 @@ export default function Footer() {
                   <input
                     type="email"
                     required
+                    aria-label="Email address for newsletter"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter email address..."
@@ -134,6 +139,19 @@ export default function Footer() {
             </span>
             <span className="text-neutral-700">|</span>
             <span>Cairo, Egypt</span>
+            {onAdminClick && (
+              <>
+                <span className="text-neutral-700">|</span>
+                <button
+                  type="button"
+                  onClick={onAdminClick}
+                  className="hover:text-white text-neutral-400 transition-colors cursor-pointer text-[10px] font-black tracking-widest uppercase bg-transparent border-none p-0 outline-none"
+                  id="footer-admin-link"
+                >
+                  Admin Portal
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>

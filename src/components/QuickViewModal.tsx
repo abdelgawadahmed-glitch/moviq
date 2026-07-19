@@ -107,6 +107,8 @@ export default function QuickViewModal({
               alt={product.name}
               className="w-full h-full object-cover object-center transition-transform duration-500 hover:scale-105"
               referrerPolicy="no-referrer"
+              loading="lazy"
+              decoding="async"
             />
           </div>
 
@@ -121,7 +123,7 @@ export default function QuickViewModal({
                     activeImage === imgUrl ? 'border-black ring-1 ring-black' : 'border-neutral-200 hover:border-black'
                   }`}
                 >
-                  <img src={imgUrl} alt="Thumbnail preview" className="w-full h-full object-cover object-center" referrerPolicy="no-referrer" />
+                  <img src={imgUrl} alt="Thumbnail preview" className="w-full h-full object-cover object-center" referrerPolicy="no-referrer" loading="lazy" decoding="async" />
                 </button>
               ))}
             </div>

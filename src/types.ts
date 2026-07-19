@@ -43,4 +43,6 @@ export interface FilterState {
   priceRange: [number, number];
   searchQuery: string;
   sortBy: 'featured' | 'bestselling' | 'low-high' | 'high-low' | 'newest';
+  gender?: 'all' | 'men' | 'women';
+  availability?: 'all' | 'in-stock';
 }

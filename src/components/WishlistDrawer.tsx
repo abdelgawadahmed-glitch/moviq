@@ -81,64 +81,76 @@ export default function WishlistDrawer({
                 </button>
               </div>
             ) : (
-              <div className="divide-y divide-neutral-100">
-                {wishlistedProducts.map((product) => {
-                  const defaultSize = product.sizes[0] || 'M';
-                  const defaultColor = product.colors[0] || { name: 'Noir Black', hex: '#000000' };
+              <div className="divide-y divide-neutral-100 relative">
+                <AnimatePresence mode="popLayout">
+                  {wishlistedProducts.map((product) => {
+                    const defaultSize = product.sizes[0] || 'M';
+                    const defaultColor = product.colors[0] || { name: 'Noir Black', hex: '#000000' };
 
-                  return (
-                    <div key={product.id} className="py-4 first:pt-0 last:pb-0 flex gap-4">
-                      {/* Product Image */}
-                      <div className="w-16 aspect-[3/4] bg-neutral-50 border border-neutral-100 shrink-0 overflow-hidden flex items-center justify-center p-1">
-                        <img
-                          src={product.image}
-                          alt={product.name}
-                          className="w-full h-full object-cover object-center"
-                          referrerPolicy="no-referrer"
-                        />
-                      </div>
+                    return (
+                      <motion.div
+                        key={product.id}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                        className="py-4 first:pt-0 last:pb-0 flex gap-4"
+                        layout
+                      >
+                        {/* Product Image */}
+                        <div className="w-16 aspect-[3/4] bg-neutral-50 border border-neutral-100 shrink-0 overflow-hidden flex items-center justify-center p-1">
+                          <img
+                            src={product.image}
+                            alt={product.name}
+                            className="w-full h-full object-cover object-center"
+                            referrerPolicy="no-referrer"
+                            loading="lazy"
+                            decoding="async"
+                          />
+                        </div>
 
-                      {/* Info and action */}
-                      <div className="flex-1 flex flex-col justify-between">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <span className="text-[9px] tracking-widest text-neutral-400 font-bold uppercase block">
-                              {product.brand}
-                            </span>
-                            <h4 className="text-xs font-serif text-black font-semibold tracking-wide line-clamp-1">
-                              {product.name}
-                            </h4>
-                            <span className="text-accent-red font-bold text-xs font-serif mt-1 block">
-                              {product.salePrice.toLocaleString()} EGP
-                            </span>
+                        {/* Info and action */}
+                        <div className="flex-1 flex flex-col justify-between">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <span className="text-[9px] tracking-widest text-neutral-400 font-bold uppercase block">
+                                {product.brand}
+                              </span>
+                              <h4 className="text-xs font-serif text-black font-semibold tracking-wide line-clamp-1">
+                                {product.name}
+                              </h4>
+                              <span className="text-accent-red font-bold text-xs font-serif mt-1 block">
+                                {product.salePrice.toLocaleString()} EGP
+                              </span>
+                            </div>
+                            
+                            <button
+                              onClick={() => onRemoveFromWishlist(product.id)}
+                              className="p-1 text-neutral-400 hover:text-black transition-colors"
+                              title="Remove favorite"
+                            >
+                              <Trash2 size={13} />
+                            </button>
                           </div>
-                          
-                          <button
-                            onClick={() => onRemoveFromWishlist(product.id)}
-                            className="p-1 text-neutral-400 hover:text-black transition-colors"
-                            title="Remove favorite"
-                          >
-                            <Trash2 size={13} />
-                          </button>
-                        </div>
 
-                        {/* Move/Add to Cart Button */}
-                        <div className="pt-2">
-                          <button
-                            onClick={() => {
-                              onAddToCart(product, defaultSize, defaultColor);
-                              onRemoveFromWishlist(product.id);
-                            }}
-                            className="w-full bg-neutral-100 hover:bg-black hover:text-white text-black font-semibold text-[9.5px] uppercase tracking-widest py-2 rounded-none transition-all flex items-center justify-center gap-1.5 cursor-pointer border border-neutral-200 hover:border-black"
-                          >
-                            <ShoppingBag size={11} />
-                            <span>Add To Bag</span>
-                          </button>
+                          {/* Move/Add to Cart Button */}
+                          <div className="pt-2">
+                            <button
+                              onClick={() => {
+                                onAddToCart(product, defaultSize, defaultColor);
+                                onRemoveFromWishlist(product.id);
+                              }}
+                              className="w-full bg-neutral-100 hover:bg-black hover:text-white text-black font-semibold text-[9.5px] uppercase tracking-widest py-2 rounded-none transition-all flex items-center justify-center gap-1.5 cursor-pointer border border-neutral-200 hover:border-black"
+                            >
+                              <ShoppingBag size={11} />
+                              <span>Add To Bag</span>
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                  );
-                })}
+                      </motion.div>
+                    );
+                  })}
+                </AnimatePresence>
               </div>
             )}
           </div>
