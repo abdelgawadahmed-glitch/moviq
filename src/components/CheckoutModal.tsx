@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, CreditCard, ShoppingBag, Truck, CheckCircle, ArrowLeft, Loader, ShieldCheck, Heart, Sparkles } from 'lucide-react';
 import { CartItem } from '../types';
+import { useI18n } from '../lib/i18n';
 
 interface CheckoutModalProps {
   isOpen: boolean;
@@ -50,6 +51,7 @@ export default function CheckoutModal({
   appliedCode,
   onOrderSuccess
 }: CheckoutModalProps) {
+  const { t } = useI18n();
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [paymentMethod, setPaymentMethod] = useState<'visa' | 'mastercard' | 'meeza' | 'cod'>('visa');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -181,15 +183,15 @@ export default function CheckoutModal({
           {step !== 3 && (
             <div className="flex items-center gap-4 mb-6 text-[10px] uppercase tracking-[0.2em] font-extrabold text-neutral-400 border-b border-neutral-100 pb-4">
               <span className={step === 1 ? 'text-black font-black pb-1 border-b border-black' : 'text-neutral-500'}>
-                01. Shipping Information
+                {t("01. Shipping Information")}
               </span>
               <span className="h-[1px] w-6 bg-neutral-200" />
               <span className={step === 2 ? 'text-black font-black pb-1 border-b border-black' : 'text-neutral-500'}>
-                02. Luxury Payment
+                {t("02. Luxury Payment")}
               </span>
               <span className="h-[1px] w-6 bg-neutral-200" />
               <span className="text-neutral-300">
-                03. Confirmation
+                {t("03. Confirmation")}
               </span>
             </div>
           )}
@@ -207,37 +209,37 @@ export default function CheckoutModal({
                 id="shipping-form"
               >
                 <div className="space-y-1">
-                  <span className="text-[9px] uppercase tracking-[0.25em] font-black text-neutral-400 block">Secure Atelier Order</span>
-                  <h3 className="font-sans text-xl font-bold tracking-tight uppercase text-black">Delivery Details</h3>
+                  <span className="text-[9px] uppercase tracking-[0.25em] font-black text-neutral-400 block">{t("Secure Atelier Order")}</span>
+                  <h3 className="font-sans text-xl font-bold tracking-tight uppercase text-black">{t("Delivery Details")}</h3>
                   <p className="text-xs text-neutral-500 font-light leading-relaxed">
-                    100% genuine products directly inspected and verified. Premium boxed express transport to Cairo, Giza, Alexandria and all other Egyptian governorates.
+                    {t("Check out our luxury selection")}
                   </p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
                   <div className="space-y-1.5">
                     <label className="block text-[9px] text-neutral-500 font-bold uppercase tracking-wider">
-                      Full Recipient Name *
+                      {t("Recipient Name")} *
                     </label>
                     <input
                       type="text"
                       required
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
-                      placeholder="e.g. Aly Ibrahim"
+                      placeholder="Aly Ibrahim"
                       className="w-full bg-neutral-50 border border-neutral-200 focus:border-black focus:ring-1 focus:ring-black text-xs py-3 px-4 outline-none rounded-none font-medium text-black placeholder:text-neutral-300"
                     />
                   </div>
                   <div className="space-y-1.5">
                     <label className="block text-[9px] text-neutral-500 font-bold uppercase tracking-wider">
-                      Email Address *
+                      {t("Email Address")} *
                     </label>
                     <input
                       type="email"
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="e.g. aly.ibrahim@outlook.com"
+                      placeholder="aly.ibrahim@outlook.com"
                       className="w-full bg-neutral-50 border border-neutral-200 focus:border-black focus:ring-1 focus:ring-black text-xs py-3 px-4 outline-none rounded-none font-medium text-black placeholder:text-neutral-300"
                     />
                   </div>
@@ -245,14 +247,14 @@ export default function CheckoutModal({
 
                 <div className="space-y-1.5">
                   <label className="block text-[9px] text-neutral-500 font-bold uppercase tracking-wider">
-                    Full Delivery Address (Street Name, Building, Floor, Apartment) *
+                    {t("Delivery Address")} *
                   </label>
                   <input
                     type="text"
                     required
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
-                    placeholder="e.g. 15 El-Gezira St, Floor 4, Apt 12, Zamalek"
+                    placeholder="15 El-Gezira St, Zamalek"
                     className="w-full bg-neutral-50 border border-neutral-200 focus:border-black focus:ring-1 focus:ring-black text-xs py-3 px-4 outline-none rounded-none font-medium text-black placeholder:text-neutral-300"
                   />
                 </div>
@@ -261,7 +263,7 @@ export default function CheckoutModal({
                   {/* Governorate Dropdown */}
                   <div className="space-y-1.5">
                     <label className="block text-[9px] text-neutral-500 font-bold uppercase tracking-wider">
-                      Governorate *
+                      {t("Governorate")} *
                     </label>
                     <div className="relative">
                       <select
@@ -272,7 +274,7 @@ export default function CheckoutModal({
                       >
                         {EGYPT_GOVERNORATES.map((gov) => (
                           <option key={gov} value={gov}>
-                            {gov}
+                            {t(gov)}
                           </option>
                         ))}
                       </select>
@@ -284,14 +286,14 @@ export default function CheckoutModal({
 
                   <div className="space-y-1.5">
                     <label className="block text-[9px] text-neutral-500 font-bold uppercase tracking-wider">
-                      ZIP / Postal Code *
+                      {t("ZIP Code")} *
                     </label>
                     <input
                       type="text"
                       required
                       value={zip}
                       onChange={(e) => setZip(e.target.value)}
-                      placeholder="e.g. 11211"
+                      placeholder="11211"
                       className="w-full bg-neutral-50 border border-neutral-200 focus:border-black focus:ring-1 focus:ring-black text-xs py-3 px-4 outline-none rounded-none font-medium text-black placeholder:text-neutral-300"
                     />
                   </div>
@@ -299,24 +301,23 @@ export default function CheckoutModal({
 
                 <div className="space-y-1.5">
                   <label className="block text-[9px] text-neutral-500 font-bold uppercase tracking-wider">
-                    Recipient Phone Number (Courier Contact) *
+                    {t("Phone Number")} *
                   </label>
                   <input
                     type="tel"
                     required
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    placeholder="e.g. +20 100 123 4567"
+                    placeholder="+20 100 123 4567"
                     className="w-full bg-neutral-50 border border-neutral-200 focus:border-black focus:ring-1 focus:ring-black text-xs py-3 px-4 outline-none rounded-none font-medium text-black placeholder:text-neutral-300"
                   />
-                  <p className="text-[9px] text-neutral-400 italic pl-0.5">We will call or SMS you before dispatching the driver.</p>
                 </div>
 
                 <button
                   type="submit"
                   className="w-full bg-black hover:bg-neutral-850 text-white font-bold text-xs py-4 px-6 uppercase tracking-widest rounded-none transition-all duration-300 pt-4 mt-6 shadow-md cursor-pointer hover:tracking-[0.12em]"
                 >
-                  Proceed to Payment Options
+                  {t("Proceed to Payment")}
                 </button>
               </motion.form>
             )}
@@ -341,9 +342,9 @@ export default function CheckoutModal({
                     <ArrowLeft size={16} />
                   </button>
                   <div className="space-y-0.5">
-                    <h3 className="font-sans text-lg font-bold tracking-tight uppercase text-black">Atelier Secure Payment</h3>
+                    <h3 className="font-sans text-lg font-bold tracking-tight uppercase text-black">{t("Atelier Secure Payment")}</h3>
                     <p className="text-xs text-neutral-400 font-light">
-                      Select your preferred authentic, encrypted settlement option.
+                      {t("Select payment method")}
                     </p>
                   </div>
                 </div>
@@ -360,7 +361,7 @@ export default function CheckoutModal({
                     }`}
                   >
                     <CreditCard size={13} />
-                    <span>Visa</span>
+                    <span>{t("Visa")}</span>
                   </button>
                   <button
                     type="button"
@@ -372,7 +373,7 @@ export default function CheckoutModal({
                     }`}
                   >
                     <CreditCard size={13} />
-                    <span>MasterCard</span>
+                    <span>{t("MasterCard")}</span>
                   </button>
                   <button
                     type="button"
@@ -384,7 +385,7 @@ export default function CheckoutModal({
                     }`}
                   >
                     <CreditCard size={13} />
-                    <span>Meeza Card</span>
+                    <span>{t("Meeza")}</span>
                   </button>
                   <button
                     type="button"
@@ -396,7 +397,7 @@ export default function CheckoutModal({
                     }`}
                   >
                     <Truck size={13} />
-                    <span>Cash On Delivery</span>
+                    <span>{t("Cash On Delivery")}</span>
                   </button>
                 </div>
 
@@ -413,7 +414,7 @@ export default function CheckoutModal({
                     }`}>
                       <div className="absolute right-6 top-6 flex flex-col items-end">
                         <span className="text-xs uppercase tracking-widest font-extrabold italic opacity-90">
-                          {paymentMethod === 'visa' ? 'Visa' : paymentMethod === 'mastercard' ? 'MasterCard' : 'Meeza'}
+                          {paymentMethod === 'visa' ? t("Visa") : paymentMethod === 'mastercard' ? t("MasterCard") : t("Meeza")}
                         </span>
                         <div className="flex gap-1.5 mt-1">
                           {paymentMethod === 'visa' && (
@@ -447,19 +448,19 @@ export default function CheckoutModal({
 
                       <div className="flex justify-between items-end">
                         <div>
-                          <span className="text-[7px] uppercase tracking-wider text-neutral-400 block">Cardholder</span>
+                          <span className="text-[7px] uppercase tracking-wider text-neutral-400 block">{t("Cardholder Name")}</span>
                           <span className="text-[11px] font-mono tracking-wider font-semibold uppercase line-clamp-1 max-w-[150px]">
-                            {cardName || 'YOUR FULL NAME'}
+                            {cardName || 'Aly Ibrahim'}
                           </span>
                         </div>
                         <div className="text-right">
-                          <span className="text-[7px] uppercase tracking-wider text-neutral-400 block">Expires</span>
+                          <span className="text-[7px] uppercase tracking-wider text-neutral-400 block">{t("Expiry Date")}</span>
                           <span className="text-xs font-mono font-bold tracking-widest">
                             {cardExpiry || 'MM/YY'}
                           </span>
                         </div>
                         <div className="text-right pl-3">
-                          <span className="text-[7px] uppercase tracking-wider text-neutral-400 block">CVV</span>
+                          <span className="text-[7px] uppercase tracking-wider text-neutral-400 block">{t("CVV")}</span>
                           <span className="text-xs font-mono font-bold">
                             {cardCvv ? '•••' : '•••'}
                           </span>
@@ -470,21 +471,21 @@ export default function CheckoutModal({
                     <div className="space-y-3.5 pt-1">
                       <div className="space-y-1">
                         <label className="block text-[9px] text-neutral-500 font-bold uppercase tracking-wider">
-                          Cardholder Full Name *
+                          {t("Cardholder Name")} *
                         </label>
                         <input
                           type="text"
                           required
                           value={cardName}
                           onChange={(e) => setCardName(e.target.value)}
-                          placeholder="e.g. Aly Ibrahim"
+                          placeholder="Aly Ibrahim"
                           className="w-full bg-neutral-50 border border-neutral-200 focus:border-black focus:ring-1 focus:ring-black text-xs py-2.5 px-4 outline-none rounded-none font-semibold uppercase text-black"
                         />
                       </div>
 
                       <div className="space-y-1">
                         <label className="block text-[9px] text-neutral-500 font-bold uppercase tracking-wider">
-                          Card Number *
+                          {t("Card Number")} *
                         </label>
                         <input
                           type="text"
@@ -495,7 +496,7 @@ export default function CheckoutModal({
                             const val = e.target.value.replace(/\s?/g, '').replace(/(\d{4})/g, '$1 ').trim();
                             setCardNumber(val);
                           }}
-                          placeholder="e.g. 4111 2222 3333 4444"
+                          placeholder="4111 2222 3333 4444"
                           className="w-full bg-neutral-50 border border-neutral-200 focus:border-black focus:ring-1 focus:ring-black text-xs py-2.5 px-4 outline-none rounded-none font-mono font-bold text-black"
                         />
                       </div>
@@ -503,7 +504,7 @@ export default function CheckoutModal({
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1">
                           <label className="block text-[9px] text-neutral-500 font-bold uppercase tracking-wider">
-                            Expiry Date (MM/YY) *
+                            {t("Expiry Date")} *
                           </label>
                           <input
                             type="text"
@@ -517,13 +518,13 @@ export default function CheckoutModal({
                               }
                               setCardExpiry(val);
                             }}
-                            placeholder="e.g. 12/28"
+                            placeholder="12/28"
                             className="w-full bg-neutral-50 border border-neutral-200 focus:border-black focus:ring-1 focus:ring-black text-xs py-2.5 px-4 outline-none rounded-none font-mono font-bold text-black"
                           />
                         </div>
                         <div className="space-y-1">
                           <label className="block text-[9px] text-neutral-500 font-bold uppercase tracking-wider">
-                            CVV Code *
+                            {t("CVV")} *
                           </label>
                           <input
                             type="password"
@@ -531,7 +532,7 @@ export default function CheckoutModal({
                             maxLength={3}
                             value={cardCvv}
                             onChange={(e) => setCardCvv(e.target.value.replace(/\D/g, ''))}
-                            placeholder="e.g. 123"
+                            placeholder="123"
                             className="w-full bg-neutral-50 border border-neutral-200 focus:border-black focus:ring-1 focus:ring-black text-xs py-2.5 px-4 outline-none rounded-none font-mono font-bold text-black"
                           />
                         </div>
@@ -548,10 +549,10 @@ export default function CheckoutModal({
                     </div>
                     <div className="space-y-1.5">
                       <span className="text-[10px] font-bold text-black uppercase tracking-widest block">
-                        Cash On Delivery (COD) Egypt
+                        {t("Cash On Delivery")}
                       </span>
                       <p className="text-xs text-neutral-600 max-w-sm mx-auto leading-relaxed font-light">
-                        Please prepare exactly <strong className="text-neutral-900 font-semibold font-mono">{finalTotal.toLocaleString()} EGP</strong> to hand to the delivery courier. No extra handling, administrative or hidden custom fees apply.
+                        {t("Cash On Delivery")}: <strong className="text-neutral-900 font-semibold font-mono">{finalTotal.toLocaleString()} {t("EGP")}</strong>
                       </p>
                     </div>
                   </div>
@@ -565,10 +566,10 @@ export default function CheckoutModal({
                   {isProcessing ? (
                     <>
                       <Loader size={15} className="animate-spin text-white" />
-                      <span>Authorizing Secure Gateway...</span>
+                      <span>{t("Authorizing Secure Gateway...")}</span>
                     </>
                   ) : (
-                    <span>Place Order ({finalTotal.toLocaleString()} EGP)</span>
+                    <span>{t("Place Order")} ({finalTotal.toLocaleString()} {t("EGP")})</span>
                   )}
                 </button>
               </motion.form>
@@ -591,49 +592,31 @@ export default function CheckoutModal({
                 </div>
                 
                 <div className="space-y-1">
-                  <span className="text-[9px] uppercase tracking-[0.25em] font-black text-emerald-600">Verification Pending</span>
-                  <h3 className="font-sans text-xl font-bold uppercase tracking-tight text-neutral-950">Atelier Order Confirmed</h3>
+                  <span className="text-[9px] uppercase tracking-[0.25em] font-black text-emerald-600">{t("Verification Pending") || "Verification Pending"}</span>
+                  <h3 className="font-sans text-xl font-bold uppercase tracking-tight text-neutral-950">{t("Atelier Order Confirmed")}</h3>
                   <p className="text-xs text-neutral-500 max-w-md mx-auto font-light leading-relaxed">
-                    Thank you, {fullName || 'Valued Client'}. Your exclusive sneaker selection is being verified by our specialist authentication team.
+                    {t("A confirmation transmission has been sent. Welcome to the Syndicate.")}
                   </p>
                 </div>
 
                 <div className="bg-neutral-50 border border-neutral-200/80 p-5 text-left space-y-3.5 rounded-none text-xs">
                   <div className="flex justify-between items-center text-[10px] uppercase tracking-wider text-neutral-500 border-b border-neutral-200/40 pb-2">
-                    <span>Order Reference Code</span>
+                    <span>{t("Order Reference")}</span>
                     <span className="font-mono font-bold text-black">{orderId}</span>
                   </div>
                   <div className="flex justify-between items-center text-[10px] uppercase tracking-wider text-neutral-500 border-b border-neutral-200/40 pb-2">
-                    <span>Destination Governorate</span>
-                    <span className="font-semibold text-black">{governorate}</span>
+                    <span>{t("Governorate")}</span>
+                    <span className="font-semibold text-black">{t(governorate)}</span>
                   </div>
                   <div className="flex justify-between items-start text-[10px] uppercase tracking-wider text-neutral-500 border-b border-neutral-200/40 pb-2">
-                    <span>Full Courier Address</span>
+                    <span>{t("Delivery Address")}</span>
                     <span className="font-semibold text-black text-right line-clamp-1 max-w-[200px]">{address}</span>
                   </div>
                   <div className="flex justify-between items-center text-[10px] uppercase tracking-wider text-neutral-500">
-                    <span>Tracking Status</span>
+                    <span>{t("Tracking Status")}</span>
                     <span className="text-emerald-700 font-extrabold uppercase tracking-widest text-[8.5px] bg-emerald-50 px-2 py-0.5 border border-emerald-100">
-                      Preparing Authenticity Audit
+                      {t("Preparing Authenticity Audit") || "Preparing Authenticity Audit"}
                     </span>
-                  </div>
-
-                  {/* Order Progress Timeline */}
-                  <div className="relative pl-5 pt-2 space-y-4 text-xs text-neutral-500 before:absolute before:left-1.5 before:top-3 before:bottom-1 before:w-[1px] before:bg-neutral-300">
-                    <div className="relative">
-                      <span className="absolute -left-[17px] top-1 w-2 h-2 rounded-full bg-black ring-4 ring-black/15" />
-                      <p className="font-bold text-black text-[11px] uppercase tracking-wide">1. Authenticity Certification</p>
-                      <span className="text-[10px] text-neutral-400 font-light block leading-normal">Moviq experts audit leather texture, stitching, sizing codes and original tags</span>
-                    </div>
-                    <div className="relative">
-                      <span className="absolute -left-[17px] top-1 w-2 h-2 rounded-full bg-neutral-300" />
-                      <p className="font-semibold text-neutral-400 text-[11px] uppercase tracking-wide">2. Double-Box Premium Packing</p>
-                      <span className="text-[10px] text-neutral-400 font-light block leading-normal">Sealing the original box in protective customized shock-absorb containers</span>
-                    </div>
-                    <div className="relative text-neutral-300">
-                      <span className="absolute -left-[17px] top-1 w-2 h-2 rounded-full bg-neutral-200" />
-                      <p className="font-semibold text-[11px] uppercase tracking-wide">3. Secured Dispatch</p>
-                    </div>
                   </div>
                 </div>
 
@@ -641,7 +624,7 @@ export default function CheckoutModal({
                   onClick={handleCompleteAndClose}
                   className="w-full bg-black hover:bg-neutral-850 text-white font-bold text-xs py-4 px-6 uppercase tracking-widest rounded-none transition-colors shadow-md cursor-pointer hover:tracking-[0.12em]"
                 >
-                  Return to Sneaker Catalog
+                  {t("Return to Catalog")}
                 </button>
               </motion.div>
             )}
@@ -653,10 +636,10 @@ export default function CheckoutModal({
           <div>
             <div className="flex items-center justify-between border-b border-neutral-200 pb-3.5 mb-4">
               <span className="text-[10px] tracking-[0.2em] text-neutral-400 font-bold uppercase block">
-                Order Selection
+                {t("Order Summary")}
               </span>
               <span className="text-[10px] bg-neutral-200 text-neutral-800 px-2 py-0.5 font-bold rounded-full font-mono">
-                {cartItems.reduce((acc, item) => acc + item.quantity, 0)} Items
+                {cartItems.reduce((acc, item) => acc + item.quantity, 0)} {t("Items")}
               </span>
             </div>
 
@@ -669,15 +652,15 @@ export default function CheckoutModal({
                   </div>
                   <div className="flex-1 min-w-0">
                     <span className="text-[8px] tracking-wider text-neutral-400 uppercase font-black block">
-                      {item.product.brand}
+                      {t(item.product.brand)}
                     </span>
-                    <h4 className="font-bold text-neutral-900 line-clamp-1 text-xs">{item.product.name}</h4>
+                    <h4 className="font-bold text-neutral-900 line-clamp-1 text-xs">{t(item.product.name)}</h4>
                     <span className="text-neutral-500 text-[10px] font-medium block mt-0.5">
-                      Qty: {item.quantity} &bull; Size: {item.selectedSize} &bull; {item.selectedColor.name}
+                      {t("Quantity")}: {item.quantity} &bull; {t("Sizes")}: {item.selectedSize} &bull; {t(item.selectedColor.name)}
                     </span>
                   </div>
                   <span className="font-bold font-sans text-neutral-900 shrink-0">
-                    {(item.product.salePrice * item.quantity).toLocaleString()} EGP
+                    {(item.product.salePrice * item.quantity).toLocaleString()} {t("EGP")}
                   </span>
                 </div>
               ))}
@@ -687,32 +670,32 @@ export default function CheckoutModal({
           {/* Pricing calculations footer */}
           <div className="border-t border-neutral-200 pt-5 mt-5 space-y-3 text-xs text-neutral-600">
             <div className="flex justify-between items-center">
-              <span className="font-medium">Items Subtotal</span>
-              <span className="text-neutral-900 font-bold">{subtotal.toLocaleString()} EGP</span>
+              <span className="font-medium">{t("Subtotal")}</span>
+              <span className="text-neutral-900 font-bold">{subtotal.toLocaleString()} {t("EGP")}</span>
             </div>
             {discountRate > 0 && (
               <div className="flex justify-between items-center text-emerald-700 bg-emerald-50 px-2.5 py-1.5 border border-emerald-100 font-semibold rounded-xs">
-                <span>Voucher Applied {appliedCode && `(${appliedCode})`}</span>
-                <span>-{discountAmount.toLocaleString()} EGP</span>
+                <span>{t("Code applied!")} {appliedCode && `(${appliedCode})`}</span>
+                <span>-{discountAmount.toLocaleString()} {t("EGP")}</span>
               </div>
             )}
             <div className="flex justify-between items-center">
-              <span className="font-medium">Express Air Courier Freight</span>
+              <span className="font-medium">{t("Shipping")}</span>
               <span className="text-neutral-900 font-bold">
-                {shippingCost === 0 ? 'Free' : `${shippingCost} EGP`}
+                {shippingCost === 0 ? t("Free Shipping") : `${shippingCost} ${t("EGP")}`}
               </span>
             </div>
 
             <div className="border-t border-neutral-200 pt-3.5 flex justify-between items-baseline text-black uppercase">
-              <span className="font-sans text-xs font-bold tracking-widest">Total Amount</span>
+              <span className="font-sans text-xs font-bold tracking-widest">{t("Total")}</span>
               <span className="text-lg font-bold text-neutral-950 font-mono">
-                {finalTotal.toLocaleString()} <span className="text-xs font-semibold">EGP</span>
+                {finalTotal.toLocaleString()} <span className="text-xs font-semibold">{t("EGP")}</span>
               </span>
             </div>
 
             <div className="bg-white p-3.5 border border-neutral-200/60 flex items-start gap-2.5 text-[9px] text-neutral-400 font-semibold uppercase tracking-wider pt-3 rounded-xs mt-3">
               <ShieldCheck size={14} className="text-neutral-800 shrink-0 mt-0.5" />
-              <span>Includes original designer box, physical Authenticity Certificate card, Moviq custom dust-bags &amp; original tags.</span>
+              <span>{t("Secure SSL encrypted gateway")}</span>
             </div>
           </div>
         </div>

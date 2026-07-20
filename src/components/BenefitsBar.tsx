@@ -1,8 +1,10 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { ShieldCheck, Truck, RefreshCw, MessageSquare } from 'lucide-react';
+import { useI18n } from '../lib/i18n';
 
 export default function BenefitsBar() {
+  const { t } = useI18n();
   const benefits = [
     {
       icon: ShieldCheck,
@@ -50,10 +52,10 @@ export default function BenefitsBar() {
                 {/* Text Context */}
                 <div className="space-y-1.5 text-left">
                   <h4 className="font-serif text-[13px] font-semibold uppercase tracking-wider text-white">
-                    {b.title}
+                    {t(b.title)}
                   </h4>
                   <p className="text-[11px] text-neutral-400 font-light leading-relaxed tracking-wide">
-                    {b.desc}
+                    {t(b.desc)}
                   </p>
                 </div>
               </motion.div>

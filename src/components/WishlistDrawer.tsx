@@ -2,6 +2,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Heart, ShoppingBag, Trash2 } from 'lucide-react';
 import { Product } from '../types';
+import { useI18n } from '../lib/i18n';
 
 interface WishlistDrawerProps {
   isOpen: boolean;
@@ -18,6 +19,8 @@ export default function WishlistDrawer({
   onRemoveFromWishlist,
   onAddToCart
 }: WishlistDrawerProps) {
+  const { t } = useI18n();
+
   if (!isOpen) return null;
 
   return (
@@ -44,7 +47,7 @@ export default function WishlistDrawer({
           <div className="p-6 border-b border-neutral-100 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Heart size={18} fill="#000" />
-              <h3 className="font-serif text-lg font-bold tracking-wide uppercase">Your Wishlist</h3>
+              <h3 className="font-serif text-lg font-bold tracking-wide uppercase">{t("Wishlist")}</h3>
               <span className="bg-black text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
                 {wishlistedProducts.length}
               </span>
@@ -67,17 +70,17 @@ export default function WishlistDrawer({
                 </div>
                 <div>
                   <h4 className="font-serif text-sm font-semibold tracking-wider uppercase text-black">
-                    Your wishlist is empty
+                    {t("Your Wishlist is Empty")}
                   </h4>
                   <p className="text-xs text-neutral-500 mt-1.5 leading-relaxed max-w-[240px] mx-auto">
-                    Save your favorite grail sneakers from Nike, Jordan, and Balenciaga to access them anytime.
+                    {t("Your Wishlist is Empty")}
                   </p>
                 </div>
                 <button
                   onClick={onClose}
                   className="bg-black hover:bg-neutral-800 text-white font-bold text-[10.5px] uppercase tracking-widest py-3 px-6 rounded-none transition-colors"
                 >
-                  Explore Sneakers
+                  {t("Go Back to Catalog")}
                 </button>
               </div>
             ) : (
@@ -114,13 +117,13 @@ export default function WishlistDrawer({
                           <div className="flex justify-between items-start">
                             <div>
                               <span className="text-[9px] tracking-widest text-neutral-400 font-bold uppercase block">
-                                {product.brand}
+                                {t(product.brand)}
                               </span>
                               <h4 className="text-xs font-serif text-black font-semibold tracking-wide line-clamp-1">
-                                {product.name}
+                                {t(product.name)}
                               </h4>
                               <span className="text-accent-red font-bold text-xs font-serif mt-1 block">
-                                {product.salePrice.toLocaleString()} EGP
+                                {product.salePrice.toLocaleString()} {t("EGP")}
                               </span>
                             </div>
                             
@@ -143,7 +146,7 @@ export default function WishlistDrawer({
                               className="w-full bg-neutral-100 hover:bg-black hover:text-white text-black font-semibold text-[9.5px] uppercase tracking-widest py-2 rounded-none transition-all flex items-center justify-center gap-1.5 cursor-pointer border border-neutral-200 hover:border-black"
                             >
                               <ShoppingBag size={11} />
-                              <span>Add To Bag</span>
+                              <span>{t("Add to Bag")}</span>
                             </button>
                           </div>
                         </div>

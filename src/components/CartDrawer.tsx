@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Plus, Minus, Trash2, ShoppingBag, ArrowRight, Tag, Percent, ShieldCheck } from 'lucide-react';
 import { CartItem } from '../types';
+import { useI18n } from '../lib/i18n';
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -20,6 +21,7 @@ export default function CartDrawer({
   onRemoveItem,
   onCheckout
 }: CartDrawerProps) {
+  const { t } = useI18n();
   const [promoCodeInput, setPromoCodeInput] = useState('');
   const [activeDiscountRate, setActiveDiscountRate] = useState(0); // decimal rate e.g. 0.15 for 15%
   const [appliedCode, setAppliedCode] = useState('');
@@ -104,8 +106,8 @@ export default function CartDrawer({
                 <ShoppingBag size={16} />
               </div>
               <div>
-                <h3 className="font-sans text-sm font-bold tracking-widest uppercase text-black">Shopping Cart</h3>
-                <p className="text-[10px] text-neutral-400 font-medium">Verify your luxury selections</p>
+                <h3 className="font-sans text-sm font-bold tracking-widest uppercase text-black">{t("Shopping Bag")}</h3>
+                <p className="text-[10px] text-neutral-400 font-medium">{t("Check out our luxury selection")}</p>
               </div>
               <span className="ml-2 bg-neutral-100 border border-neutral-200 text-neutral-800 text-[10px] font-bold px-2 py-0.5 rounded-full font-mono">
                 {cartItems.reduce((sum, item) => sum + item.quantity, 0)}
@@ -129,17 +131,17 @@ export default function CartDrawer({
                 </div>
                 <div className="space-y-1.5">
                   <h4 className="font-sans text-xs font-bold tracking-widest uppercase text-black">
-                    Your Shopping Bag is Empty
+                    {t("Your Bag is Empty")}
                   </h4>
                   <p className="text-xs text-neutral-500 leading-relaxed max-w-[250px] mx-auto font-light">
-                    Add authentic curated sneakers from Nike, Jordan, Balenciaga, and Dior.
+                    {t("Your Wishlist is Empty")}
                   </p>
                 </div>
                 <button
                   onClick={onClose}
                   className="bg-black hover:bg-neutral-850 text-white font-bold text-[10px] uppercase tracking-widest py-3.5 px-8 rounded-none transition-all duration-300 shadow-sm cursor-pointer hover:tracking-[0.12em]"
                 >
-                  Explore Showcase
+                  {t("Go Back to Catalog")}
                 </button>
               </div>
             ) : (
@@ -178,10 +180,10 @@ export default function CartDrawer({
                           <div className="flex justify-between items-start gap-2">
                             <div>
                               <span className="text-[9px] tracking-widest text-neutral-400 font-bold uppercase block">
-                                {item.product.brand}
+                                {t(item.product.brand)}
                               </span>
                               <h4 className="text-xs font-sans text-neutral-900 font-bold tracking-wide line-clamp-1">
-                                {item.product.name}
+                                {t(item.product.name)}
                               </h4>
                             </div>
                             <button
@@ -195,16 +197,16 @@ export default function CartDrawer({
                           
                           <div className="flex flex-wrap items-center gap-x-2 gap-y-1 pt-1">
                             <span className="text-[10px] text-neutral-500 font-semibold bg-neutral-100 px-2 py-0.5">
-                              Size: <strong className="text-neutral-800 font-bold uppercase">{item.selectedSize}</strong>
+                              {t("Sizes")}: <strong className="text-neutral-800 font-bold uppercase">{item.selectedSize}</strong>
                             </span>
                             <span className="text-neutral-300">|</span>
                             <span className="inline-flex items-center gap-1.5 text-[10px] text-neutral-500 font-semibold bg-neutral-100 px-2 py-0.5">
-                              Shade:
+                              {t("Colors")}:
                               <span
                                 className="w-2 h-2 rounded-full inline-block border border-neutral-300/80"
                                 style={{ backgroundColor: item.selectedColor.hex }}
                               />
-                              <strong className="text-neutral-800 font-bold">{item.selectedColor.name}</strong>
+                              <strong className="text-neutral-800 font-bold">{t(item.selectedColor.name)}</strong>
                             </span>
                           </div>
                         </div>
@@ -254,11 +256,11 @@ export default function CartDrawer({
                           {/* Price sum */}
                           <div className="text-right">
                             <span className="text-xs font-bold font-sans text-neutral-900 block">
-                              {(item.product.salePrice * item.quantity).toLocaleString()} EGP
+                              {(item.product.salePrice * item.quantity).toLocaleString()} {t("EGP")}
                             </span>
                             {item.quantity > 1 && (
                               <span className="text-[9px] text-neutral-400 font-medium">
-                                ({item.product.salePrice.toLocaleString()} each)
+                                ({item.product.salePrice.toLocaleString()} {t("EGP")})
                               </span>
                             )}
                           </div>
@@ -277,7 +279,7 @@ export default function CartDrawer({
               {/* Promo code form */}
               <div className="space-y-1.5">
                 <span className="text-[9px] tracking-widest text-neutral-400 font-bold uppercase block pl-0.5">
-                  Promotional Voucher Code
+                  {t("Promo Code")}
                 </span>
                 <form onSubmit={handleApplyPromo} className="flex gap-2">
                   <input
@@ -291,7 +293,7 @@ export default function CartDrawer({
                     type="submit"
                     className="bg-black hover:bg-neutral-850 text-white font-bold text-[10px] px-5 py-2.5 uppercase tracking-widest rounded-none transition-all shrink-0 cursor-pointer"
                   >
-                    Apply
+                    {t("Apply")}
                   </button>
                 </form>
                 <p className="text-[9px] text-neutral-400 italic pl-1">
@@ -302,7 +304,7 @@ export default function CartDrawer({
               {appliedCode && (
                 <div className="flex items-center gap-1.5 text-xs text-emerald-700 bg-emerald-50 px-3.5 py-2 border border-emerald-200">
                   <Tag size={12} className="shrink-0" />
-                  <span className="font-semibold">Voucher Applied: {appliedCode}</span>
+                  <span className="font-semibold">{t("Code applied!")}: {appliedCode}</span>
                   <button
                     onClick={() => {
                       setActiveDiscountRate(0);
@@ -310,7 +312,7 @@ export default function CartDrawer({
                     }}
                     className="ml-auto text-[9px] uppercase tracking-wider text-emerald-800 hover:text-black font-extrabold"
                   >
-                    Remove
+                    {t("Remove")}
                   </button>
                 </div>
               )}
@@ -324,36 +326,36 @@ export default function CartDrawer({
               {/* Subtotal, Shipping, Total */}
               <div className="space-y-2.5 text-xs text-neutral-600 pt-1">
                 <div className="flex justify-between items-center">
-                  <span className="font-medium">Selected Items Subtotal</span>
-                  <span className="text-neutral-900 font-bold">{subtotal.toLocaleString()} EGP</span>
+                  <span className="font-medium">{t("Subtotal")}</span>
+                  <span className="text-neutral-900 font-bold">{subtotal.toLocaleString()} {t("EGP")}</span>
                 </div>
                 {activeDiscountRate > 0 && (
                   <div className="flex justify-between items-center text-emerald-700 font-semibold bg-emerald-50/50 px-2 py-1 rounded-sm">
                     <span className="flex items-center gap-1">
                       <Percent size={11} />
-                      <span>Discount Coupon ({activeDiscountRate * 100}%)</span>
+                      <span>{t("Discount")} ({activeDiscountRate * 100}%)</span>
                     </span>
-                    <span>-{discountAmount.toLocaleString()} EGP</span>
+                    <span>-{discountAmount.toLocaleString()} {t("EGP")}</span>
                   </div>
                 )}
                 <div className="flex justify-between items-center">
                   <span className="flex items-center gap-1.5">
-                    <span className="font-medium">Express Insured Courier</span>
+                    <span className="font-medium">{t("Shipping")}</span>
                     {shippingCost === 0 && (
                       <span className="bg-emerald-600 text-white text-[8px] font-black tracking-widest uppercase px-1.5 py-0.5">
-                        Free
+                        {t("Free Shipping")}
                       </span>
                     )}
                   </span>
                   <span className="text-neutral-900 font-bold">
-                    {shippingCost === 0 ? 'Free Delivery' : `${shippingCost} EGP`}
+                    {shippingCost === 0 ? t("Free Shipping") : `${shippingCost} ${t("EGP")}`}
                   </span>
                 </div>
 
                 <div className="border-t border-neutral-200 pt-3.5 flex justify-between items-baseline text-black uppercase">
-                  <span className="font-sans text-xs font-bold tracking-widest">Grand Total Due</span>
+                  <span className="font-sans text-xs font-bold tracking-widest">{t("Total")}</span>
                   <span className="text-lg font-bold text-neutral-950 font-mono">
-                    {finalTotal.toLocaleString()} <span className="text-xs font-semibold">EGP</span>
+                    {finalTotal.toLocaleString()} <span className="text-xs font-semibold">{t("EGP")}</span>
                   </span>
                 </div>
               </div>
@@ -363,13 +365,13 @@ export default function CartDrawer({
                 onClick={() => onCheckout(activeDiscountRate, appliedCode || 'NONE')}
                 className="w-full bg-black hover:bg-neutral-850 text-white font-bold text-xs py-4 px-6 uppercase tracking-widest rounded-none transition-all duration-300 flex items-center justify-center gap-2.5 shadow-md cursor-pointer hover:gap-4 hover:tracking-[0.12em]"
               >
-                <span>Proceed to Secure Checkout</span>
+                <span>{t("Proceed to Checkout")}</span>
                 <ArrowRight size={14} />
               </button>
               
               <div className="flex items-center justify-center gap-1.5 text-[9px] text-neutral-400 font-bold uppercase tracking-wider text-center">
                 <ShieldCheck size={11} className="text-emerald-600" />
-                <span>SSL Encryption &bull; Authenticity Certificate Included</span>
+                <span>{t("Secure SSL encrypted gateway")}</span>
               </div>
             </div>
           )}

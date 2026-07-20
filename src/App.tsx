@@ -18,6 +18,7 @@ import MoviqAssistant from './components/MoviqAssistant';
 
 import { PRODUCTS } from './data/products';
 import { Product, CartItem, FilterState, Review } from './types';
+import { useI18n } from './lib/i18n';
 
 function SkeletonCard() {
   return (
@@ -78,6 +79,7 @@ function SkeletonCard() {
 }
 
 export default function App() {
+  const { t } = useI18n();
   // --- STATE PERSISTENCE ---
   const [products, setProducts] = useState<Product[]>(() => {
     // Attempt to load products from session state to keep posted reviews persistent across clicks
@@ -150,6 +152,39 @@ export default function App() {
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [selectedQuickProduct, setSelectedQuickProduct] = useState<Product | null>(null);
   const [isAdminView, setIsAdminView] = useState(false);
+
+  // Handle direct Admin URL checking and routing
+  useEffect(() => {
+    const checkAdminUrl = () => {
+      const isHashAdmin = window.location.hash === '#admin';
+      const params = new URLSearchParams(window.location.search);
+      const isSearchAdmin = params.get('admin') === 'true' || params.get('view') === 'admin';
+      
+      if (isHashAdmin || isSearchAdmin) {
+        setIsAdminView(true);
+      }
+    };
+
+    window.addEventListener('hashchange', checkAdminUrl);
+    checkAdminUrl();
+
+    return () => {
+      window.removeEventListener('hashchange', checkAdminUrl);
+    };
+  }, []);
+
+  // Update hash dynamically based on admin view status
+  useEffect(() => {
+    if (isAdminView) {
+      if (window.location.hash !== '#admin') {
+        window.location.hash = 'admin';
+      }
+    } else {
+      if (window.location.hash === '#admin') {
+        window.history.pushState('', document.title, window.location.pathname + window.location.search);
+      }
+    }
+  }, [isAdminView]);
 
   // Discount code applied from Cart to Checkout
   const [activeDiscountRate, setActiveDiscountRate] = useState(0);
@@ -443,7 +478,7 @@ export default function App() {
             {filteredProducts.length === 0 ? (
               <div className="text-center py-24 space-y-4">
                 <span className="text-neutral-400 text-sm block font-light italic">
-                  No matching luxury creations discovered in our inventory.
+                  {t("No matching luxury creations discovered in our inventory.")}
                 </span>
                 <button
                   onClick={() =>
@@ -461,7 +496,7 @@ export default function App() {
                   }
                   className="bg-black hover:bg-neutral-800 text-white font-bold text-[10px] uppercase tracking-widest px-6 py-3 rounded-none transition-colors cursor-pointer"
                 >
-                  Reset Search Filters
+                  {t("Reset Search Filters")}
                 </button>
               </div>
             ) : isCatalogLoading ? (
@@ -502,14 +537,14 @@ export default function App() {
       <section className="bg-neutral-900/40 backdrop-blur-md py-20 border-t border-b border-neutral-900" id="brand-philosophy">
         <div className="max-w-3xl mx-auto text-center px-4 space-y-6">
           <span className="text-[10px] tracking-[0.3em] font-bold text-amber-500/80 uppercase">
-            Moviq Luxury Sneaker Philosophy
+            {t("Moviq Luxury Sneaker Philosophy")}
           </span>
           <p className="font-serif text-2xl sm:text-3xl font-extralight tracking-wide leading-relaxed text-neutral-200 italic">
-            &ldquo;Luxury is not about standing out, but about being remembered. It lies in the purity of geometric proportions and the absolute honesty of materials.&rdquo;
+            &ldquo;{t("Philosophy Quote")}&rdquo;
           </p>
           <div className="flex justify-center items-center gap-1.5 text-neutral-500">
             <span className="w-6 h-[1.5px] bg-neutral-800" />
-            <span className="text-[10px] tracking-widest uppercase font-bold text-white">Founder of MOVIQ</span>
+            <span className="text-[10px] tracking-widest uppercase font-bold text-white">{t("Founder of MOVIQ")}</span>
             <span className="w-6 h-[1.5px] bg-neutral-800" />
           </div>
         </div>
@@ -588,13 +623,13 @@ export default function App() {
           >
             <div className="w-2.5 h-2.5 rounded-full bg-accent-red animate-ping" />
             <span className="text-xs uppercase tracking-wider font-semibold flex-1">
-              {toastMessage}
+              {t(toastMessage)}
             </span>
             <button
               onClick={() => setToastMessage(null)}
               className="text-neutral-400 hover:text-white text-[10px] uppercase font-bold font-mono pl-2"
             >
-              Dismiss
+              {t("Dismiss")}
             </button>
           </motion.div>
         )}

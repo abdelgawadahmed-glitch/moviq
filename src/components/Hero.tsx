@@ -3,6 +3,7 @@ import { motion, useMotionValue, useSpring, useTransform } from 'motion/react';
 import { ArrowDown, MoveRight, Sparkles, Shield, Compass, Star } from 'lucide-react';
 // @ts-ignore
 import mascotSheet from '../assets/images/moviq_mascot_sheet_15pose_1784494483953.jpg';
+import { useI18n } from '../lib/i18n';
 
 interface HeroProps {
   activeTab: string;
@@ -11,6 +12,7 @@ interface HeroProps {
 }
 
 export default function Hero({ activeTab, selectedBrand, onScrollToCatalog }: HeroProps) {
+  const { lang, t } = useI18n();
   // Parallax Scroll State
   const [scrollY, setScrollY] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -210,7 +212,7 @@ export default function Hero({ activeTab, selectedBrand, onScrollToCatalog }: He
             >
               <Shield size={11} className="text-amber-500/80" />
               <span className="text-[9px] tracking-[0.4em] font-extrabold text-neutral-300 uppercase">
-                MOVIQ ATELIER • EST. 2024
+                {t("MOVIQ ATELIER • EST. 2024")}
               </span>
             </motion.div>
 
@@ -223,10 +225,21 @@ export default function Hero({ activeTab, selectedBrand, onScrollToCatalog }: He
                 className="font-serif text-4xl sm:text-6xl md:text-7xl font-extralight tracking-tight leading-[1.08] text-white uppercase"
                 id="hero-title"
               >
-                Beyond Footwear.<br />
-                <span className="font-serif italic font-light text-transparent bg-clip-text bg-gradient-to-r from-neutral-100 via-neutral-300 to-amber-200/90">
-                  A Statement of Identity.
-                </span>
+                {lang === 'ar' ? (
+                  <>
+                    ما وراء الأحذية.<br />
+                    <span className="font-serif italic font-light text-transparent bg-clip-text bg-gradient-to-r from-neutral-100 via-neutral-300 to-amber-200/90">
+                      تعبير عن الهوية.
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    Beyond Footwear.<br />
+                    <span className="font-serif italic font-light text-transparent bg-clip-text bg-gradient-to-r from-neutral-100 via-neutral-300 to-amber-200/90">
+                      A Statement of Identity.
+                    </span>
+                  </>
+                )}
               </motion.h1>
 
               {/* Supporting Text */}
@@ -237,7 +250,7 @@ export default function Hero({ activeTab, selectedBrand, onScrollToCatalog }: He
                 className="text-xs sm:text-sm md:text-base tracking-[0.25em] text-neutral-400 font-light uppercase leading-relaxed max-w-2xl mx-auto font-sans"
                 id="hero-subtitle"
               >
-                Designed with innovation, crafted with passion, built for those who demand excellence.
+                {t("Designed with innovation, crafted with passion, built for those who demand excellence.")}
               </motion.p>
             </div>
 
@@ -256,7 +269,7 @@ export default function Hero({ activeTab, selectedBrand, onScrollToCatalog }: He
               transition={{ duration: 1.2, delay: 0.7 }}
               className="text-xs italic text-neutral-500 tracking-widest font-serif leading-relaxed max-w-xl"
             >
-              &ldquo;{quote}&rdquo;
+              &ldquo;{t(quote)}&rdquo;
             </motion.blockquote>
 
             {/* Action Buttons */}
@@ -271,7 +284,7 @@ export default function Hero({ activeTab, selectedBrand, onScrollToCatalog }: He
                 className="w-full sm:w-auto bg-white hover:bg-neutral-200 text-black font-semibold text-[11px] uppercase tracking-[0.28em] px-10 py-5 rounded-none transition-all duration-300 flex items-center justify-center gap-2.5 group cursor-pointer shadow-[0_10px_35px_rgba(255,255,255,0.06)] hover:scale-[1.02] active:scale-95"
                 id="hero-shop-btn"
               >
-                <span>ENTER ATELIER</span>
+                <span>{t("ENTER ATELIER")}</span>
                 <ArrowDown size={12} className="group-hover:translate-y-0.5 transition-transform duration-300" />
               </button>
 
@@ -280,7 +293,7 @@ export default function Hero({ activeTab, selectedBrand, onScrollToCatalog }: He
                 className="w-full sm:w-auto bg-transparent hover:bg-white/5 border border-neutral-700 hover:border-white text-white font-semibold text-[11px] uppercase tracking-[0.28em] px-10 py-5 rounded-none transition-all duration-300 flex items-center justify-center gap-2.5 group cursor-pointer hover:scale-[1.02] active:scale-95"
                 id="hero-explore-btn"
               >
-                <span>EXPLORE COLLECTION</span>
+                <span>{t("EXPLORE COLLECTION")}</span>
                 <MoveRight size={12} className="group-hover:translate-x-1 transition-transform duration-300" />
               </button>
             </motion.div>
@@ -302,15 +315,15 @@ export default function Hero({ activeTab, selectedBrand, onScrollToCatalog }: He
                 className="space-y-4"
               >
                 <span className="text-[10px] tracking-[0.4em] font-extrabold text-neutral-500 uppercase block">
-                  {category}
+                  {t(category)}
                 </span>
                 
                 <h1 className="font-serif text-3.5xl sm:text-5.5xl font-extralight tracking-wide leading-[1.1] text-white uppercase" id="hero-title">
-                  {title}
+                  {t(title)}
                 </h1>
                 
                 <p className="text-xs sm:text-[13px] tracking-[0.25em] text-neutral-400 font-light uppercase leading-relaxed font-sans" id="hero-subtitle">
-                  {subtitle}
+                  {t(subtitle)}
                 </p>
               </motion.div>
 
@@ -322,7 +335,7 @@ export default function Hero({ activeTab, selectedBrand, onScrollToCatalog }: He
                 className="border-l border-neutral-800 pl-4 py-1"
               >
                 <p className="text-xs italic text-neutral-400 font-serif tracking-wider">
-                  &ldquo;{quote}&rdquo;
+                  &ldquo;{t(quote)}&rdquo;
                 </p>
               </motion.div>
 
@@ -338,7 +351,7 @@ export default function Hero({ activeTab, selectedBrand, onScrollToCatalog }: He
                   className="bg-white hover:bg-neutral-200 text-black font-semibold text-[10.5px] uppercase tracking-[0.25em] px-8 py-4.5 rounded-none transition-all duration-300 flex items-center gap-2 group cursor-pointer shadow-[0_8px_30px_rgba(255,255,255,0.05)] hover:shadow-[0_15px_45px_rgba(255,255,255,0.1)] hover:scale-[1.02] active:scale-95"
                   id="hero-shop-btn"
                 >
-                  <span>SHOP NOW</span>
+                  <span>{t("SHOP NOW")}</span>
                   <ArrowDown size={12} className="group-hover:translate-y-0.5 transition-transform" />
                 </button>
 
@@ -347,7 +360,7 @@ export default function Hero({ activeTab, selectedBrand, onScrollToCatalog }: He
                   className="bg-transparent hover:bg-white/5 border border-neutral-700 hover:border-white text-white font-semibold text-[10.5px] uppercase tracking-[0.25em] px-8 py-4.5 rounded-none transition-all duration-300 flex items-center gap-2 group cursor-pointer hover:scale-[1.02] active:scale-95"
                   id="hero-explore-btn"
                 >
-                  <span>EXPLORE COLLECTION</span>
+                  <span>{t("EXPLORE COLLECTION")}</span>
                   <MoveRight size={12} className="group-hover:translate-x-1 transition-transform" />
                 </button>
               </motion.div>

@@ -3,6 +3,7 @@ import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from
 import { Sparkles, Send, X, MessageSquare, ShieldCheck, HelpCircle } from 'lucide-react';
 // @ts-ignore
 import mascotSheet from '../assets/images/moviq_mascot_sheet_15pose_1784494483953.jpg';
+import { useI18n } from '../lib/i18n';
 
 type MascotState =
   | 'idle'
@@ -81,6 +82,7 @@ const getSpritePosition = (state: MascotState) => {
 };
 
 export default function MoviqAssistant({ onApplyFilter, onTriggerSizeFilter }: MoviqAssistantProps) {
+  const { lang, t } = useI18n();
   const [mascotState, setMascotState] = useState<MascotState>('idle');
   const [speechBubble, setSpeechBubble] = useState<string | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -88,14 +90,18 @@ export default function MoviqAssistant({ onApplyFilter, onTriggerSizeFilter }: M
 
   // Chat panel state
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: 'welcome-msg',
-      sender: 'assistant',
-      text: "Welcome to the MOVIQ Atelier. I am your luxury concierge. How can I assist you with your sneaker selection today?",
-      timestamp: new Date()
-    }
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
+
+  useEffect(() => {
+    setMessages([
+      {
+        id: 'welcome-msg',
+        sender: 'assistant',
+        text: t("Welcome to the MOVIQ Atelier. I am your luxury concierge. How can I assist you with your sneaker selection today?"),
+        timestamp: new Date()
+      }
+    ]);
+  }, [lang]);
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
 
@@ -435,8 +441,8 @@ export default function MoviqAssistant({ onApplyFilter, onTriggerSizeFilter }: M
       let action: string | undefined = undefined;
       let category: string | undefined = undefined;
 
-      // Language detection
-      const isArabic = /[\u0600-\u06FF]/.test(query);
+      // Language detection based on selected website language
+      const isArabic = lang === 'ar';
 
       // Sizing Keywords Matches (Arabic and English)
       const sizeKeywordsAr = [
@@ -578,10 +584,10 @@ export default function MoviqAssistant({ onApplyFilter, onTriggerSizeFilter }: M
                 </div>
                 <div>
                   <h3 className="font-serif text-[15px] font-bold tracking-wide text-white uppercase">
-                    MOVIQ Assistant
+                    {t("MOVIQ Assistant")}
                   </h3>
                   <p className="text-[9px] text-neutral-500 tracking-wider uppercase">
-                    Elite Sneaker Concierge
+                    {t("Elite Sneaker Concierge")}
                   </p>
                 </div>
               </div>
@@ -611,7 +617,7 @@ export default function MoviqAssistant({ onApplyFilter, onTriggerSizeFilter }: M
                     <div>{msg.text}</div>
                     {msg.action && (
                       <div className="mt-2.5 pt-2 border-t border-neutral-800/80 text-[10px] font-mono text-amber-500/95 leading-tight select-text">
-                        <div className="text-[8px] text-neutral-500 uppercase tracking-widest font-sans font-bold mb-1">Concierge Payload Action</div>
+                        <div className="text-[8px] text-neutral-500 uppercase tracking-widest font-sans font-bold mb-1">{t("Concierge Payload Action")}</div>
                         <pre className="bg-black/50 p-2 rounded border border-neutral-800/60 overflow-x-auto text-[9px] text-amber-400">
 {JSON.stringify({ action: msg.action, category: msg.category }, null, 2)}
                         </pre>
@@ -619,7 +625,7 @@ export default function MoviqAssistant({ onApplyFilter, onTriggerSizeFilter }: M
                     )}
                   </div>
                   <span className="text-[8.5px] text-neutral-500 mt-1 uppercase tracking-wider">
-                    {msg.sender === 'user' ? 'You' : 'MOVIQ Concierge'}
+                    {msg.sender === 'user' ? t('You') : t('MOVIQ Concierge')}
                   </span>
                 </div>
               ))}
@@ -642,13 +648,13 @@ export default function MoviqAssistant({ onApplyFilter, onTriggerSizeFilter }: M
                 type="text"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                placeholder="Ask about authentic items, Egypt shipping..."
+                placeholder={t("Ask about authentic items, Egypt shipping...")}
                 className="flex-grow bg-neutral-900 border border-neutral-800 text-white placeholder:text-neutral-500 focus:outline-none focus:border-neutral-700 text-xs py-3 px-4 rounded-xl font-light tracking-wide"
               />
               <button
                 type="submit"
                 className="bg-white hover:bg-neutral-200 text-black p-3 rounded-xl transition-colors shrink-0 flex items-center justify-center cursor-pointer"
-                aria-label="Send Message"
+                aria-label={t("Send Message")}
               >
                 <Send size={13} />
               </button>
@@ -673,7 +679,7 @@ export default function MoviqAssistant({ onApplyFilter, onTriggerSizeFilter }: M
                 <Sparkles className="w-3 h-3 text-white" />
               </div>
               <p className="text-[11px] font-extrabold uppercase tracking-widest text-neutral-900 leading-snug whitespace-pre-line">
-                {speechBubble}
+                {t(speechBubble)}
               </p>
             </div>
             {/* Small speech tail */}

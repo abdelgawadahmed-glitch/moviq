@@ -2,6 +2,7 @@ import React from 'react';
 import { CATEGORIES, LUXURY_BRANDS, SIZES, COLORS } from '../data/products';
 import { FilterState } from '../types';
 import { SlidersHorizontal, RotateCcw, ChevronDown, Check } from 'lucide-react';
+import { useI18n } from '../lib/i18n';
 
 interface FiltersProps {
   filters: FilterState;
@@ -16,6 +17,7 @@ export default function Filters({
   totalProductsCount,
   filteredCount
 }: FiltersProps) {
+  const { t, lang } = useI18n();
   const [isOpen, setIsOpen] = React.useState(true);
 
   const handleGenderChange = (gender: 'all' | 'men' | 'women') => {
@@ -112,10 +114,10 @@ export default function Filters({
               id="filter-toggle-button"
             >
               <SlidersHorizontal size={14} />
-              <span>{isOpen ? 'Hide Filters' : 'Show Filters'}</span>
+              <span>{isOpen ? t('Hide Filters') : t('Show Filters')}</span>
             </button>
             <span className="text-xs text-neutral-500 font-medium tracking-wider">
-              Showing {filteredCount} of {totalProductsCount} sneakers
+              {t("Showing")} {filteredCount} {t("of")} {totalProductsCount} {t("sneakers")}
             </span>
           </div>
 
@@ -127,13 +129,13 @@ export default function Filters({
                 id="reset-filters-btn"
               >
                 <RotateCcw size={12} />
-                <span>Reset</span>
+                <span>{t("Reset")}</span>
               </button>
             )}
 
             <div className="flex items-center gap-2 shrink-0">
               <label htmlFor="sort-select" className="text-xs text-neutral-400 uppercase tracking-wider font-medium hidden sm:inline">
-                Sort By:
+                {t("Sort By:")}
               </label>
               <div className="relative">
                 <select
@@ -142,10 +144,10 @@ export default function Filters({
                   onChange={handleSortChange}
                   className="bg-neutral-50 border border-neutral-200 focus:border-black text-xs uppercase tracking-widest font-semibold py-2 pl-3 pr-8 rounded-none outline-none cursor-pointer appearance-none text-black"
                 >
-                  <option value="featured">Featured</option>
-                  <option value="newest">Newest</option>
-                  <option value="low-high">Price Low to High</option>
-                  <option value="high-low">Price High to Low</option>
+                  <option value="featured">{t("Featured")}</option>
+                  <option value="newest">{t("Newest")}</option>
+                  <option value="low-high">{t("Price Low to High")}</option>
+                  <option value="high-low">{t("Price High to Low")}</option>
                 </select>
                 <ChevronDown size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none" />
               </div>
@@ -160,7 +162,7 @@ export default function Filters({
             {/* 1. Gender Filter */}
             <div className="space-y-3" id="filter-gender-section">
               <h4 className="text-xs font-semibold uppercase tracking-widest text-black pb-1 border-b border-neutral-100">
-                Gender
+                {t("Gender")}
               </h4>
               <div className="flex flex-col gap-2">
                 {[
@@ -184,7 +186,7 @@ export default function Filters({
                         <span className="w-1.5 h-1.5 bg-black rounded-full" />
                       )}
                     </span>
-                    <span>{item.label}</span>
+                    <span>{t(item.label)}</span>
                   </button>
                 ))}
               </div>
@@ -193,7 +195,7 @@ export default function Filters({
             {/* 2. Brand Filter */}
             <div className="space-y-3" id="filter-brand-section">
               <h4 className="text-xs font-semibold uppercase tracking-widest text-black pb-1 border-b border-neutral-100">
-                Brand
+                {t("Brand")}
               </h4>
               <div className="flex flex-col gap-1.5 max-h-[160px] overflow-y-auto pr-2">
                 {LUXURY_BRANDS.map((brand) => (
@@ -206,7 +208,7 @@ export default function Filters({
                         : 'text-neutral-500 hover:text-black'
                     }`}
                   >
-                    <span>{brand}</span>
+                    <span>{t(brand)}</span>
                     {filters.brand === brand && <Check size={11} className="text-black" />}
                   </button>
                 ))}
@@ -216,7 +218,7 @@ export default function Filters({
             {/* 3. Price Filter */}
             <div className="space-y-3" id="filter-price-section">
               <h4 className="text-xs font-semibold uppercase tracking-widest text-black pb-1 border-b border-neutral-100">
-                Price
+                {t("Price")}
               </h4>
               <div className="space-y-3 pt-1">
                 <input
@@ -231,11 +233,11 @@ export default function Filters({
                 />
                 <div className="flex flex-col gap-1 text-[11px] tracking-wider">
                   <div className="flex items-center justify-between">
-                    <span className="text-neutral-400">Min: 2,000 EGP</span>
-                    <span className="text-neutral-400">Max: 50K EGP</span>
+                    <span className="text-neutral-400">{t("Min: 2,000 EGP")}</span>
+                    <span className="text-neutral-400">{t("Max: 50K EGP")}</span>
                   </div>
                   <span className="text-black font-bold font-serif text-xs mt-1">
-                    Up to: {filters.priceRange[1].toLocaleString()} EGP
+                    {t("Up to:")} {filters.priceRange[1].toLocaleString()} {t("EGP")}
                   </span>
                 </div>
               </div>
@@ -244,7 +246,7 @@ export default function Filters({
             {/* 4. Color Filter */}
             <div className="space-y-3" id="filter-colors-section">
               <h4 className="text-xs font-semibold uppercase tracking-widest text-black pb-1 border-b border-neutral-100">
-                Color
+                {t("Color")}
               </h4>
               <div className="flex flex-wrap gap-2 pt-1">
                 {COLORS.map((color) => {
@@ -272,7 +274,7 @@ export default function Filters({
               </div>
               {filters.color && (
                 <div className="text-[9.5px] text-neutral-400 tracking-wider">
-                  Selected: <span className="text-black font-semibold">{filters.color}</span>
+                  {t("Selected:")} <span className="text-black font-semibold">{t(filters.color)}</span>
                 </div>
               )}
             </div>
@@ -280,7 +282,7 @@ export default function Filters({
             {/* 5. Size Filter */}
             <div className="space-y-3" id="filter-sizes-section">
               <h4 className="text-xs font-semibold uppercase tracking-widest text-black pb-1 border-b border-neutral-100">
-                Size
+                {t("Size")}
               </h4>
               <div className="grid grid-cols-3 gap-1.5 pt-1">
                 {SIZES.map((size) => (
@@ -302,7 +304,7 @@ export default function Filters({
             {/* 6. Availability Filter */}
             <div className="space-y-3" id="filter-availability-section">
               <h4 className="text-xs font-semibold uppercase tracking-widest text-black pb-1 border-b border-neutral-100">
-                Availability
+                {t("Availability")}
               </h4>
               <div className="flex flex-col gap-2">
                 {[
@@ -325,7 +327,7 @@ export default function Filters({
                         <Check size={10} strokeWidth={3} />
                       )}
                     </span>
-                    <span>{item.label}</span>
+                    <span>{t(item.label)}</span>
                   </button>
                 ))}
               </div>

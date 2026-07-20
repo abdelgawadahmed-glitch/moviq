@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Heart, Eye, ShoppingBag, Star, Sparkles } from 'lucide-react';
 import { Product } from '../types';
+import { useI18n } from '../lib/i18n';
 
 interface ProductCardProps {
   product: Product;
@@ -18,6 +19,7 @@ export default function ProductCard({
   onAddToCart,
   onQuickView
 }: ProductCardProps) {
+  const { t } = useI18n();
   const [isHovered, setIsHovered] = useState(false);
   
   // Select first available size and color as default for quick-add
@@ -62,12 +64,12 @@ export default function ProductCard({
         {/* Discount Badge */}
         {product.discount > 0 ? (
           <span className="absolute top-4 right-4 z-20 bg-red-600 text-white text-[10px] tracking-[0.2em] font-bold px-3 py-1.5 rounded-full shadow-sm">
-            -{product.discount}% OFF
+            -{product.discount}% {t("OFF")}
           </span>
         ) : product.isNew ? (
           <span className="absolute top-4 right-4 z-20 bg-white text-black text-[10px] tracking-[0.2em] font-bold px-3 py-1.5 rounded-full shadow-sm flex items-center gap-1">
             <Sparkles size={9} className="animate-pulse" />
-            NEW IN
+            {t("New")}
           </span>
         ) : null}
 
@@ -92,7 +94,7 @@ export default function ProductCard({
               className="w-full bg-neutral-900/95 backdrop-blur-md hover:bg-neutral-800 text-white font-semibold text-[10.5px] uppercase tracking-[0.2em] py-3.5 flex items-center justify-center gap-2 rounded-full transition-all cursor-pointer shadow-md hover:shadow-lg active:scale-[0.98] border border-neutral-800"
             >
               <Eye size={13} />
-              <span>Quick View</span>
+              <span>{t("View Detail")}</span>
             </button>
 
             {/* Add to Cart Button */}
@@ -101,7 +103,7 @@ export default function ProductCard({
               className="w-full bg-white hover:bg-neutral-200 text-black font-semibold text-[10.5px] uppercase tracking-[0.2em] py-3.5 flex items-center justify-center gap-2 rounded-full transition-all cursor-pointer shadow-md hover:shadow-lg active:scale-[0.98]"
             >
               <ShoppingBag size={13} />
-              <span>Add To Bag</span>
+              <span>{t("Add to Bag")}</span>
             </button>
           </div>
         </div>
@@ -111,12 +113,12 @@ export default function ProductCard({
       <div className="p-6 flex flex-col flex-grow bg-neutral-900/20">
         {/* Brand */}
         <span className="text-[10px] tracking-[0.25em] text-neutral-500 font-bold uppercase block mb-1">
-          {product.brand}
+          {t(product.brand)}
         </span>
 
         {/* Product Name */}
         <h3 className="font-serif text-[16px] text-white font-medium tracking-wide mb-2.5 line-clamp-1 group-hover:text-neutral-200 transition-colors">
-          {product.name}
+          {t(product.name)}
         </h3>
 
         {/* Rating Stars with reviews count */}
@@ -132,14 +134,14 @@ export default function ProductCard({
             ))}
           </div>
           <span className="text-[9.5px] text-neutral-500 font-bold tracking-wider ml-1">
-            {product.rating.toFixed(1)} ({product.reviewsCount} reviews)
+            {product.rating.toFixed(1)} ({product.reviewsCount} {t("Reviews Count")})
           </span>
         </div>
 
         {/* Available Sizes Showcase */}
         <div className="mb-5 pt-3 border-t border-neutral-800/80">
           <span className="text-[8.5px] tracking-[0.18em] text-neutral-500 font-bold uppercase block mb-2">
-            Available Sizes
+            {t("Sizes")}
           </span>
           <div className="flex flex-wrap gap-1.5">
             {product.sizes.slice(0, 5).map((size) => (
@@ -162,11 +164,11 @@ export default function ProductCard({
         <div className="mt-auto pt-4 border-t border-neutral-800/80 flex items-center justify-between gap-3">
           <div className="flex items-baseline gap-2.5">
             <span className="text-white font-bold text-[14.5px] tracking-wide font-serif">
-              {product.salePrice.toLocaleString()} EGP
+              {product.salePrice.toLocaleString()} {t("EGP")}
             </span>
             {product.discount > 0 && (
               <span className="text-neutral-500 line-through text-[11px] font-light">
-                {product.originalPrice.toLocaleString()} EGP
+                {product.originalPrice.toLocaleString()} {t("EGP")}
               </span>
             )}
           </div>

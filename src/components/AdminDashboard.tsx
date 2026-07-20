@@ -144,6 +144,36 @@ export default function AdminDashboard({
   products,
   setProducts
 }: AdminDashboardProps) {
+  // --- AUTHENTICATION STATE ---
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return sessionStorage.getItem('moviq_admin_auth') === 'true';
+  });
+  const [usernameInput, setUsernameInput] = useState('');
+  const [passwordInput, setPasswordInput] = useState('');
+  const [loginError, setLoginError] = useState('');
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    const ADMIN_USERNAME = (import.meta as any).env?.VITE_ADMIN_USERNAME || 'Moviq22';
+    const ADMIN_PASSWORD = (import.meta as any).env?.VITE_ADMIN_PASSWORD || 'Moviq2026';
+
+    if (usernameInput === ADMIN_USERNAME && passwordInput === ADMIN_PASSWORD) {
+      sessionStorage.setItem('moviq_admin_auth', 'true');
+      setIsAuthenticated(true);
+      setLoginError('');
+    } else {
+      setLoginError('Invalid username or password.');
+    }
+  };
+
+  const handleLogout = () => {
+    sessionStorage.removeItem('moviq_admin_auth');
+    setIsAuthenticated(false);
+    setUsernameInput('');
+    setPasswordInput('');
+    onClose(); // Automatically exit the admin workspace back to the public catalog
+  };
+
   // Navigation
   const [activeTab, setActiveTab] = useState<'overview' | 'orders' | 'products' | 'customers' | 'inventory' | 'discounts' | 'analytics' | 'brand'>('overview');
 
@@ -677,6 +707,99 @@ export default function AdminDashboard({
     c.phone.toLowerCase().includes(customerQuery.toLowerCase())
   );
 
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-neutral-950 text-white flex flex-col justify-center items-center p-4 font-sans selection:bg-white selection:text-black animate-none" id="admin-login-portal">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="w-full max-w-md bg-neutral-900 border border-neutral-800 p-8 md:p-10 flex flex-col space-y-6 relative"
+        >
+          {/* Logo / Title */}
+          <div className="text-center space-y-2">
+            <span className="text-[10px] tracking-[0.3em] font-bold text-amber-500 uppercase block">
+              SECURE WORKSPACE
+            </span>
+            <h2 className="text-3xl font-serif font-black tracking-[0.2em] text-white">
+              MOVIQ
+            </h2>
+            <p className="text-[11px] text-neutral-400 font-light leading-relaxed">
+              Verify your administrative credentials to enter the Atelier Control Portal.
+            </p>
+          </div>
+
+          {/* Form */}
+          <form onSubmit={handleLogin} className="space-y-4">
+            {loginError && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="bg-red-500/10 border border-red-500/20 text-red-400 text-xs py-3 px-4 text-center font-medium"
+              >
+                {loginError}
+              </motion.div>
+            )}
+
+            <div className="space-y-1.5">
+              <label className="block text-[9px] text-neutral-400 font-bold uppercase tracking-widest">
+                Username
+              </label>
+              <input
+                type="text"
+                value={usernameInput}
+                onChange={(e) => setUsernameInput(e.target.value)}
+                placeholder="Enter admin username"
+                required
+                className="w-full bg-neutral-950 border border-neutral-800 focus:border-white focus:ring-1 focus:ring-white text-xs py-3 px-4 outline-none rounded-none font-medium text-white placeholder:text-neutral-600 transition-all"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block text-[9px] text-neutral-400 font-bold uppercase tracking-widest">
+                Password
+              </label>
+              <input
+                type="password"
+                value={passwordInput}
+                onChange={(e) => setPasswordInput(e.target.value)}
+                placeholder="Enter secure password"
+                required
+                className="w-full bg-neutral-950 border border-neutral-800 focus:border-white focus:ring-1 focus:ring-white text-xs py-3 px-4 outline-none rounded-none font-medium text-white placeholder:text-neutral-600 transition-all"
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="w-full bg-white hover:bg-neutral-200 text-black font-black text-xs py-3.5 px-6 uppercase tracking-widest rounded-none transition-all duration-300 shadow-md cursor-pointer hover:tracking-[0.12em] block mt-2"
+            >
+              Sign In
+            </button>
+          </form>
+
+          {/* Security Notice */}
+          <div className="border-t border-neutral-800/60 pt-4 text-[9px] text-neutral-500 leading-normal space-y-1.5 text-center">
+            <p className="font-bold uppercase tracking-wider text-amber-500/60">
+              Development Notice
+            </p>
+            <p className="font-light">
+              This portal utilizes client-side environment protection. For production environments, it is recommended to manage administrative access via an isolated backend or standard auth service.
+            </p>
+          </div>
+
+          {/* Close/Exit */}
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-[10px] uppercase font-black tracking-widest text-neutral-400 hover:text-white transition-all text-center block w-full pt-2 cursor-pointer"
+          >
+            Return to Catalog
+          </button>
+        </motion.div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-neutral-950 text-white flex flex-col font-sans" id="premium-admin-dashboard-container">
       {/* Dynamic Header */}
@@ -696,8 +819,14 @@ export default function AdminDashboard({
 
         <div className="flex items-center gap-3">
           <button
-            onClick={onClose}
+            onClick={handleLogout}
             className="px-4 py-2 bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-neutral-300 hover:text-white font-extrabold text-[10px] uppercase tracking-widest transition-all cursor-pointer"
+          >
+            Logout
+          </button>
+          <button
+            onClick={onClose}
+            className="px-4 py-2 bg-white hover:bg-neutral-200 text-black font-extrabold text-[10px] uppercase tracking-widest transition-all cursor-pointer"
           >
             Exit Workspace
           </button>

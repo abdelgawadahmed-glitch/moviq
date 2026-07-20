@@ -4,6 +4,7 @@ import { Search, User, Heart, ShoppingBag, Menu, X, Check, Award, ChevronDown, C
 import { LUXURY_BRANDS } from '../data/products';
 import { Product } from '../types';
 import AccountDashboardModal from './AccountDashboardModal';
+import { useI18n } from '../lib/i18n';
 
 interface HeaderProps {
   activeTab: string;
@@ -32,6 +33,7 @@ export default function Header({
   products = [],
   onQuickView
 }: HeaderProps) {
+  const { lang, setLang, t } = useI18n();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isAccountOpen, setIsAccountOpen] = useState(false);
@@ -52,13 +54,13 @@ export default function Header({
   }, []);
 
   const navItems = [
-    { label: 'Home', value: 'Home' },
-    { label: 'Men', value: 'Men' },
-    { label: 'Women', value: 'Women' },
-    { label: 'Brands', value: 'Brands' },
-    { label: 'New Arrivals', value: 'New Arrivals' },
-    { label: 'Best Sellers', value: 'Best Sellers' },
-    { label: 'Sale', value: 'Sale' }
+    { label: t('Home'), value: 'Home' },
+    { label: t('Men'), value: 'Men' },
+    { label: t('Women'), value: 'Women' },
+    { label: t('Brands'), value: 'Brands' },
+    { label: t('New Arrivals'), value: 'New Arrivals' },
+    { label: t('Best Sellers'), value: 'Best Sellers' },
+    { label: t('Sale'), value: 'Sale' }
   ];
 
   const handleNavClick = (val: string) => {
@@ -94,7 +96,7 @@ export default function Header({
       {/* Black Top Announcement Bar */}
       <div className="w-full bg-black py-2.5 px-4 relative overflow-hidden border-b border-neutral-900" id="announcement-bar">
         <div className="max-w-7xl mx-auto flex items-center justify-center text-[10px] sm:text-[11px] font-medium text-neutral-200 tracking-[0.25em] uppercase select-none text-center">
-          {announcements[0]}
+          {t("Luxury Announcement Bar")}
         </div>
       </div>
 
@@ -162,7 +164,7 @@ export default function Header({
                         className="absolute top-full left-1/2 -translate-x-1/2 mt-1 w-[460px] bg-neutral-900 border border-neutral-800 shadow-2xl p-6 rounded-none z-50"
                       >
                         <div className="pb-3 border-b border-neutral-800 text-[10px] text-neutral-500 font-bold tracking-[0.15em] uppercase">
-                          Our Curated Fashion Houses
+                          {t("Our Curated Fashion Houses")}
                         </div>
                         <div className="grid grid-cols-3 gap-x-4 gap-y-2.5 pt-4">
                           {LUXURY_BRANDS.map((brand) => (
@@ -207,6 +209,29 @@ export default function Header({
 
         {/* Right Icons: Added Search, Wishlist, Account, Cart */}
         <div className="flex items-center gap-1.5 sm:gap-3 text-white" id="right-actions">
+          {/* Premium Language Switcher (Desktop) */}
+          <div className="hidden sm:flex items-center gap-2 text-[10px] sm:text-[11px] uppercase tracking-wider text-neutral-400 font-semibold mr-1 sm:mr-3 border-r border-neutral-800 pr-2 sm:pr-4" id="lang-switcher-desktop">
+            <button
+              onClick={() => setLang('en')}
+              className={`hover:text-white transition-all cursor-pointer ${
+                lang === 'en' ? 'text-white font-extrabold scale-105' : 'text-neutral-500 hover:scale-105'
+              }`}
+              id="lang-btn-en"
+            >
+              🇺🇸 English
+            </button>
+            <span className="text-neutral-800 font-normal">|</span>
+            <button
+              onClick={() => setLang('ar')}
+              className={`hover:text-white transition-all cursor-pointer font-serif ${
+                lang === 'ar' ? 'text-white font-extrabold scale-105' : 'text-neutral-500 hover:scale-105'
+              }`}
+              id="lang-btn-ar"
+            >
+              🇪🇬 العربية
+            </button>
+          </div>
+
           {/* Search Toggle Button */}
           <button
             onClick={() => setIsSearchOpen(!isSearchOpen)}
@@ -459,6 +484,35 @@ export default function Header({
                 >
                   <X size={22} />
                 </button>
+              </div>
+
+              {/* Mobile Language Switcher */}
+              <div className="py-4 border-b border-neutral-100 flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-neutral-500" id="lang-switcher-mobile">
+                <span>{lang === 'ar' ? 'اللغة' : 'Language'}</span>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => {
+                      setLang('en');
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className={`px-2.5 py-1.5 transition-all rounded-md text-[11px] ${
+                      lang === 'en' ? 'bg-black text-white font-bold' : 'hover:bg-neutral-100 text-neutral-400'
+                    }`}
+                  >
+                    🇺🇸 English
+                  </button>
+                  <button
+                    onClick={() => {
+                      setLang('ar');
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className={`px-2.5 py-1.5 transition-all rounded-md text-[11px] font-serif ${
+                      lang === 'ar' ? 'bg-black text-white font-bold' : 'hover:bg-neutral-100 text-neutral-400'
+                    }`}
+                  >
+                    🇪🇬 العربية
+                  </button>
+                </div>
               </div>
 
               {/* Mobile links */}

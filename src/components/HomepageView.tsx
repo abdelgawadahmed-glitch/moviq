@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Star, ShieldCheck, Heart, Eye, ShoppingBag, Send, ArrowRight, Sparkles, Truck, Lock, Gift, ChevronRight } from 'lucide-react';
 import { Product } from '../types';
 import ProductCard from './ProductCard';
+import { useI18n } from '../lib/i18n';
 
 interface HomepageViewProps {
   products: Product[];
@@ -23,6 +24,7 @@ export default function HomepageView({
   onSelectBrand,
   onNavigateTab
 }: HomepageViewProps) {
+  const { t } = useI18n();
   // Newsletter state
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [newsletterSubscribed, setNewsletterSubscribed] = useState(false);
@@ -126,7 +128,7 @@ export default function HomepageView({
                 onClick={() => onSelectBrand(brand)}
                 className="hover:text-white transition-colors uppercase font-bold text-center flex-1 min-w-[90px] cursor-pointer"
               >
-                {brand}
+                {t(brand)}
               </button>
             ))}
           </div>
@@ -137,10 +139,10 @@ export default function HomepageView({
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6" id="featured-brands-section">
         <div className="text-center space-y-4 mb-16">
           <span className="text-[10px] tracking-[0.3em] font-bold text-neutral-500 uppercase">
-            Curated Fashion Houses
+            {t("Curated Fashion Houses")}
           </span>
           <h2 className="font-serif text-3.5xl sm:text-4.5xl font-extralight tracking-wide leading-tight text-white uppercase">
-            Featured Brands
+            {t("Featured Brands")}
           </h2>
           <div className="w-12 h-[1px] bg-white/20 mx-auto mt-2" />
         </div>
@@ -169,16 +171,16 @@ export default function HomepageView({
               
               <div className="absolute inset-x-0 bottom-0 p-8 flex flex-col justify-end text-white">
                 <span className="text-[9px] tracking-[0.25em] text-neutral-500 font-bold uppercase mb-2">
-                  Explore Atelier
+                  {t("Explore Atelier")}
                 </span>
                 <h3 className="font-serif text-2xl tracking-wider font-light uppercase mb-1">
-                  {brand.name}
+                  {t(brand.name)}
                 </h3>
                 <p className="text-[11px] text-neutral-300 font-light tracking-wide italic mb-4 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-2 group-hover:translate-y-0">
-                  {brand.tagline}
+                  {t(brand.tagline)}
                 </p>
                 <div className="flex items-center gap-2 text-white text-[10px] font-bold tracking-[0.18em] uppercase border-b border-white/20 pb-1 w-fit group-hover:border-white transition-colors">
-                  <span>Browse House</span>
+                  <span>{t("Browse House")}</span>
                   <ChevronRight size={12} className="group-hover:translate-x-1 transition-transform" />
                 </div>
               </div>
@@ -192,17 +194,17 @@ export default function HomepageView({
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-16">
           <div className="space-y-2 text-center md:text-left">
             <span className="text-[10px] tracking-[0.3em] font-bold text-neutral-500 uppercase block">
-              The Latest Releases
+              {t("The Latest Releases")}
             </span>
             <h2 className="font-serif text-3.5xl sm:text-4.5xl font-extralight tracking-wide leading-tight text-white uppercase">
-              New Arrivals
+              {t("New Arrivals")}
             </h2>
           </div>
           <button
             onClick={() => onNavigateTab('New Arrivals')}
             className="text-white hover:text-neutral-300 font-bold text-[11px] uppercase tracking-[0.25em] flex items-center gap-2 border-b border-white/10 pb-1 hover:border-white transition-all cursor-pointer"
           >
-            <span>View Full Collection</span>
+            <span>{t("View Full Collection")}</span>
             <ArrowRight size={13} />
           </button>
         </div>
@@ -233,17 +235,17 @@ export default function HomepageView({
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-16">
           <div className="space-y-2 text-center md:text-left">
             <span className="text-[10px] tracking-[0.3em] font-bold text-neutral-500 uppercase block">
-              The Most Coveted Grails
+              {t("The Most Coveted Grails")}
             </span>
             <h2 className="font-serif text-3.5xl sm:text-4.5xl font-extralight tracking-wide leading-tight text-white uppercase">
-              Best Sellers
+              {t("Best Sellers")}
             </h2>
           </div>
           <button
             onClick={() => onNavigateTab('Best Sellers')}
             className="text-white hover:text-neutral-300 font-bold text-[11px] uppercase tracking-[0.25em] flex items-center gap-2 border-b border-white/10 pb-1 hover:border-white transition-all cursor-pointer"
           >
-            <span>View All Bestsellers</span>
+            <span>{t("View All Bestsellers")}</span>
             <ArrowRight size={13} />
           </button>
         </div>
@@ -276,10 +278,10 @@ export default function HomepageView({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-4 mb-20">
             <span className="text-[10px] tracking-[0.3em] font-bold text-neutral-400 uppercase block">
-              Global Street Couture
+              {t("Global Street Couture")}
             </span>
             <h2 className="font-serif text-3.5xl sm:text-4.5xl font-extralight tracking-wide leading-tight text-white uppercase">
-              Trending This Week
+              {t("Trending This Week")}
             </h2>
             <div className="w-12 h-[1px] bg-white/20 mx-auto mt-2" />
           </div>
@@ -295,18 +297,18 @@ export default function HomepageView({
                 className="lg:col-span-5 bg-black/60 border border-neutral-800/80 p-8 sm:p-10 flex flex-col justify-between space-y-8 relative group overflow-hidden"
               >
                 <div className="absolute top-0 right-0 bg-white/10 px-4 py-1 text-[8.5px] uppercase font-semibold tracking-widest text-neutral-300">
-                  Must Have
+                  {t("Must Have")}
                 </div>
                 
                 <div className="space-y-4">
                   <span className="text-[10px] tracking-[0.25em] text-neutral-400 font-bold uppercase block">
-                    {trendingThisWeek[0].brand}
+                    {t(trendingThisWeek[0].brand)}
                   </span>
                   <h3 className="font-serif text-2xl sm:text-3.5xl font-light tracking-wide leading-tight text-white uppercase">
-                    {trendingThisWeek[0].name}
+                    {t(trendingThisWeek[0].name)}
                   </h3>
                   <p className="text-xs text-neutral-400 font-light leading-relaxed line-clamp-3">
-                    {trendingThisWeek[0].description}
+                    {t(trendingThisWeek[0].description)}
                   </p>
                 </div>
 
@@ -323,13 +325,13 @@ export default function HomepageView({
 
                 <div className="flex items-center justify-between pt-6 border-t border-neutral-800">
                   <span className="text-lg font-serif text-neutral-200">
-                    {trendingThisWeek[0].salePrice.toLocaleString()} EGP
+                    {trendingThisWeek[0].salePrice.toLocaleString()} {t("EGP")}
                   </span>
                   <button
                     onClick={() => onQuickView(trendingThisWeek[0])}
                     className="bg-white hover:bg-neutral-200 text-black text-[10px] uppercase font-bold tracking-widest px-6 py-3 transition-colors cursor-pointer"
                   >
-                    Acquire Now
+                    {t("Acquire Now")}
                   </button>
                 </div>
               </motion.div>
@@ -349,10 +351,10 @@ export default function HomepageView({
                   >
                     <div className="space-y-2">
                       <span className="text-[9px] tracking-[0.25em] text-neutral-400 font-bold uppercase block">
-                        {item.brand}
+                        {t(item.brand)}
                       </span>
                       <h4 className="font-serif text-lg font-light tracking-wide text-white uppercase line-clamp-1">
-                        {item.name}
+                        {t(item.name)}
                       </h4>
                     </div>
 
@@ -369,13 +371,13 @@ export default function HomepageView({
 
                     <div className="flex items-center justify-between pt-4 border-t border-neutral-800/80">
                       <span className="text-sm font-serif text-neutral-300">
-                        {item.salePrice.toLocaleString()} EGP
+                        {item.salePrice.toLocaleString()} {t("EGP")}
                       </span>
                       <button
                         onClick={() => onQuickView(item)}
                         className="text-white hover:text-neutral-400 text-[10px] uppercase font-bold tracking-widest flex items-center gap-1.5 transition-colors"
                       >
-                        <span>Details</span>
+                        <span>{t("Details")}</span>
                         <ArrowRight size={11} />
                       </button>
                     </div>
@@ -392,17 +394,17 @@ export default function HomepageView({
               >
                 <div className="space-y-1.5">
                   <span className="text-[9px] tracking-[0.25em] text-neutral-400 font-bold uppercase block">
-                    Exclusive Egyptian Allocation
+                    {t("Exclusive Egyptian Allocation")}
                   </span>
                   <p className="text-xs text-neutral-300 font-light max-w-lg leading-relaxed">
-                    Our procurement desk secures highly-coveted drops in absolute deadstock condition. Secure yours before allocations expire.
+                    {t("syndicate_pitch")}
                   </p>
                 </div>
                 <button
                   onClick={() => onNavigateTab('Luxury Collection')}
                   className="bg-neutral-800 hover:bg-neutral-700 text-white text-[10px] uppercase font-bold tracking-widest px-6 py-3 border border-neutral-700/60 transition-colors cursor-pointer w-full sm:w-auto"
                 >
-                  View Collection
+                  {t("View Collection")}
                 </button>
               </motion.div>
             </div>
@@ -415,17 +417,17 @@ export default function HomepageView({
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-16">
           <div className="space-y-2 text-center md:text-left">
             <span className="text-[10px] tracking-[0.3em] font-bold text-neutral-500 uppercase block">
-              Atelier Couture Selection
+              {t("Atelier Couture Selection")}
             </span>
             <h2 className="font-serif text-3.5xl sm:text-4.5xl font-extralight tracking-wide leading-tight text-white uppercase">
-              Luxury Collection
+              {t("Luxury Collection")}
             </h2>
           </div>
           <button
             onClick={() => onNavigateTab('Luxury Collection')}
             className="text-white hover:text-neutral-300 font-bold text-[11px] uppercase tracking-[0.25em] flex items-center gap-2 border-b border-white/10 pb-1 hover:border-white transition-all cursor-pointer"
           >
-            <span>Explore High-End Pairs</span>
+            <span>{t("Explore High-End Pairs")}</span>
             <ArrowRight size={13} />
           </button>
         </div>
@@ -455,10 +457,10 @@ export default function HomepageView({
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-b border-neutral-900 py-24" id="why-choose-section">
         <div className="text-center space-y-4 mb-20">
           <span className="text-[10px] tracking-[0.3em] font-bold text-neutral-500 uppercase block">
-            Our Core Pillars
+            {t("Our Core Pillars")}
           </span>
           <h2 className="font-serif text-3.5xl sm:text-4.5xl font-extralight tracking-wide leading-tight text-white uppercase">
-            Why Choose MOVIQ
+            {t("Why Choose MOVIQ")}
           </h2>
           <div className="w-12 h-[1px] bg-white/20 mx-auto mt-2" />
         </div>
@@ -470,10 +472,10 @@ export default function HomepageView({
               <ShieldCheck size={28} className="stroke-[1.25]" />
             </div>
             <h3 className="font-serif text-[17px] tracking-wide font-light uppercase text-white">
-              100% Certified Verification
+              {t("100% Certified Verification")}
             </h3>
             <p className="text-xs text-neutral-400 font-light leading-relaxed max-w-xs">
-              Every single pair undergoes a rigorous multi-point physical verification audit by our expert authenticators prior to dispatch.
+              {t("Every single pair undergoes a rigorous multi-point physical verification audit by our expert authenticators prior to dispatch.")}
             </p>
           </div>
 
@@ -483,10 +485,10 @@ export default function HomepageView({
               <Truck size={28} className="stroke-[1.25]" />
             </div>
             <h3 className="font-serif text-[17px] tracking-wide font-light uppercase text-white">
-              White-Glove Egyptian Delivery
+              {t("White-Glove Egyptian Delivery")}
             </h3>
             <p className="text-xs text-neutral-400 font-light leading-relaxed max-w-xs">
-              Hand-delivered directly to your doorstep in Cairo, Giza, Alexandria, and all major Egyptian Governorates with premium security.
+              {t("Hand-delivered directly to your doorstep in Cairo, Giza, Alexandria, and all major Egyptian Governorates with premium security.")}
             </p>
           </div>
 
@@ -496,10 +498,10 @@ export default function HomepageView({
               <Lock size={28} className="stroke-[1.25]" />
             </div>
             <h3 className="font-serif text-[17px] tracking-wide font-light uppercase text-white">
-              Encrypted Luxury Checkout
+              {t("Encrypted Luxury Checkout")}
             </h3>
             <p className="text-xs text-neutral-400 font-light leading-relaxed max-w-xs">
-              State-of-the-art secure payment structures. Safe cash on delivery options or direct card handling for stress-free shopping.
+              {t("State-of-the-art secure payment structures. Safe cash on delivery options or direct card handling for stress-free shopping.")}
             </p>
           </div>
 
@@ -509,10 +511,10 @@ export default function HomepageView({
               <Gift size={28} className="stroke-[1.25]" />
             </div>
             <h3 className="font-serif text-[17px] tracking-wide font-light uppercase text-white">
-              Bespoke Custom Packaging
+              {t("Bespoke Custom Packaging")}
             </h3>
             <p className="text-xs text-neutral-400 font-light leading-relaxed max-w-xs">
-              Your sneakers are packaged inside customized archival box protectors, wrapped meticulously in soft luxury monogram tissue paper.
+              {t("Your sneakers are packaged inside customized archival box protectors, wrapped meticulously in soft luxury monogram tissue paper.")}
             </p>
           </div>
         </div>
@@ -522,10 +524,10 @@ export default function HomepageView({
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" id="customer-reviews-section">
         <div className="text-center space-y-4 mb-20">
           <span className="text-[10px] tracking-[0.3em] font-bold text-neutral-500 uppercase block">
-            Client Testimonials
+            {t("Client Testimonials")}
           </span>
           <h2 className="font-serif text-3.5xl sm:text-4.5xl font-extralight tracking-wide leading-tight text-white uppercase">
-            Customer Reviews
+            {t("Customer Reviews")}
           </h2>
           <div className="w-12 h-[1px] bg-white/20 mx-auto mt-2" />
         </div>
@@ -550,26 +552,26 @@ export default function HomepageView({
 
               {/* Review Quote text */}
               <p className="text-xs sm:text-[13px] text-neutral-300 font-light leading-relaxed italic font-serif">
-                &ldquo;{review.quote}&rdquo;
+                &ldquo;{t(review.id === 'r1' ? 'review_1_quote' : review.id === 'r2' ? 'review_2_quote' : 'review_3_quote')}&rdquo;
               </p>
 
               {/* Reviewer Meta Details */}
               <div className="flex items-center justify-between pt-6 border-t border-neutral-800">
                 <div>
                   <span className="text-[11.5px] uppercase tracking-[0.12em] text-white font-semibold block">
-                    {review.name}
+                    {t(review.name)}
                   </span>
                   <span className="text-[9px] uppercase tracking-[0.15em] text-neutral-500 font-medium">
-                    {review.location}
+                    {t(review.location)}
                   </span>
                 </div>
                 
                 <div className="text-right">
                   <span className="bg-neutral-800 text-neutral-300 text-[8px] uppercase tracking-[0.18em] font-bold px-2.5 py-1 block w-fit ml-auto rounded-sm">
-                    VERIFIED BUYER
+                    {t("VERIFIED BUYER")}
                   </span>
                   <span className="text-[8.5px] text-neutral-500 font-semibold uppercase mt-1 block">
-                    {review.product}
+                    {t(review.product)}
                   </span>
                 </div>
               </div>
@@ -593,13 +595,13 @@ export default function HomepageView({
           
           <div className="relative z-10 max-w-2xl mx-auto space-y-6">
             <span className="text-[9px] tracking-[0.35em] text-neutral-400 font-bold uppercase block">
-              Join The MOVIQ Syndicate
+              {t("Join The MOVIQ Syndicate")}
             </span>
             <h2 className="font-serif text-3xl sm:text-4.5xl font-extralight tracking-wide uppercase leading-tight">
-              Newsletter
+              {t("Newsletter")}
             </h2>
             <p className="text-xs text-neutral-300 font-light tracking-widest uppercase leading-relaxed max-w-lg mx-auto font-sans">
-              Subscribe to unlock privileged allocations, private drop notifications, and luxury sneaker insights.
+              {t("Subscribe to unlock privileged allocations, private drop notifications, and luxury sneaker insights.")}
             </p>
 
             <AnimatePresence mode="wait">
@@ -616,7 +618,7 @@ export default function HomepageView({
                     type="email"
                     required
                     aria-label="Email address for newsletter subscription"
-                    placeholder="ENTER YOUR EMAIL FOR COUTURE ACCESS"
+                    placeholder={t("ENTER YOUR EMAIL FOR COUTURE ACCESS")}
                     value={newsletterEmail}
                     onChange={(e) => setNewsletterEmail(e.target.value)}
                     className="flex-grow bg-neutral-900 border border-neutral-800 focus:border-white text-white text-[10px] tracking-widest uppercase placeholder:text-neutral-500 px-5 py-4 focus:outline-none transition-colors rounded-none"
@@ -625,7 +627,7 @@ export default function HomepageView({
                     type="submit"
                     className="bg-white hover:bg-neutral-200 text-black text-[10px] font-bold tracking-[0.25em] uppercase px-8 py-4 transition-all duration-300 flex items-center justify-center gap-2 rounded-none cursor-pointer"
                   >
-                    <span>Subscribe</span>
+                    <span>{t("Subscribe")}</span>
                     <Send size={11} />
                   </button>
                 </motion.form>
@@ -641,10 +643,10 @@ export default function HomepageView({
                     <Sparkles size={18} />
                   </div>
                   <h3 className="font-serif text-lg tracking-wider font-light uppercase text-white">
-                    Privileged Access Granted
+                    {t("Privileged Access Granted")}
                   </h3>
                   <p className="text-[10px] text-neutral-400 tracking-[0.18em] uppercase font-light">
-                    A confirmation transmission has been sent. Welcome to the Syndicate.
+                    {t("A confirmation transmission has been sent. Welcome to the Syndicate.")}
                   </p>
                 </motion.div>
               )}
