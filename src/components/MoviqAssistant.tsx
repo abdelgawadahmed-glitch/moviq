@@ -513,9 +513,9 @@ export default function MoviqAssistant({ onApplyFilter, onTriggerSizeFilter }: M
         responsePose = 'welcome';
       } else if (isReturnQuery) {
         if (isArabic) {
-          responseText = "بنقدم سياسة استرجاع واستبدال مرنة جداً لمدة 30 يوم! بشرط الكوتشي يكون ملبسش وفي علبته الأصلية مع تيكيت التحقق سليم وبدون أي تلف. تقدر تتواصل معانا وهنبعتلك مندوب يستلمه مجاناً.";
+          responseText = "بنقدم سياسة استرجاع واستبدال مرنة جداً لمدة 15 يوم! بشرط الكوتشي يكون ملبسش وفي علبته الأصلية مع تيكيت التحقق سليم وبدون أي تلف. تقدر تتواصل معانا وهنبعتلك مندوب يستلمه مجاناً.";
         } else {
-          responseText = "We offer a flawless 30-day returns and size exchange policy! The pair must be returned unworn in original brand packaging with the MOVIQ verification tag completely intact. Just click our service chat or reach out to arrange a complimentary return courier.";
+          responseText = "We offer a flawless 15-day returns and size exchange policy! The pair must be returned unworn in original brand packaging with the MOVIQ verification tag completely intact. Just click our service chat or reach out to arrange a complimentary return courier.";
         }
         responsePose = 'shopping';
       } else if (isBrandQuery) {

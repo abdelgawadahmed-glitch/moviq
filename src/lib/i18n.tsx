@@ -127,7 +127,7 @@ const TRANSLATIONS: Record<Language, Record<string, string>> = {
     'All Rights Reserved.': 'All Rights Reserved.',
     'Bespoke procurement of 100% authentic luxury and retro sneakers. Hand-delivered under white-glove conditions across Egypt.': 'Bespoke procurement of 100% authentic luxury and retro sneakers. Hand-delivered under white-glove conditions across Egypt.',
     'Our Curated Fashion Houses': 'Our Curated Fashion Houses',
-    'Luxury Announcement Bar': 'FREE SHIPPING ACROSS EGYPT | 100% AUTHENTIC | 30 DAYS RETURNS',
+    'Luxury Announcement Bar': 'FREE SHIPPING ACROSS EGYPT | 100% AUTHENTIC | 15 DAYS RETURNS',
     'Atelier Concierge': 'Atelier Concierge',
 
     // Hero Quotes
@@ -142,7 +142,7 @@ const TRANSLATIONS: Record<Language, Record<string, string>> = {
     'Every pair physically verified by experts. Tagged for absolute security.': 'Every pair physically verified by experts. Tagged for absolute security.',
     'Free Shipping in Egypt': 'Free Shipping in Egypt',
     'Complimentary premium courier to Cairo, Alexandria, and all governorates.': 'Complimentary premium courier to Cairo, Alexandria, and all governorates.',
-    '30-Day Luxury Returns': '30-Day Luxury Returns',
+    '15-Day Luxury Returns': '15-Day Luxury Returns',
     'Hassle-free size exchanges and returns on unworn deadstock inventory.': 'Hassle-free size exchanges and returns on unworn deadstock inventory.',
     'Instant styling help and sizing consults via our responsive virtual guide.': 'Instant styling help and sizing consults via our responsive virtual guide.',
 
@@ -426,7 +426,7 @@ const TRANSLATIONS: Record<Language, Record<string, string>> = {
     'All Rights Reserved.': 'جميع الحقوق محفوظة.',
     'Bespoke procurement of 100% authentic luxury and retro sneakers. Hand-delivered under white-glove conditions across Egypt.': 'توفير مخصص لكوتشيات رياضية فاخرة وريترو أصلية 100%. توصيل يدوي ممتاز وبمنتهى العناية في جميع أنحاء مصر.',
     'Our Curated Fashion Houses': 'دور الأزياء الفاخرة المختارة',
-    'Luxury Announcement Bar': 'شحن مجاني لجميع أنحاء مصر | أصلي 100% | استرجاع خلال 30 يوم',
+    'Luxury Announcement Bar': 'شحن مجاني لجميع أنحاء مصر | أصلي 100% | استرجاع خلال 15 يوم',
     'Atelier Concierge': 'كونسيرج الأتيليه',
 
     // Hero Quotes
@@ -441,7 +441,7 @@ const TRANSLATIONS: Record<Language, Record<string, string>> = {
     'Every pair physically verified by experts. Tagged for absolute security.': 'كل كوتشي يتم فحصه فعليًا بواسطة خبراء. ومزود بتيكيت أمان كامل.',
     'Free Shipping in Egypt': 'شحن مجاني داخل مصر',
     'Complimentary premium courier to Cairo, Alexandria, and all governorates.': 'توصيل يدوياً ممتاز ومجاني للقاهرة والأسكندرية وجميع المحافظات.',
-    '30-Day Luxury Returns': 'استرجاع فاخر خلال 30 يوم',
+    '15-Day Luxury Returns': 'استرجاع فاخر خلال 15 يوم',
     'Hassle-free size exchanges and returns on unworn deadstock inventory.': 'استبدال واسترجاع المقاسات بكل سهولة للمنتجات غير المستخدمة بعبوتها الأصلية.',
     'Instant styling help and sizing consults via our responsive virtual guide.': 'مساعدة فورية في اختيار الموديلات والمقاسات عبر مساعدنا الافتراضي التفاعلي.',
 

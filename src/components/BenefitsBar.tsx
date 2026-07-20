@@ -18,7 +18,7 @@ export default function BenefitsBar() {
     },
     {
       icon: RefreshCw,
-      title: "30-Day Luxury Returns",
+      title: "15-Day Luxury Returns",
       desc: "Hassle-free size exchanges and returns on unworn deadstock inventory."
     },
     {

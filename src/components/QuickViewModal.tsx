@@ -286,7 +286,7 @@ export default function QuickViewModal({
                 </div>
                 <div className="flex flex-col items-center gap-1.5">
                   <RefreshCw size={16} className="text-neutral-400" />
-                  <span>30-Day Returns</span>
+                  <span>15-Day Returns</span>
                 </div>
               </div>
 
