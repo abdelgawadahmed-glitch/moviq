@@ -601,7 +601,87 @@ export default function App() {
       </AnimatePresence>
 
       {/* Dynamic interactive AI mascot assistant */}
-      <MoviqAssistant />
+      <MoviqAssistant
+        onApplyFilter={(action, category) => {
+          if (action === 'apply_filter') {
+            if (category === 'man') {
+              handleTabChange('Men');
+              setFilters((prev) => ({
+                ...prev,
+                gender: 'men'
+              }));
+            } else if (category === 'woman') {
+              handleTabChange('Women');
+              setFilters((prev) => ({
+                ...prev,
+                gender: 'women'
+              }));
+            }
+          }
+        }}
+        onTriggerSizeFilter={() => {
+          // If we are currently on the Home tab, switch to a collection tab so Catalog is rendered.
+          const isHome = activeTab === 'Home';
+          if (isHome) {
+            handleTabChange('Men');
+          }
+
+          // Allow the tab transition to start rendering the Catalog
+          setTimeout(() => {
+            // If the filters section is collapsed/closed, trigger the toggle button
+            const sizeFilterInit = document.getElementById('filter-sizes-section');
+            if (!sizeFilterInit) {
+              const toggleBtn = document.getElementById('filter-toggle-button');
+              if (toggleBtn) {
+                toggleBtn.click();
+              }
+            }
+
+            // Allow short delay for the DOM to render the Filters board
+            setTimeout(() => {
+              const finalSizeFilter = document.getElementById('filter-sizes-section');
+              if (finalSizeFilter) {
+                // Determine if size filter is already in the viewport
+                const rect = finalSizeFilter.getBoundingClientRect();
+                const isAlreadyVisible = (
+                  rect.top >= 0 &&
+                  rect.bottom <= (window.innerHeight || document.documentElement.clientHeight)
+                );
+
+                if (!isAlreadyVisible) {
+                  finalSizeFilter.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+
+                // Apply a highly-refined premium amber/gold glow and zoom effect
+                finalSizeFilter.style.transition = 'all 0.5s ease-in-out';
+                finalSizeFilter.style.boxShadow = '0 0 35px rgba(245, 158, 11, 0.75)';
+                finalSizeFilter.style.borderColor = '#eab308'; // Luxury gold amber color
+                finalSizeFilter.style.transform = 'scale(1.04)';
+                finalSizeFilter.style.borderRadius = '12px';
+                finalSizeFilter.style.padding = '14px';
+                finalSizeFilter.style.backgroundColor = 'rgba(245, 158, 11, 0.04)';
+
+                // Automatically focus on the first size button
+                const sizeButtons = finalSizeFilter.querySelectorAll('button');
+                if (sizeButtons && sizeButtons.length > 0) {
+                  sizeButtons[0].focus();
+                }
+
+                // Gracefully fade out premium glow after 2.5 seconds
+                setTimeout(() => {
+                  finalSizeFilter.style.boxShadow = 'none';
+                  finalSizeFilter.style.borderColor = 'transparent';
+                  finalSizeFilter.style.transform = 'scale(1)';
+                  finalSizeFilter.style.borderRadius = '0px';
+                  finalSizeFilter.style.padding = '0px';
+                  finalSizeFilter.style.backgroundColor = 'transparent';
+                }, 2500);
+              }
+            }, 150);
+
+          }, isHome ? 450 : 50);
+        }}
+      />
     </div>
   );
 }

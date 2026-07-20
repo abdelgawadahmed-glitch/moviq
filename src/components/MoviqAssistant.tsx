@@ -26,6 +26,13 @@ interface Message {
   sender: 'user' | 'assistant';
   text: string;
   timestamp: Date;
+  action?: string;
+  category?: string;
+}
+
+interface MoviqAssistantProps {
+  onApplyFilter?: (action: string, category: string) => void;
+  onTriggerSizeFilter?: () => void;
 }
 
 const HOMEPAGE_MESSAGES = [
@@ -73,7 +80,7 @@ const getSpritePosition = (state: MascotState) => {
   }
 };
 
-export default function MoviqAssistant() {
+export default function MoviqAssistant({ onApplyFilter, onTriggerSizeFilter }: MoviqAssistantProps) {
   const [mascotState, setMascotState] = useState<MascotState>('idle');
   const [speechBubble, setSpeechBubble] = useState<string | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -425,27 +432,106 @@ export default function MoviqAssistant() {
       const query = userText.toLowerCase();
       let responseText = "";
       let responsePose: MascotState = 'thumbs-up';
+      let action: string | undefined = undefined;
+      let category: string | undefined = undefined;
 
-      if (query.includes('authentic') || query.includes('fake') || query.includes('original') || query.includes('legit')) {
-        responseText = "Rest assured! At MOVIQ, authenticity is our golden standard. Every single pair is checked by our expert procurement authenticators and comes with our custom, tamper-proof MOVIQ physical verification tag. We offer a 100% money-back guarantee.";
-        responsePose = 'happy';
-      } else if (query.includes('shipping') || query.includes('delivery') || query.includes('egypt') || query.includes('cairo') || query.includes('alexandria') || query.includes('arrive')) {
-        responseText = "We provide white-glove, secure hand-delivered shipping to all governorates in Egypt! Deliveries to Cairo, Giza, and New Cairo arrive in 2-3 business days, while Alexandria and other governorates take 3-5 business days. Premium shipping is completely free.";
-        responsePose = 'welcome';
-      } else if (query.includes('return') || query.includes('exchange') || query.includes('refund')) {
-        responseText = "We offer a flawless 30-day returns and size exchange policy! The pair must be returned unworn in original brand packaging with the MOVIQ verification tag completely intact. Just click our service chat or reach out to arrange a complimentary return courier.";
-        responsePose = 'shopping';
-      } else if (query.includes('brand') || query.includes('nike') || query.includes('adidas') || query.includes('jordan') || query.includes('balance') || query.includes('balenciaga') || query.includes('dior')) {
-        responseText = "We curate elite models from Nike, Air Jordan, Adidas, New Balance, Balenciaga, and Dior. If you're looking for a specific premium drop, let me know! You can also click brand tags above to filter selections instantly.";
+      // Language detection
+      const isArabic = /[\u0600-\u06FF]/.test(query);
+
+      // Sizing Keywords Matches (Arabic and English)
+      const sizeKeywordsAr = [
+        'مقاس', 'مقاسي', 'مقاسات', 'المقاس', 'أختار مقاسي', 'المقاسات', 'جدول', 'تحديد مقاسي', 'المقاس الأوروبي', 'المقاس المناسب', 'مقاسي كام'
+      ];
+      const sizeKeywordsEn = [
+        'size', 'sizes', 'measurement', 'measurements', 'shoe size', 'size guide', 'size chart', 'what size', 'choose my size', 'which size', 'help me choose', 'fits me', 'fit me', 'do you have size', 'eu size'
+      ];
+
+      const isSizingQuery = sizeKeywordsAr.some(kw => query.includes(kw)) || sizeKeywordsEn.some(kw => query.includes(kw));
+
+      // Query Categories Matches (Arabic and English)
+      const isMenQuery = query.includes('man') || query.includes('men') || query.includes('رجالي') || query.includes('رجال') || query.includes('شبابي') || query.includes('ولادي') || query.includes('ذكور') || query.includes('أولاد');
+      const isWomenQuery = query.includes('woman') || query.includes('women') || query.includes('حريمي') || query.includes('بناتي') || query.includes('سيدات') || query.includes('نسائي') || query.includes('حريم') || query.includes('نساء');
+      const isAuthenticQuery = query.includes('authentic') || query.includes('fake') || query.includes('original') || query.includes('legit') || query.includes('أصلي') || query.includes('أصلي؟') || query.includes('تقليد') || query.includes('مضروب') || query.includes('كوبي') || query.includes('اوريجينال') || query.includes('اورجينال') || query.includes('حقيقي');
+      const isShippingQuery = query.includes('shipping') || query.includes('delivery') || query.includes('egypt') || query.includes('cairo') || query.includes('alexandria') || query.includes('arrive') || query.includes('شحن') || query.includes('توصيل') || query.includes('مصر') || query.includes('القاهرة') || query.includes('الاسكندرية') || query.includes('بيوصل') || query.includes('شاحن');
+      const isReturnQuery = query.includes('return') || query.includes('exchange') || query.includes('refund') || query.includes('ترجيع') || query.includes('تبديل') || query.includes('استرجاع') || query.includes('استبدال') || query.includes('رجع') || query.includes('ابدل');
+      const isBrandQuery = query.includes('brand') || query.includes('nike') || query.includes('adidas') || query.includes('jordan') || query.includes('balance') || query.includes('balenciaga') || query.includes('dior') || query.includes('ماركة') || query.includes('براند') || query.includes('نايكي') || query.includes('اديداس') || query.includes('جوردان');
+      const isPriceQuery = query.includes('price') || query.includes('cost') || query.includes('egp') || query.includes('discount') || query.includes('سعر') || query.includes('بكام') || query.includes('فلوس') || query.includes('خصم') || query.includes('تخفيض') || query.includes('سعرها') || query.includes('رخيص');
+
+      if (isSizingQuery) {
+        if (isArabic) {
+          responseText = "هساعدك تختار المقاس المناسب. فتحتلك فلتر المقاسات الموجود في الصفحة.";
+        } else {
+          responseText = "I'll help you choose the correct size. I've opened the size selector for you.";
+        }
         responsePose = 'pointing';
-      } else if (query.includes('size') || query.includes('sizing') || query.includes('fit') || query.includes('tight')) {
-        responseText = "Most luxury silhouettes fit true-to-size. However, Jordan retro releases have structural high-tops that feel slightly snug, and Balenciaga models typically fit oversized (we suggest sizing down). Let me know the exact sneaker you are considering!";
-        responsePose = 'thinking';
-      } else if (query.includes('price') || query.includes('cost') || query.includes('egp') || query.includes('discount')) {
-        responseText = "All our pricing is transparently listed in Egyptian Pounds (EGP). We run exclusive seasonal offers and markdown drops which are already calculated in the product cards. Checkout now to capture these allocations!";
+        if (onTriggerSizeFilter) {
+          onTriggerSizeFilter();
+        }
+      } else if (isMenQuery) {
+        if (isArabic) {
+          responseText = "تم توجيهك إلى قسم الأحذية الرجالية يا فندم لرؤية المقاسات المتاحة.";
+        } else {
+          responseText = "I have successfully navigated you to the Men's collection page so you can explore the available sizes.";
+        }
+        responsePose = 'pointing';
+        action = 'apply_filter';
+        category = 'man';
+        if (onApplyFilter) {
+          onApplyFilter('apply_filter', 'man');
+        }
+      } else if (isWomenQuery) {
+        if (isArabic) {
+          responseText = "تم توجيهك إلى قسم الأحذية النسائية يا فندم لرؤية المقاسات المتاحة.";
+        } else {
+          responseText = "I have successfully navigated you to the Women's collection page so you can explore the available sizes.";
+        }
+        responsePose = 'pointing';
+        action = 'apply_filter';
+        category = 'woman';
+        if (onApplyFilter) {
+          onApplyFilter('apply_filter', 'woman');
+        }
+      } else if (isAuthenticQuery) {
+        if (isArabic) {
+          responseText = "اطمن تماماً يا فندم! في MOVIQ، الأصالة هي معيارنا الذهبي. كل كوتشي بيتم فحصه بعناية من فريق الخبراء بتاعنا وبيوصلك مع تيكيت التحقق الفعلي الخاص بنا المقاوم للتلاعب. وبنقدم ضمان استرجاع فلوسك بنسبة 100%.";
+        } else {
+          responseText = "Rest assured! At MOVIQ, authenticity is our golden standard. Every single pair is checked by our expert procurement authenticators and comes with our custom, tamper-proof MOVIQ physical verification tag. We offer a 100% money-back guarantee.";
+        }
+        responsePose = 'happy';
+      } else if (isShippingQuery) {
+        if (isArabic) {
+          responseText = "بنقدم خدمة شحن آمنة وممتازة لكل المحافظات في مصر! التوصيل للقاهرة، الجيزة، والقاهرة الجديدة بياخد من يومين لـ 3 أيام عمل، والأسكندرية وباقي المحافظات بتاخد من 3 لـ 5 أيام عمل. والشحن مجاني تماماً يا فندم.";
+        } else {
+          responseText = "We provide white-glove, secure hand-delivered shipping to all governorates in Egypt! Deliveries to Cairo, Giza, and New Cairo arrive in 2-3 business days, while Alexandria and other governorates take 3-5 business days. Premium shipping is completely free.";
+        }
+        responsePose = 'welcome';
+      } else if (isReturnQuery) {
+        if (isArabic) {
+          responseText = "بنقدم سياسة استرجاع واستبدال مرنة جداً لمدة 30 يوم! بشرط الكوتشي يكون ملبسش وفي علبته الأصلية مع تيكيت التحقق سليم وبدون أي تلف. تقدر تتواصل معانا وهنبعتلك مندوب يستلمه مجاناً.";
+        } else {
+          responseText = "We offer a flawless 30-day returns and size exchange policy! The pair must be returned unworn in original brand packaging with the MOVIQ verification tag completely intact. Just click our service chat or reach out to arrange a complimentary return courier.";
+        }
+        responsePose = 'shopping';
+      } else if (isBrandQuery) {
+        if (isArabic) {
+          responseText = "بنختار بعناية أرقى الموديلات من نايكي، إير جوردان، أديداس، نيو بالانس، بالينسياجا، وديور. لو بتدور على إصدار معين ومميز قولي عليه! وتقدر كمان تضغط على علامات البراندات فوق لتصفية المنتجات فوراً.";
+        } else {
+          responseText = "We curate elite models from Nike, Air Jordan, Adidas, New Balance, Balenciaga, and Dior. If you're looking for a specific premium drop, let me know! You can also click brand tags above to filter selections instantly.";
+        }
+        responsePose = 'pointing';
+      } else if (isPriceQuery) {
+        if (isArabic) {
+          responseText = "كل أسعارنا واضحة ومعلنة بالجنيه المصري (EGP). وبنقدم عروض موسمية حصرية وخصومات مضافة بالفعل على كروت المنتجات. تقدر تطلب دلوقتي وتستفيد بالخصم المتاح!";
+        } else {
+          responseText = "All our pricing is transparently listed in Egyptian Pounds (EGP). We run exclusive seasonal offers and markdown drops which are already calculated in the product cards. Checkout now to capture these allocations!";
+        }
         responsePose = 'excited';
       } else {
-        responseText = "I'm on it! As your private MOVIQ concierge, I can assist you with sneaker authentications, custom Egyptian courier tracking, sizing, or finding the hottest trending grails. Tell me what color or style you're matching!";
+        if (isArabic) {
+          responseText = "معاك يا فندم! بصفتي المساعد الشخصي ليك في MOVIQ، أقدر أساعدك في التأكد من أصالة الكوتشيات، تتبع الشحنات في مصر، اختيار المقاسات، أو تلاقي الكوتشي التريند اللي بتدور عليه. قولي حابب تنسق لون أو ستايل إيه؟";
+        } else {
+          responseText = "I'm on it! As your private MOVIQ concierge, I can assist you with sneaker authentications, custom Egyptian courier tracking, sizing, or finding the hottest trending grails. Tell me what color or style you're matching!";
+        }
         responsePose = 'idle';
       }
 
@@ -455,7 +541,9 @@ export default function MoviqAssistant() {
           id: `reply-${Date.now()}`,
           sender: 'assistant',
           text: responseText,
-          timestamp: new Date()
+          timestamp: new Date(),
+          action,
+          category
         }
       ]);
       setMascotState(responsePose);
@@ -520,7 +608,15 @@ export default function MoviqAssistant() {
                         : 'bg-neutral-900 text-neutral-200 border border-neutral-800/60 rounded-tl-none'
                     }`}
                   >
-                    {msg.text}
+                    <div>{msg.text}</div>
+                    {msg.action && (
+                      <div className="mt-2.5 pt-2 border-t border-neutral-800/80 text-[10px] font-mono text-amber-500/95 leading-tight select-text">
+                        <div className="text-[8px] text-neutral-500 uppercase tracking-widest font-sans font-bold mb-1">Concierge Payload Action</div>
+                        <pre className="bg-black/50 p-2 rounded border border-neutral-800/60 overflow-x-auto text-[9px] text-amber-400">
+{JSON.stringify({ action: msg.action, category: msg.category }, null, 2)}
+                        </pre>
+                      </div>
+                    )}
                   </div>
                   <span className="text-[8.5px] text-neutral-500 mt-1 uppercase tracking-wider">
                     {msg.sender === 'user' ? 'You' : 'MOVIQ Concierge'}
