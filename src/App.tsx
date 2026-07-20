@@ -15,6 +15,7 @@ import Footer from './components/Footer';
 import HomepageView from './components/HomepageView';
 import AdminDashboard from './components/AdminDashboard';
 import MoviqAssistant from './components/MoviqAssistant';
+import BrandPage from './components/BrandPage';
 
 import { PRODUCTS } from './data/products';
 import { Product, CartItem, FilterState, Review } from './types';
@@ -125,6 +126,25 @@ export default function App() {
   });
 
   const [isCatalogLoading, setIsCatalogLoading] = useState(false);
+
+  // --- CLIENT ROUTING ENGINE ---
+  const [currentPath, setCurrentPath] = useState<string>(window.location.pathname);
+
+  useEffect(() => {
+    const handlePopState = () => {
+      setCurrentPath(window.location.pathname);
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, []);
+
+  const navigateTo = (path: string) => {
+    window.history.pushState({}, '', path);
+    setCurrentPath(path);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   useEffect(() => {
     if (activeTab === 'Home') return;
@@ -389,16 +409,20 @@ export default function App() {
 
   // Sync brand navigation action from header
   const handleSelectedBrandFromHeader = (brand: string) => {
-    setFilters((prev) => ({
-      ...prev,
-      brand,
-      category: 'All Collections'
-    }));
-    setTimeout(handleScrollToCatalog, 150);
+    if (brand) {
+      const slug = brand.toLowerCase().replace(/\s+/g, '-');
+      navigateTo(`/brands/${slug}`);
+    } else {
+      navigateTo('/');
+    }
   };
 
   // Sync general nav tab changes
   const handleTabChange = (tab: string) => {
+    if (window.location.pathname !== '/') {
+      window.history.pushState({}, '', '/');
+      setCurrentPath('/');
+    }
     setActiveTab(tab);
     // Reset secondary sub-filters on main tab changes to show full category collections
     setFilters((prev) => ({
@@ -443,17 +467,29 @@ export default function App() {
       />
 
       {/* 2. Hero Section */}
-      <Hero
-        activeTab={activeTab}
-        selectedBrand={filters.brand}
-        onScrollToCatalog={handleScrollToCatalog}
-      />
+      {!currentPath.startsWith('/brands/') && (
+        <Hero
+          activeTab={activeTab}
+          selectedBrand={filters.brand}
+          onScrollToCatalog={handleScrollToCatalog}
+        />
+      )}
 
       {/* Luxury Brand Benefits Bar */}
       <BenefitsBar />
 
-      {/* 3. Homepage Custom Premium Sections OR Catalog Showcase */}
-      {activeTab === 'Home' ? (
+      {/* 3. Homepage Custom Premium Sections OR Catalog Showcase OR Brand Page */}
+      {currentPath.startsWith('/brands/') ? (
+        <BrandPage
+          brandId={currentPath.split('/brands/')[1] || ''}
+          products={products}
+          wishlist={wishlist}
+          onWishlistToggle={handleWishlistToggle}
+          onQuickView={(pTarget) => setSelectedQuickProduct(pTarget)}
+          onAddToCart={handleAddToCart}
+          onNavigateTo={navigateTo}
+        />
+      ) : activeTab === 'Home' ? (
         <HomepageView
           products={products}
           wishlist={wishlist}
