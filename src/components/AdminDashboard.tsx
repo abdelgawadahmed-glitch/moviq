@@ -175,7 +175,7 @@ export default function AdminDashboard({
   };
 
   // Navigation
-  const [activeTab, setActiveTab] = useState<'overview' | 'orders' | 'products' | 'customers' | 'inventory' | 'discounts' | 'analytics' | 'brand'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'orders' | 'products' | 'customers' | 'inventory' | 'discounts' | 'analytics' | 'brand' | 'pending-imports'>('overview');
 
   // --- STATE MANAGERS ---
   const [adminOrders, setAdminOrders] = useState<SavedOrder[]>([]);
@@ -604,6 +604,40 @@ export default function AdminDashboard({
     }
   };
 
+  const handlePublishProduct = (pId: string, pName: string) => {
+    const updatedProducts = products.map(p => {
+      if (p.id === pId) {
+        return { ...p, status: 'published' as const };
+      }
+      return p;
+    });
+    setProducts(updatedProducts);
+
+    // Sync publish to server
+    fetch('/api/import/publish', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: pId })
+    }).catch(err => console.error('Error syncing publish state:', err));
+
+    triggerSuccess(`Successfully published "${pName}" to the luxury storefront.`);
+  };
+
+  const handleDeletePendingProduct = (pId: string, pName: string) => {
+    if (confirm(`Are you absolutely sure you want to delete pending import "${pName}"?`)) {
+      setProducts(products.filter(p => p.id !== pId));
+
+      // Sync delete to server
+      fetch('/api/import/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: pId })
+      }).catch(err => console.error('Error syncing delete state:', err));
+
+      triggerSuccess(`Deleted pending import "${pName}".`);
+    }
+  };
+
   // 3. Discount Code Handlers
   const handleSaveDiscount = (e: React.FormEvent) => {
     e.preventDefault();
@@ -695,11 +729,21 @@ export default function AdminDashboard({
     o.status.toLowerCase().includes(orderQuery.toLowerCase())
   );
 
-  const filteredProductsList = products.filter(p => 
-    p.name.toLowerCase().includes(productQuery.toLowerCase()) ||
-    p.brand.toLowerCase().includes(productQuery.toLowerCase()) ||
-    p.category.toLowerCase().includes(productQuery.toLowerCase())
-  );
+  const filteredProductsList = products
+    .filter(p => p.status !== 'pending')
+    .filter(p => 
+      p.name.toLowerCase().includes(productQuery.toLowerCase()) ||
+      p.brand.toLowerCase().includes(productQuery.toLowerCase()) ||
+      p.category.toLowerCase().includes(productQuery.toLowerCase())
+    );
+
+  const pendingProductsList = products
+    .filter(p => p.status === 'pending')
+    .filter(p => 
+      p.name.toLowerCase().includes(productQuery.toLowerCase()) ||
+      p.brand.toLowerCase().includes(productQuery.toLowerCase()) ||
+      p.category.toLowerCase().includes(productQuery.toLowerCase())
+    );
 
   const filteredCustomers = customers.filter(c => 
     c.name.toLowerCase().includes(customerQuery.toLowerCase()) ||
@@ -891,6 +935,23 @@ export default function AdminDashboard({
           >
             <Box size={14} />
             <span>Products</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('pending-imports')}
+            className={`flex items-center gap-3 px-4 py-3 text-xs uppercase tracking-widest font-extrabold transition-all shrink-0 cursor-pointer relative ${
+              activeTab === 'pending-imports'
+                ? 'bg-white text-black font-black'
+                : 'text-neutral-400 hover:text-white hover:bg-neutral-900/50'
+            }`}
+          >
+            <RefreshCw size={14} className={products.filter(p => p.status === 'pending').length > 0 ? "animate-spin" : ""} style={{ animationDuration: '8s' }} />
+            <span>Pending Imports</span>
+            {products.filter(p => p.status === 'pending').length > 0 && (
+              <span className="ml-auto bg-amber-500 text-black text-[9px] font-black px-1.5 py-0.5 rounded-full">
+                {products.filter(p => p.status === 'pending').length}
+              </span>
+            )}
           </button>
 
           <button
@@ -1629,6 +1690,84 @@ export default function AdminDashboard({
                           {p.isNew && (
                             <span className="bg-neutral-100 text-black text-[7px] font-black uppercase tracking-wider px-1.5 py-0.5">New</span>
                           )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </motion.div>
+            )}
+
+            {/* ==================== PENDING IMPORTS WORKFLOW ==================== */}
+            {activeTab === 'pending-imports' && (
+              <motion.div
+                key="tab-pending-imports"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="space-y-6"
+              >
+                <div className="flex flex-wrap justify-between items-end gap-4">
+                  <div>
+                    <h2 className="text-xl font-bold uppercase tracking-tight text-white">Pending Imports Queue</h2>
+                    <p className="text-xs text-neutral-400 mt-1 font-light font-sans">
+                      Verify specifications, establish pricing, and authorize staging for imported collections before publication
+                    </p>
+                  </div>
+                </div>
+
+                {pendingProductsList.length === 0 ? (
+                  <div className="bg-neutral-900 border border-neutral-800 p-12 text-center space-y-3">
+                    <RefreshCw size={24} className="mx-auto text-neutral-600 animate-pulse" />
+                    <h3 className="text-xs font-black uppercase tracking-widest text-neutral-400">Queue is Clear</h3>
+                    <p className="text-xs text-neutral-500 max-w-md mx-auto">
+                      All imported shoes have been cataloged and validated. No pending creations are awaiting authorization.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {pendingProductsList.map((p) => (
+                      <div
+                        key={p.id}
+                        className="bg-neutral-900 border border-neutral-800 p-4 flex gap-4 hover:border-neutral-700 transition-colors relative"
+                      >
+                        <div className="w-20 h-24 bg-neutral-950 border border-neutral-800 flex items-center justify-center p-1 shrink-0">
+                          <img src={p.image} alt={p.name} className="max-w-full max-h-full object-contain" />
+                        </div>
+
+                        <div className="flex-1 flex flex-col justify-between min-w-0">
+                          <div>
+                            <span className="text-[8px] uppercase tracking-wider text-amber-500 font-extrabold block">
+                              Pending Authorization
+                            </span>
+                            <h4 className="font-bold text-xs text-white truncate mt-0.5">{p.name}</h4>
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className="text-[10px] text-neutral-400 uppercase tracking-widest font-semibold">{p.brand}</span>
+                              <span className="text-[9px] text-neutral-600">•</span>
+                              <span className="text-[10px] text-neutral-400">{p.category}</span>
+                            </div>
+                          </div>
+
+                          <div className="flex items-end justify-between mt-3">
+                            <span className="font-serif font-black text-xs text-neutral-200">
+                              {p.salePrice.toLocaleString()} EGP
+                            </span>
+
+                            <div className="flex items-center gap-1.5">
+                              <button
+                                onClick={() => handlePublishProduct(p.id, p.name)}
+                                className="px-3 py-1.5 bg-white hover:bg-neutral-200 text-black font-extrabold text-[9px] uppercase tracking-widest transition-all cursor-pointer"
+                              >
+                                Publish
+                              </button>
+                              <button
+                                onClick={() => handleDeletePendingProduct(p.id, p.name)}
+                                className="px-3 py-1.5 bg-neutral-800 hover:bg-red-950/40 border border-neutral-700 text-neutral-400 hover:text-red-400 font-extrabold text-[9px] uppercase tracking-widest transition-all cursor-pointer"
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     ))}

@@ -111,6 +111,34 @@ export default function App() {
     localStorage.setItem('moviq_wishlist', JSON.stringify(wishlist));
   }, [wishlist]);
 
+  // Synchronize newly imported pending products from the backend server
+  useEffect(() => {
+    fetch('/api/import')
+      .then((res) => {
+        if (!res.ok) throw new Error('Failed to fetch pending imports');
+        return res.json();
+      })
+      .then((serverPendingProducts: Product[]) => {
+        if (Array.isArray(serverPendingProducts) && serverPendingProducts.length > 0) {
+          setProducts((prevProducts) => {
+            const newProducts = [...prevProducts];
+            let changed = false;
+            serverPendingProducts.forEach((sp) => {
+              const exists = prevProducts.some(
+                (p) => p.id === sp.id || (sp.telegramMessageId && String(p.telegramMessageId) === String(sp.telegramMessageId))
+              );
+              if (!exists) {
+                newProducts.unshift(sp);
+                changed = true;
+              }
+            });
+            return changed ? newProducts : prevProducts;
+          });
+        }
+      })
+      .catch((err) => console.log('Import endpoint sync status:', err));
+  }, []);
+
   // --- CORE UI STATE ---
   const [activeTab, setActiveTab] = useState<string>('Home');
   const [filters, setFilters] = useState<FilterState>({
@@ -236,8 +264,12 @@ export default function App() {
     return charCodeSum % 2 !== 0 || charCodeSum % 5 === 0;
   };
 
+  const storefrontProducts = React.useMemo(() => {
+    return products.filter((p) => p.status !== 'pending');
+  }, [products]);
+
   const getFilteredProducts = () => {
-    return products.filter((p) => {
+    return storefrontProducts.filter((p) => {
       // 1. Navigation Tab Filtering
       if (activeTab === 'Men' && !isProductForMen(p)) return false;
       if (activeTab === 'Women' && !isProductForWomen(p)) return false;
@@ -436,7 +468,7 @@ export default function App() {
     }
   };
 
-  const wishlistedProducts = products.filter((p) => wishlist.includes(p.id));
+  const wishlistedProducts = storefrontProducts.filter((p) => wishlist.includes(p.id));
 
   if (isAdminView) {
     return (
@@ -462,7 +494,7 @@ export default function App() {
         searchQuery={filters.searchQuery}
         setSearchQuery={(q) => setFilters((prev) => ({ ...prev, searchQuery: q }))}
         setSelectedBrand={handleSelectedBrandFromHeader}
-        products={products}
+        products={storefrontProducts}
         onQuickView={(pTarget) => setSelectedQuickProduct(pTarget)}
       />
 
@@ -482,7 +514,7 @@ export default function App() {
       {currentPath.startsWith('/brands/') ? (
         <BrandPage
           brandId={currentPath.split('/brands/')[1] || ''}
-          products={products}
+          products={storefrontProducts}
           wishlist={wishlist}
           onWishlistToggle={handleWishlistToggle}
           onQuickView={(pTarget) => setSelectedQuickProduct(pTarget)}
@@ -491,7 +523,7 @@ export default function App() {
         />
       ) : activeTab === 'Home' ? (
         <HomepageView
-          products={products}
+          products={storefrontProducts}
           wishlist={wishlist}
           onWishlistToggle={handleWishlistToggle}
           onQuickView={(pTarget) => setSelectedQuickProduct(pTarget)}
@@ -505,7 +537,7 @@ export default function App() {
           <Filters
             filters={filters}
             setFilters={setFilters}
-            totalProductsCount={products.length}
+            totalProductsCount={storefrontProducts.length}
             filteredCount={filteredProducts.length}
           />
 

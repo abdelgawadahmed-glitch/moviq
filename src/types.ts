@@ -26,6 +26,10 @@ export interface Product {
   isNew?: boolean;
   isBestSeller?: boolean;
   isLuxury?: boolean;
+  status?: 'pending' | 'published';
+  supplierPrice?: number;
+  supplierName?: string;
+  telegramMessageId?: string | number;
 }
 
 export interface CartItem {
