@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Heart, Eye, ShoppingBag, Star, Sparkles } from 'lucide-react';
+import { Heart, Eye, ShoppingBag, Sparkles } from 'lucide-react';
 import { Product } from '../types';
 import { useI18n } from '../lib/i18n';
 
@@ -117,26 +117,9 @@ export default function ProductCard({
         </span>
 
         {/* Product Name */}
-        <h3 className="font-serif text-[16px] text-white font-medium tracking-wide mb-2.5 line-clamp-1 group-hover:text-neutral-200 transition-colors">
+        <h3 className="font-serif text-[16px] text-white font-medium tracking-wide mb-4 line-clamp-1 group-hover:text-neutral-200 transition-colors">
           {t(product.name)}
         </h3>
-
-        {/* Rating Stars with reviews count */}
-        <div className="flex items-center gap-1 mb-4">
-          <div className="flex items-center text-amber-500 gap-0.5">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <Star
-                key={i}
-                size={11}
-                fill={i < Math.floor(product.rating) ? 'currentColor' : 'none'}
-                className="stroke-[1.5]"
-              />
-            ))}
-          </div>
-          <span className="text-[9.5px] text-neutral-500 font-bold tracking-wider ml-1">
-            {product.rating.toFixed(1)} ({product.reviewsCount} {t("Reviews Count")})
-          </span>
-        </div>
 
         {/* Available Sizes Showcase */}
         <div className="mb-5 pt-3 border-t border-neutral-800/80">
