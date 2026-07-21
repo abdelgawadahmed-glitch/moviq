@@ -136,12 +136,12 @@ export default function HomepageView({
       </section>
 
       {/* 1. Featured Brands Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6" id="featured-brands-section">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-20" id="featured-brands-section">
         <div className="text-center space-y-4 mb-16">
-          <span className="text-[10px] tracking-[0.3em] font-bold text-neutral-500 uppercase">
+          <span className="text-[12px] tracking-[0.3em] font-bold text-neutral-500 uppercase">
             {t("Curated Fashion Houses")}
           </span>
-          <h2 className="font-serif text-3.5xl sm:text-4.5xl font-extralight tracking-wide leading-tight text-white uppercase">
+          <h2 className="text-[32px] sm:text-[40px] font-bold tracking-tight leading-tight text-white uppercase">
             {t("Featured Brands")}
           </h2>
           <div className="w-12 h-[1px] bg-white/20 mx-auto mt-2" />
@@ -156,7 +156,7 @@ export default function HomepageView({
               viewport={{ once: true, margin: '-100px' }}
               transition={{ duration: 0.6, delay: idx * 0.08, ease: [0.16, 1, 0.3, 1] }}
               onClick={() => onSelectBrand(brand.name)}
-              className="group relative h-[320px] sm:h-[380px] bg-neutral-900 overflow-hidden cursor-pointer border border-neutral-800"
+              className="group relative h-[320px] sm:h-[380px] bg-neutral-900 rounded-[20px] overflow-hidden cursor-pointer border border-neutral-800 shadow-luxury hover:shadow-luxury-lg transition-luxury"
               id={`brand-card-${brand.name.toLowerCase()}`}
             >
               <img
@@ -170,18 +170,18 @@ export default function HomepageView({
               <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent" />
               
               <div className="absolute inset-x-0 bottom-0 p-8 flex flex-col justify-end text-white">
-                <span className="text-[9px] tracking-[0.25em] text-neutral-500 font-bold uppercase mb-2">
+                <span className="text-[11px] tracking-[0.25em] text-neutral-400 font-bold uppercase mb-2">
                   {t("Explore Atelier")}
                 </span>
-                <h3 className="font-serif text-2xl tracking-wider font-light uppercase mb-1">
+                <h3 className="text-[20px] font-semibold tracking-wide uppercase mb-1">
                   {t(brand.name)}
                 </h3>
-                <p className="text-[11px] text-neutral-300 font-light tracking-wide italic mb-4 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-2 group-hover:translate-y-0">
+                <p className="text-[14px] text-neutral-300 font-normal tracking-wide italic mb-4 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-2 group-hover:translate-y-0">
                   {t(brand.tagline)}
                 </p>
-                <div className="flex items-center gap-2 text-white text-[10px] font-bold tracking-[0.18em] uppercase border-b border-white/20 pb-1 w-fit group-hover:border-white transition-colors">
+                <div className="flex items-center gap-2 text-white text-[14px] font-semibold tracking-[0.15em] uppercase border-b border-white/20 pb-1 w-fit group-hover:border-white transition-colors">
                   <span>{t("Browse House")}</span>
-                  <ChevronRight size={12} className="group-hover:translate-x-1 transition-transform" />
+                  <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
                 </div>
               </div>
             </motion.div>
@@ -190,22 +190,22 @@ export default function HomepageView({
       </section>
 
       {/* 2. New Arrivals Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" id="new-arrivals-section">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-20" id="new-arrivals-section">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-16">
           <div className="space-y-2 text-center md:text-left">
-            <span className="text-[10px] tracking-[0.3em] font-bold text-neutral-500 uppercase block">
+            <span className="text-[12px] tracking-[0.3em] font-bold text-neutral-500 uppercase block">
               {t("The Latest Releases")}
             </span>
-            <h2 className="font-serif text-3.5xl sm:text-4.5xl font-extralight tracking-wide leading-tight text-white uppercase">
+            <h2 className="text-[32px] sm:text-[40px] font-bold tracking-tight leading-tight text-white uppercase">
               {t("New Arrivals")}
             </h2>
           </div>
           <button
             onClick={() => onNavigateTab('New Arrivals')}
-            className="text-white hover:text-neutral-300 font-bold text-[11px] uppercase tracking-[0.25em] flex items-center gap-2 border-b border-white/10 pb-1 hover:border-white transition-all cursor-pointer"
+            className="text-white hover:text-neutral-300 font-semibold text-[16px] uppercase tracking-[0.15em] flex items-center gap-2 border-b border-white/10 pb-1 hover:border-white transition-all cursor-pointer"
           >
             <span>{t("View Full Collection")}</span>
-            <ArrowRight size={13} />
+            <ArrowRight size={15} />
           </button>
         </div>
 
@@ -231,22 +231,22 @@ export default function HomepageView({
       </section>
 
       {/* 3. Best Sellers Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" id="best-sellers-section">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-20" id="best-sellers-section">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-16">
           <div className="space-y-2 text-center md:text-left">
-            <span className="text-[10px] tracking-[0.3em] font-bold text-neutral-500 uppercase block">
+            <span className="text-[12px] tracking-[0.3em] font-bold text-neutral-500 uppercase block">
               {t("The Most Coveted Grails")}
             </span>
-            <h2 className="font-serif text-3.5xl sm:text-4.5xl font-extralight tracking-wide leading-tight text-white uppercase">
+            <h2 className="text-[32px] sm:text-[40px] font-bold tracking-tight leading-tight text-white uppercase">
               {t("Best Sellers")}
             </h2>
           </div>
           <button
             onClick={() => onNavigateTab('Best Sellers')}
-            className="text-white hover:text-neutral-300 font-bold text-[11px] uppercase tracking-[0.25em] flex items-center gap-2 border-b border-white/10 pb-1 hover:border-white transition-all cursor-pointer"
+            className="text-white hover:text-neutral-300 font-semibold text-[16px] uppercase tracking-[0.15em] flex items-center gap-2 border-b border-white/10 pb-1 hover:border-white transition-all duration-300 cursor-pointer"
           >
             <span>{t("View All Bestsellers")}</span>
-            <ArrowRight size={13} />
+            <ArrowRight size={15} />
           </button>
         </div>
 
@@ -272,15 +272,15 @@ export default function HomepageView({
       </section>
 
       {/* 4. Trending This Week Section (Premium Bento / Staggered Layout) */}
-      <section className="bg-neutral-900 py-24 sm:py-32 text-white overflow-hidden relative" id="trending-section">
+      <section className="bg-neutral-900 py-20 lg:py-28 text-white overflow-hidden relative" id="trending-section">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.03),transparent_45%)]" />
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-4 mb-20">
-            <span className="text-[10px] tracking-[0.3em] font-bold text-neutral-400 uppercase block">
+            <span className="text-[12px] tracking-[0.3em] font-bold text-neutral-400 uppercase block">
               {t("Global Street Couture")}
             </span>
-            <h2 className="font-serif text-3.5xl sm:text-4.5xl font-extralight tracking-wide leading-tight text-white uppercase">
+            <h2 className="text-[32px] sm:text-[40px] font-bold tracking-tight leading-tight text-white uppercase">
               {t("Trending This Week")}
             </h2>
             <div className="w-12 h-[1px] bg-white/20 mx-auto mt-2" />
@@ -294,9 +294,9 @@ export default function HomepageView({
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.8 }}
-                className="lg:col-span-5 bg-black/60 border border-neutral-800/80 p-8 sm:p-10 flex flex-col justify-between space-y-8 relative group overflow-hidden"
+                className="lg:col-span-5 bg-black/60 border border-neutral-800/80 p-8 sm:p-10 flex flex-col justify-between space-y-8 relative group overflow-hidden rounded-[20px] shadow-luxury"
               >
-                <div className="absolute top-0 right-0 bg-white/10 px-4 py-1 text-[8.5px] uppercase font-semibold tracking-widest text-neutral-300">
+                <div className="absolute top-0 right-0 bg-white/10 px-4 py-1 text-[8.5px] uppercase font-semibold tracking-widest text-neutral-300 rounded-bl-[12px]">
                   {t("Must Have")}
                 </div>
                 
@@ -304,10 +304,10 @@ export default function HomepageView({
                   <span className="text-[10px] tracking-[0.25em] text-neutral-400 font-bold uppercase block">
                     {t(trendingThisWeek[0].brand)}
                   </span>
-                  <h3 className="font-serif text-2xl sm:text-3.5xl font-light tracking-wide leading-tight text-white uppercase">
+                  <h3 className="text-2xl sm:text-3xl font-semibold tracking-tight leading-tight text-white uppercase">
                     {t(trendingThisWeek[0].name)}
                   </h3>
-                  <p className="text-xs text-neutral-400 font-light leading-relaxed line-clamp-3">
+                  <p className="text-[14px] text-neutral-400 font-normal leading-relaxed line-clamp-3">
                     {t(trendingThisWeek[0].description)}
                   </p>
                 </div>
@@ -324,12 +324,12 @@ export default function HomepageView({
                 </div>
 
                 <div className="flex items-center justify-between pt-6 border-t border-neutral-800">
-                  <span className="text-lg font-serif text-neutral-200">
+                  <span className="text-lg font-bold text-neutral-200">
                     {trendingThisWeek[0].salePrice.toLocaleString()} {t("EGP")}
                   </span>
                   <button
                     onClick={() => onQuickView(trendingThisWeek[0])}
-                    className="bg-white hover:bg-neutral-200 text-black text-[10px] uppercase font-bold tracking-widest px-6 py-3 transition-colors cursor-pointer"
+                    className="bg-white hover:bg-neutral-200 text-black text-[14px] uppercase font-semibold tracking-widest px-6 py-3 transition-colors duration-300 rounded-full cursor-pointer"
                   >
                     {t("Acquire Now")}
                   </button>
@@ -347,13 +347,13 @@ export default function HomepageView({
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.7, delay: idx * 0.15 }}
-                    className="bg-black/40 border border-neutral-800/60 p-6 sm:p-8 flex flex-col justify-between space-y-6 relative group"
+                    className="bg-black/40 border border-neutral-800/60 p-6 sm:p-8 flex flex-col justify-between space-y-6 relative group rounded-[20px] shadow-luxury"
                   >
                     <div className="space-y-2">
                       <span className="text-[9px] tracking-[0.25em] text-neutral-400 font-bold uppercase block">
                         {t(item.brand)}
                       </span>
-                      <h4 className="font-serif text-lg font-light tracking-wide text-white uppercase line-clamp-1">
+                      <h4 className="text-lg font-semibold tracking-tight text-white uppercase line-clamp-1">
                         {t(item.name)}
                       </h4>
                     </div>
@@ -370,15 +370,15 @@ export default function HomepageView({
                     </div>
 
                     <div className="flex items-center justify-between pt-4 border-t border-neutral-800/80">
-                      <span className="text-sm font-serif text-neutral-300">
+                      <span className="text-sm font-bold text-neutral-300">
                         {item.salePrice.toLocaleString()} {t("EGP")}
                       </span>
                       <button
                         onClick={() => onQuickView(item)}
-                        className="text-white hover:text-neutral-400 text-[10px] uppercase font-bold tracking-widest flex items-center gap-1.5 transition-colors"
+                        className="text-white hover:text-neutral-400 text-[12px] uppercase font-semibold tracking-widest flex items-center gap-1.5 transition-colors duration-300 cursor-pointer"
                       >
                         <span>{t("Details")}</span>
-                        <ArrowRight size={11} />
+                        <ArrowRight size={13} />
                       </button>
                     </div>
                   </motion.div>
@@ -390,19 +390,19 @@ export default function HomepageView({
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
-                className="bg-neutral-800/20 border border-neutral-800/35 p-6 text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-6"
+                className="bg-neutral-800/20 border border-neutral-800/35 p-6 sm:p-8 text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-6 rounded-[20px]"
               >
                 <div className="space-y-1.5">
-                  <span className="text-[9px] tracking-[0.25em] text-neutral-400 font-bold uppercase block">
+                  <span className="text-[10px] tracking-[0.25em] text-neutral-400 font-bold uppercase block">
                     {t("Exclusive Egyptian Allocation")}
                   </span>
-                  <p className="text-xs text-neutral-300 font-light max-w-lg leading-relaxed">
+                  <p className="text-xs text-neutral-300 font-normal max-w-lg leading-relaxed">
                     {t("syndicate_pitch")}
                   </p>
                 </div>
                 <button
                   onClick={() => onNavigateTab('Luxury Collection')}
-                  className="bg-neutral-800 hover:bg-neutral-700 text-white text-[10px] uppercase font-bold tracking-widest px-6 py-3 border border-neutral-700/60 transition-colors cursor-pointer w-full sm:w-auto"
+                  className="bg-neutral-800 hover:bg-neutral-700 text-white text-[12px] uppercase font-semibold tracking-widest px-6 py-3 border border-neutral-700/60 transition-colors duration-300 cursor-pointer w-full sm:w-auto rounded-full"
                 >
                   {t("View Collection")}
                 </button>
@@ -413,22 +413,22 @@ export default function HomepageView({
       </section>
 
       {/* 5. Luxury Collection Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" id="luxury-collection-section">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-20" id="luxury-collection-section">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-16">
           <div className="space-y-2 text-center md:text-left">
-            <span className="text-[10px] tracking-[0.3em] font-bold text-neutral-500 uppercase block">
+            <span className="text-[12px] tracking-[0.3em] font-bold text-neutral-500 uppercase block">
               {t("Atelier Couture Selection")}
             </span>
-            <h2 className="font-serif text-3.5xl sm:text-4.5xl font-extralight tracking-wide leading-tight text-white uppercase">
+            <h2 className="text-[32px] sm:text-[40px] font-bold tracking-tight leading-tight text-white uppercase">
               {t("Luxury Collection")}
             </h2>
           </div>
           <button
             onClick={() => onNavigateTab('Luxury Collection')}
-            className="text-white hover:text-neutral-300 font-bold text-[11px] uppercase tracking-[0.25em] flex items-center gap-2 border-b border-white/10 pb-1 hover:border-white transition-all cursor-pointer"
+            className="text-white hover:text-neutral-300 font-semibold text-[16px] uppercase tracking-[0.15em] flex items-center gap-2 border-b border-white/10 pb-1 hover:border-white transition-all duration-300 cursor-pointer"
           >
             <span>{t("Explore High-End Pairs")}</span>
-            <ArrowRight size={13} />
+            <ArrowRight size={15} />
           </button>
         </div>
 
@@ -454,12 +454,12 @@ export default function HomepageView({
       </section>
 
       {/* 6. Why Choose MOVIQ Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-b border-neutral-900 py-24" id="why-choose-section">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-b border-neutral-900 py-20 lg:py-24" id="why-choose-section">
         <div className="text-center space-y-4 mb-20">
-          <span className="text-[10px] tracking-[0.3em] font-bold text-neutral-500 uppercase block">
+          <span className="text-[12px] tracking-[0.3em] font-bold text-neutral-500 uppercase block">
             {t("Our Core Pillars")}
           </span>
-          <h2 className="font-serif text-3.5xl sm:text-4.5xl font-extralight tracking-wide leading-tight text-white uppercase">
+          <h2 className="text-[32px] sm:text-[40px] font-bold tracking-tight leading-tight text-white uppercase">
             {t("Why Choose MOVIQ")}
           </h2>
           <div className="w-12 h-[1px] bg-white/20 mx-auto mt-2" />
@@ -471,10 +471,10 @@ export default function HomepageView({
             <div className="p-4 bg-neutral-900 rounded-full border border-neutral-800 text-white">
               <ShieldCheck size={28} className="stroke-[1.25]" />
             </div>
-            <h3 className="font-serif text-[17px] tracking-wide font-light uppercase text-white">
+            <h3 className="text-[20px] tracking-wide font-semibold uppercase text-white">
               {t("100% Certified Verification")}
             </h3>
-            <p className="text-xs text-neutral-400 font-light leading-relaxed max-w-xs">
+            <p className="text-[16px] text-neutral-400 font-normal leading-relaxed max-w-xs">
               {t("Every single pair undergoes a rigorous multi-point physical verification audit by our expert authenticators prior to dispatch.")}
             </p>
           </div>
@@ -484,10 +484,10 @@ export default function HomepageView({
             <div className="p-4 bg-neutral-900 rounded-full border border-neutral-800 text-white">
               <Truck size={28} className="stroke-[1.25]" />
             </div>
-            <h3 className="font-serif text-[17px] tracking-wide font-light uppercase text-white">
+            <h3 className="text-[20px] tracking-wide font-semibold uppercase text-white">
               {t("White-Glove Egyptian Delivery")}
             </h3>
-            <p className="text-xs text-neutral-400 font-light leading-relaxed max-w-xs">
+            <p className="text-[16px] text-neutral-400 font-normal leading-relaxed max-w-xs">
               {t("Hand-delivered directly to your doorstep in Cairo, Giza, Alexandria, and all major Egyptian Governorates with premium security.")}
             </p>
           </div>
@@ -497,10 +497,10 @@ export default function HomepageView({
             <div className="p-4 bg-neutral-900 rounded-full border border-neutral-800 text-white">
               <Lock size={28} className="stroke-[1.25]" />
             </div>
-            <h3 className="font-serif text-[17px] tracking-wide font-light uppercase text-white">
+            <h3 className="text-[20px] tracking-wide font-semibold uppercase text-white">
               {t("Encrypted Luxury Checkout")}
             </h3>
-            <p className="text-xs text-neutral-400 font-light leading-relaxed max-w-xs">
+            <p className="text-[16px] text-neutral-400 font-normal leading-relaxed max-w-xs">
               {t("State-of-the-art secure payment structures. Safe cash on delivery options or direct card handling for stress-free shopping.")}
             </p>
           </div>
@@ -510,10 +510,10 @@ export default function HomepageView({
             <div className="p-4 bg-neutral-900 rounded-full border border-neutral-800 text-white">
               <Gift size={28} className="stroke-[1.25]" />
             </div>
-            <h3 className="font-serif text-[17px] tracking-wide font-light uppercase text-white">
+            <h3 className="text-[20px] tracking-wide font-semibold uppercase text-white">
               {t("Bespoke Custom Packaging")}
             </h3>
-            <p className="text-xs text-neutral-400 font-light leading-relaxed max-w-xs">
+            <p className="text-[16px] text-neutral-400 font-normal leading-relaxed max-w-xs">
               {t("Your sneakers are packaged inside customized archival box protectors, wrapped meticulously in soft luxury monogram tissue paper.")}
             </p>
           </div>
@@ -521,12 +521,12 @@ export default function HomepageView({
       </section>
 
       {/* 7. Customer Reviews Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" id="customer-reviews-section">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-24" id="customer-reviews-section">
         <div className="text-center space-y-4 mb-20">
-          <span className="text-[10px] tracking-[0.3em] font-bold text-neutral-500 uppercase block">
+          <span className="text-[12px] tracking-[0.3em] font-bold text-neutral-500 uppercase block">
             {t("Client Testimonials")}
           </span>
-          <h2 className="font-serif text-3.5xl sm:text-4.5xl font-extralight tracking-wide leading-tight text-white uppercase">
+          <h2 className="text-[32px] sm:text-[40px] font-bold tracking-tight leading-tight text-white uppercase">
             {t("Customer Reviews")}
           </h2>
           <div className="w-12 h-[1px] bg-white/20 mx-auto mt-2" />
@@ -540,7 +540,7 @@ export default function HomepageView({
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: idx * 0.1, ease: [0.16, 1, 0.3, 1] }}
-              className="bg-neutral-900/40 border border-neutral-800 p-8 sm:p-10 flex flex-col justify-between space-y-8 relative rounded-2xl"
+              className="bg-neutral-900/40 border border-neutral-800 p-8 sm:p-10 flex flex-col justify-between space-y-8 relative rounded-[20px] shadow-luxury"
               id={`review-card-${idx}`}
             >
               {/* Gold Stars */}
@@ -551,26 +551,26 @@ export default function HomepageView({
               </div>
 
               {/* Review Quote text */}
-              <p className="text-xs sm:text-[13px] text-neutral-300 font-light leading-relaxed italic font-serif">
+              <p className="text-[16px] text-neutral-300 font-normal leading-relaxed italic">
                 &ldquo;{t(review.id === 'r1' ? 'review_1_quote' : review.id === 'r2' ? 'review_2_quote' : 'review_3_quote')}&rdquo;
               </p>
 
               {/* Reviewer Meta Details */}
               <div className="flex items-center justify-between pt-6 border-t border-neutral-800">
                 <div>
-                  <span className="text-[11.5px] uppercase tracking-[0.12em] text-white font-semibold block">
+                  <span className="text-[14px] uppercase tracking-[0.12em] text-white font-semibold block">
                     {t(review.name)}
                   </span>
-                  <span className="text-[9px] uppercase tracking-[0.15em] text-neutral-500 font-medium">
+                  <span className="text-[12px] uppercase tracking-[0.15em] text-neutral-500 font-normal">
                     {t(review.location)}
                   </span>
                 </div>
                 
                 <div className="text-right">
-                  <span className="bg-neutral-800 text-neutral-300 text-[8px] uppercase tracking-[0.18em] font-bold px-2.5 py-1 block w-fit ml-auto rounded-sm">
+                  <span className="bg-neutral-800 text-neutral-300 text-[10px] uppercase tracking-[0.18em] font-bold px-2.5 py-1 block w-fit ml-auto rounded-sm">
                     {t("VERIFIED BUYER")}
                   </span>
-                  <span className="text-[8.5px] text-neutral-500 font-semibold uppercase mt-1 block">
+                  <span className="text-[11px] text-neutral-500 font-semibold uppercase mt-1 block">
                     {t(review.product)}
                   </span>
                 </div>
@@ -581,26 +581,26 @@ export default function HomepageView({
       </section>
 
       {/* 8. Newsletter Section */}
-      <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8" id="newsletter-section">
+      <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 lg:pb-28" id="newsletter-section">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="bg-black text-white py-16 px-6 sm:px-12 md:px-20 text-center relative overflow-hidden border border-neutral-800"
+          className="bg-black text-white py-16 px-6 sm:px-12 md:px-20 text-center relative overflow-hidden border border-neutral-800 rounded-[20px] shadow-luxury-lg"
         >
           {/* Luxury Abstract Ambient Vector Backgrounds */}
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,rgba(255,255,255,0.04),transparent_50%)]" />
           <div className="absolute -top-32 -left-32 w-64 h-64 bg-white/[0.01] rounded-full blur-3xl" />
           
           <div className="relative z-10 max-w-2xl mx-auto space-y-6">
-            <span className="text-[9px] tracking-[0.35em] text-neutral-400 font-bold uppercase block">
+            <span className="text-[12px] tracking-[0.35em] text-neutral-400 font-bold uppercase block">
               {t("Join The MOVIQ Syndicate")}
             </span>
-            <h2 className="font-serif text-3xl sm:text-4.5xl font-extralight tracking-wide uppercase leading-tight">
+            <h2 className="text-[32px] sm:text-[40px] font-bold tracking-tight uppercase leading-tight">
               {t("Newsletter")}
             </h2>
-            <p className="text-xs text-neutral-300 font-light tracking-widest uppercase leading-relaxed max-w-lg mx-auto font-sans">
+            <p className="text-[16px] text-neutral-300 font-normal tracking-wide uppercase leading-relaxed max-w-lg mx-auto">
               {t("Subscribe to unlock privileged allocations, private drop notifications, and luxury sneaker insights.")}
             </p>
 
@@ -621,14 +621,14 @@ export default function HomepageView({
                     placeholder={t("ENTER YOUR EMAIL FOR COUTURE ACCESS")}
                     value={newsletterEmail}
                     onChange={(e) => setNewsletterEmail(e.target.value)}
-                    className="flex-grow bg-neutral-900 border border-neutral-800 focus:border-white text-white text-[10px] tracking-widest uppercase placeholder:text-neutral-500 px-5 py-4 focus:outline-none transition-colors rounded-none"
+                    className="flex-grow bg-neutral-900 border border-neutral-800 focus:border-white text-white text-[14px] tracking-widest uppercase placeholder:text-neutral-500 px-6 py-4 focus:outline-none transition-colors duration-300 rounded-full"
                   />
                   <button
                     type="submit"
-                    className="bg-white hover:bg-neutral-200 text-black text-[10px] font-bold tracking-[0.25em] uppercase px-8 py-4 transition-all duration-300 flex items-center justify-center gap-2 rounded-none cursor-pointer"
+                    className="bg-white hover:bg-neutral-200 text-black text-[15px] font-semibold tracking-[0.15em] uppercase px-8 py-4 transition-all duration-300 flex items-center justify-center gap-2 rounded-full cursor-pointer shadow-md hover:shadow-lg hover:-translate-y-0.5 active:scale-95"
                   >
                     <span>{t("Subscribe")}</span>
-                    <Send size={11} />
+                    <Send size={14} />
                   </button>
                 </motion.form>
               ) : (

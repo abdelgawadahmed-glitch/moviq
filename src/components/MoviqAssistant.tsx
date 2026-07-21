@@ -583,10 +583,10 @@ export default function MoviqAssistant({ onApplyFilter, onTriggerSizeFilter }: M
                   <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
                 </div>
                 <div>
-                  <h3 className="font-serif text-[15px] font-bold tracking-wide text-white uppercase">
+                  <h3 className="text-[20px] font-semibold tracking-tight text-white uppercase">
                     {t("MOVIQ Assistant")}
                   </h3>
-                  <p className="text-[9px] text-neutral-500 tracking-wider uppercase">
+                  <p className="text-[12px] text-neutral-400 tracking-wider uppercase font-medium">
                     {t("Elite Sneaker Concierge")}
                   </p>
                 </div>
@@ -601,14 +601,14 @@ export default function MoviqAssistant({ onApplyFilter, onTriggerSizeFilter }: M
             </div>
 
             {/* Messages body */}
-            <div className="flex-1 my-4 overflow-y-auto pr-1 space-y-4 custom-scrollbar text-xs">
+            <div className="flex-1 my-4 overflow-y-auto pr-1 space-y-4 custom-scrollbar text-[16px]">
               {messages.map((msg) => (
                 <div
                   key={msg.id}
                   className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}
                 >
                   <div
-                    className={`max-w-[85%] px-4 py-3 rounded-2xl leading-relaxed font-light tracking-wide ${
+                    className={`max-w-[85%] px-4 py-3 rounded-2xl leading-relaxed font-normal tracking-wide ${
                       msg.sender === 'user'
                         ? 'bg-white text-black rounded-tr-none'
                         : 'bg-neutral-900 text-neutral-200 border border-neutral-800/60 rounded-tl-none'

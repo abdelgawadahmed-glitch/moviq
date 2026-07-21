@@ -143,7 +143,7 @@ export default function WishlistDrawer({
                                 onAddToCart(product, defaultSize, defaultColor);
                                 onRemoveFromWishlist(product.id);
                               }}
-                              className="w-full bg-neutral-100 hover:bg-black hover:text-white text-black font-semibold text-[9.5px] uppercase tracking-widest py-2 rounded-none transition-all flex items-center justify-center gap-1.5 cursor-pointer border border-neutral-200 hover:border-black"
+                              className="w-full bg-black hover:bg-neutral-800 text-white font-semibold text-[9.5px] uppercase tracking-widest py-2.5 rounded-full transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs hover:shadow-md"
                             >
                               <ShoppingBag size={11} />
                               <span>{t("Add to Bag")}</span>

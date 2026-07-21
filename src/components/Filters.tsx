@@ -110,7 +110,7 @@ export default function Filters({
           <div className="flex items-center gap-3">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="flex items-center gap-2 px-4 py-2 bg-black hover:bg-neutral-800 text-white text-xs uppercase tracking-widest font-semibold transition-all duration-300 rounded-none cursor-pointer"
+              className="flex items-center gap-2 px-4.5 py-2.5 bg-black hover:bg-neutral-800 text-white text-[16px] uppercase tracking-widest font-semibold transition-all duration-300 rounded-full cursor-pointer shadow-xs hover:shadow-md"
               id="filter-toggle-button"
             >
               <SlidersHorizontal size={14} />
@@ -142,7 +142,7 @@ export default function Filters({
                   id="sort-select"
                   value={filters.sortBy}
                   onChange={handleSortChange}
-                  className="bg-neutral-50 border border-neutral-200 focus:border-black text-xs uppercase tracking-widest font-semibold py-2 pl-3 pr-8 rounded-none outline-none cursor-pointer appearance-none text-black"
+                  className="bg-neutral-50 border border-neutral-200 focus:border-black text-xs uppercase tracking-widest font-semibold py-2 pl-3 pr-8 rounded-xl outline-none cursor-pointer appearance-none text-black"
                 >
                   <option value="featured">{t("Featured")}</option>
                   <option value="newest">{t("Newest")}</option>

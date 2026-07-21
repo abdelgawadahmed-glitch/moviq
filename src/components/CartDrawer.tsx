@@ -363,7 +363,7 @@ export default function CartDrawer({
               {/* Checkout Button */}
               <button
                 onClick={() => onCheckout(activeDiscountRate, appliedCode || 'NONE')}
-                className="w-full bg-black hover:bg-neutral-850 text-white font-bold text-xs py-4 px-6 uppercase tracking-widest rounded-none transition-all duration-300 flex items-center justify-center gap-2.5 shadow-md cursor-pointer hover:gap-4 hover:tracking-[0.12em]"
+                className="w-full bg-black hover:bg-neutral-800 text-white font-bold text-xs py-4 px-6 uppercase tracking-widest rounded-full transition-all duration-300 flex items-center justify-center gap-2.5 shadow-md cursor-pointer hover:shadow-lg hover:gap-4 active:scale-98"
               >
                 <span>{t("Proceed to Checkout")}</span>
                 <ArrowRight size={14} />

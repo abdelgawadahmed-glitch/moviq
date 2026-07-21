@@ -23,11 +23,11 @@ import { useI18n } from './lib/i18n';
 
 function SkeletonCard() {
   return (
-    <div className="bg-neutral-900/50 rounded-3xl overflow-hidden border border-neutral-800/80 p-6 flex flex-col h-full space-y-4 shadow-2xl relative">
+    <div className="bg-white rounded-3xl overflow-hidden border border-neutral-100 p-6 flex flex-col h-full space-y-4 shadow-sm relative">
       {/* Image skeleton */}
-      <div className="relative aspect-[4/5] bg-neutral-950 rounded-2xl overflow-hidden flex items-center justify-center p-5">
+      <div className="relative aspect-[4/5] bg-neutral-100 rounded-2xl overflow-hidden flex items-center justify-center p-5">
         <motion.div
-          className="absolute inset-0 bg-gradient-to-r from-transparent via-neutral-800/45 to-transparent"
+          className="absolute inset-0 bg-gradient-to-r from-transparent via-neutral-200/50 to-transparent"
           initial={{ x: '-100%' }}
           animate={{ x: '100%' }}
           transition={{ repeat: Infinity, duration: 1.5, ease: 'linear' }}
@@ -36,17 +36,17 @@ function SkeletonCard() {
       
       {/* Brand & Name skeleton */}
       <div className="space-y-2">
-        <div className="h-3 w-1/4 bg-neutral-800/80 rounded-md relative overflow-hidden">
+        <div className="h-3 w-1/4 bg-neutral-200 rounded-md relative overflow-hidden">
           <motion.div
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-neutral-800/45 to-transparent"
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-neutral-200/50 to-transparent"
             initial={{ x: '-100%' }}
             animate={{ x: '100%' }}
             transition={{ repeat: Infinity, duration: 1.5, ease: 'linear' }}
           />
         </div>
-        <div className="h-4.5 w-3/4 bg-neutral-800/80 rounded-md relative overflow-hidden">
+        <div className="h-4.5 w-3/4 bg-neutral-200 rounded-md relative overflow-hidden">
           <motion.div
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-neutral-800/45 to-transparent"
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-neutral-200/50 to-transparent"
             initial={{ x: '-100%' }}
             animate={{ x: '100%' }}
             transition={{ repeat: Infinity, duration: 1.5, ease: 'linear' }}
@@ -57,23 +57,23 @@ function SkeletonCard() {
       {/* Stars rating skeleton */}
       <div className="flex gap-1">
         {[1, 2, 3, 4, 5].map((i) => (
-          <div key={i} className="w-2.5 h-2.5 bg-neutral-800/60 rounded-full" />
+          <div key={i} className="w-2.5 h-2.5 bg-neutral-200 rounded-full" />
         ))}
       </div>
 
       {/* Available sizes skeleton */}
-      <div className="space-y-2 pt-3 border-t border-neutral-800/60">
-        <div className="h-2 w-1/4 bg-neutral-800/85 rounded-md" />
+      <div className="space-y-2 pt-3 border-t border-neutral-100">
+        <div className="h-2 w-1/4 bg-neutral-200 rounded-md" />
         <div className="flex gap-1.5">
-          <div className="h-5 w-8 bg-neutral-800/60 rounded-md" />
-          <div className="h-5 w-8 bg-neutral-800/60 rounded-md" />
-          <div className="h-5 w-8 bg-neutral-800/60 rounded-md" />
+          <div className="h-5 w-8 bg-neutral-200 rounded-md" />
+          <div className="h-5 w-8 bg-neutral-200 rounded-md" />
+          <div className="h-5 w-8 bg-neutral-200 rounded-md" />
         </div>
       </div>
 
       {/* Price skeleton */}
-      <div className="pt-4 border-t border-neutral-800/60 flex justify-between items-center mt-auto">
-        <div className="h-4 w-20 bg-neutral-800/85 rounded-md" />
+      <div className="pt-4 border-t border-neutral-100 flex justify-between items-center mt-auto">
+        <div className="h-4 w-20 bg-neutral-200 rounded-md" />
       </div>
     </div>
   );
@@ -481,7 +481,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-white flex flex-col font-sans selection:bg-white selection:text-black relative animate-none" id="moviq-app-root">
+    <div className="min-h-screen bg-white text-neutral-900 flex flex-col font-sans selection:bg-black selection:text-white relative animate-none" id="moviq-app-root">
       
       {/* 1. Navbar */}
       <Header
@@ -532,7 +532,7 @@ export default function App() {
           onNavigateTab={handleTabChange}
         />
       ) : (
-        <div className="scroll-mt-20 pt-16 pb-24" ref={catalogRef} id="showcase-catalog-container">
+        <div className="scroll-mt-20 pt-16 pb-24 bg-neutral-50/50" ref={catalogRef} id="showcase-catalog-container">
           {/* Sizing & Sorting Board */}
           <Filters
             filters={filters}
@@ -545,7 +545,7 @@ export default function App() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10">
             {filteredProducts.length === 0 ? (
               <div className="text-center py-24 space-y-4">
-                <span className="text-neutral-400 text-sm block font-light italic">
+                <span className="text-neutral-500 text-sm block font-light italic">
                   {t("No matching luxury creations discovered in our inventory.")}
                 </span>
                 <button
@@ -562,7 +562,7 @@ export default function App() {
                       availability: 'all'
                     })
                   }
-                  className="bg-black hover:bg-neutral-800 text-white font-bold text-[10px] uppercase tracking-widest px-6 py-3 rounded-none transition-colors cursor-pointer"
+                  className="bg-black hover:bg-neutral-800 text-white font-bold text-[10px] uppercase tracking-widest px-6 py-3.5 rounded-full shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5 cursor-pointer"
                 >
                   {t("Reset Search Filters")}
                 </button>
@@ -602,18 +602,18 @@ export default function App() {
       )}
 
       {/* 5. Luxury Brand Philosophy Accent Banner */}
-      <section className="bg-neutral-900/40 backdrop-blur-md py-20 border-t border-b border-neutral-900" id="brand-philosophy">
+      <section className="bg-neutral-50 py-20 border-t border-b border-neutral-200/80" id="brand-philosophy">
         <div className="max-w-3xl mx-auto text-center px-4 space-y-6">
-          <span className="text-[10px] tracking-[0.3em] font-bold text-amber-500/80 uppercase">
+          <span className="text-[10px] tracking-[0.3em] font-bold text-[#C9A227] uppercase">
             {t("Moviq Luxury Sneaker Philosophy")}
           </span>
-          <p className="font-serif text-2xl sm:text-3xl font-extralight tracking-wide leading-relaxed text-neutral-200 italic">
+          <p className="font-serif text-2xl sm:text-3xl font-light tracking-wide leading-relaxed text-neutral-800 italic">
             &ldquo;{t("Philosophy Quote")}&rdquo;
           </p>
-          <div className="flex justify-center items-center gap-1.5 text-neutral-500">
-            <span className="w-6 h-[1.5px] bg-neutral-800" />
-            <span className="text-[10px] tracking-widest uppercase font-bold text-white">{t("Founder of MOVIQ")}</span>
-            <span className="w-6 h-[1.5px] bg-neutral-800" />
+          <div className="flex justify-center items-center gap-1.5 text-neutral-400">
+            <span className="w-6 h-[1.5px] bg-neutral-300" />
+            <span className="text-[10px] tracking-widest uppercase font-bold text-neutral-900">{t("Founder of MOVIQ")}</span>
+            <span className="w-6 h-[1.5px] bg-neutral-300" />
           </div>
         </div>
       </section>
@@ -686,16 +686,16 @@ export default function App() {
             initial={{ opacity: 0, y: 50, x: '-50%' }}
             animate={{ opacity: 1, y: 0, x: '-50%' }}
             exit={{ opacity: 0, y: 20, x: '-50%' }}
-            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-black text-white px-6 py-3.5 rounded-none shadow-2xl border border-neutral-800 flex items-center gap-3.5 min-w-[320px] max-w-md"
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-neutral-900 text-white px-6 py-3.5 rounded-2xl shadow-2xl border border-neutral-800 flex items-center gap-3.5 min-w-[320px] max-w-md"
             id="couture-toast"
           >
-            <div className="w-2.5 h-2.5 rounded-full bg-accent-red animate-ping" />
+            <div className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-ping" />
             <span className="text-xs uppercase tracking-wider font-semibold flex-1">
               {t(toastMessage)}
             </span>
             <button
               onClick={() => setToastMessage(null)}
-              className="text-neutral-400 hover:text-white text-[10px] uppercase font-bold font-mono pl-2"
+              className="text-neutral-400 hover:text-white text-[10px] uppercase font-bold font-mono pl-2 cursor-pointer"
             >
               {t("Dismiss")}
             </button>

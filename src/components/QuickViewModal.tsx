@@ -86,7 +86,7 @@ export default function QuickViewModal({
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 30 }}
         transition={{ type: 'spring', duration: 0.6, bounce: 0.15 }}
-        className="relative bg-white text-black shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-none z-10 grid grid-cols-1 md:grid-cols-12 divide-y md:divide-y-0 md:divide-x divide-neutral-100"
+        className="relative bg-white text-black shadow-luxury-lg w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-[20px] z-10 grid grid-cols-1 md:grid-cols-12 divide-y md:divide-y-0 md:divide-x divide-neutral-100 border border-neutral-100"
         id="quick-view-modal-container"
       >
         {/* Close Button */}
@@ -132,10 +132,10 @@ export default function QuickViewModal({
 
         {/* Column 2: Buy Details & Forms (md: 7 cols) */}
         <div className="md:col-span-7 p-6 sm:p-8 flex flex-col overflow-y-auto" id="modal-details-side">
-          <span className="text-[11px] tracking-[0.25em] text-neutral-400 font-bold uppercase mb-1.5 block">
+          <span className="text-[12px] tracking-[0.25em] text-neutral-400 font-bold uppercase mb-1.5 block">
             {product.brand}
           </span>
-          <h2 className="font-serif text-2xl sm:text-3.5xl font-extralight tracking-wide text-black mb-3 leading-tight uppercase">
+          <h2 className="text-[22px] sm:text-[24px] font-semibold tracking-tight text-black mb-3 leading-tight uppercase">
             {product.name}
           </h2>
 
@@ -162,15 +162,15 @@ export default function QuickViewModal({
 
           {/* Pricing Row */}
           <div className="flex items-baseline gap-4 mb-6">
-            <span className="text-xl font-bold font-serif text-accent-red">
+            <span className="text-[22px] font-bold text-accent-red">
               {product.salePrice.toLocaleString()} EGP
             </span>
             {product.discount > 0 && (
               <>
-                <span className="text-sm text-neutral-400 line-through">
+                <span className="text-[14px] text-neutral-400 line-through">
                   {product.originalPrice.toLocaleString()} EGP
                 </span>
-                <span className="bg-accent-red/10 text-accent-red text-[10px] font-bold tracking-widest uppercase px-2 py-0.5 rounded-sm">
+                <span className="bg-accent-red/10 text-accent-red text-[12px] font-bold tracking-widest uppercase px-2 py-0.5 rounded-sm">
                   Save {product.discount}%
                 </span>
               </>
@@ -203,7 +203,7 @@ export default function QuickViewModal({
           {/* Tab 1: Details */}
           {activeTab === 'details' && (
             <div className="space-y-6 flex-grow">
-              <p className="text-xs text-neutral-600 leading-relaxed font-light">
+              <p className="text-[16px] text-neutral-600 leading-relaxed font-normal">
                 {product.description}
               </p>
 
@@ -296,15 +296,15 @@ export default function QuickViewModal({
                   onClick={() => {
                     onAddToCart(product, selectedSize, selectedColor);
                   }}
-                  className="flex-1 bg-black hover:bg-neutral-800 text-white font-semibold text-xs py-4 px-6 uppercase tracking-widest rounded-none transition-all duration-300 flex items-center justify-center gap-3.5 group cursor-pointer shadow-md"
+                  className="flex-1 bg-black hover:bg-neutral-800 text-white font-semibold text-[16px] py-4 px-6 uppercase tracking-widest rounded-full transition-all duration-300 flex items-center justify-center gap-3.5 group cursor-pointer shadow-md hover:shadow-lg hover:-translate-y-0.5 active:scale-95"
                 >
-                  <ShoppingBag size={15} />
+                  <ShoppingBag size={16} />
                   <span>Add To Shopping Bag</span>
                 </button>
                 
                 <button
                   onClick={() => onWishlistToggle(product.id)}
-                  className={`px-5 py-4 border text-xs uppercase tracking-widest font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                  className={`px-5 py-4 border text-[16px] uppercase tracking-widest font-semibold rounded-full flex items-center justify-center gap-2 transition-all cursor-pointer ${
                     isWishlisted
                       ? 'bg-black text-white border-black'
                       : 'border-neutral-200 text-neutral-700 hover:border-black hover:text-black'

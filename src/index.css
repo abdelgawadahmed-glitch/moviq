@@ -1,40 +1,63 @@
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: "Playfair Display", ui-serif, Georgia, serif;
+  --font-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-serif: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   
   --color-accent-red: #E53935;
   --color-luxury-gray: #777777;
 }
 
 @layer base {
-  body {
-    @apply bg-neutral-950 text-white antialiased selection:bg-white selection:text-black;
+  *, ::before, ::after {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
   }
   
-  html.rtl-layout, .rtl-layout {
-    font-family: 'Cairo', 'Poppins', sans-serif !important;
+  body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+    @apply bg-white text-neutral-900 antialiased selection:bg-black selection:text-white;
+  }
+  
+  html.rtl-layout, .rtl-layout, html.rtl-layout *, .rtl-layout * {
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
   }
 }
 
-/* Custom scrollbar to match luxury theme */
+@utility rounded-card {
+  border-radius: 20px;
+}
+
+@utility shadow-luxury {
+  box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.05), 0 4px 12px -2px rgba(0, 0, 0, 0.03);
+}
+
+@utility shadow-luxury-lg {
+  box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.12), 0 8px 24px -4px rgba(0, 0, 0, 0.06);
+}
+
+@utility transition-luxury {
+  transition: all 300ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Custom scrollbar to match luxury light theme */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0a0a0a;
+  background: #f8f9fa;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #333333;
-  border-radius: 0px;
+  background: #e2e8f0;
+  border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #555555;
+  background: #cbd5e1;
 }
+
 
