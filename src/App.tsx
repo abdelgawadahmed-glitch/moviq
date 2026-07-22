@@ -504,6 +504,7 @@ export default function App() {
           activeTab={activeTab}
           selectedBrand={filters.brand}
           onScrollToCatalog={handleScrollToCatalog}
+          onSelectBrand={handleSelectedBrandFromHeader}
         />
       )}
 
