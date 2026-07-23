@@ -114,30 +114,51 @@ export default function App() {
 
   // Synchronize newly imported pending products from the backend server
   useEffect(() => {
-    fetch('/api/import')
-      .then((res) => {
-        if (!res.ok) throw new Error('Failed to fetch pending imports');
-        return res.json();
-      })
-      .then((serverPendingProducts: Product[]) => {
-        if (Array.isArray(serverPendingProducts) && serverPendingProducts.length > 0) {
-          setProducts((prevProducts) => {
-            const newProducts = [...prevProducts];
-            let changed = false;
-            serverPendingProducts.forEach((sp) => {
-              const exists = prevProducts.some(
-                (p) => p.id === sp.id || (sp.telegramMessageId && String(p.telegramMessageId) === String(sp.telegramMessageId))
-              );
-              if (!exists) {
-                newProducts.unshift(sp);
-                changed = true;
-              }
+    const fetchImports = () => {
+      fetch('/api/import')
+        .then((res) => {
+          if (!res.ok) throw new Error('Failed to fetch pending imports');
+          return res.json();
+        })
+        .then((serverPendingProducts: Product[]) => {
+          if (Array.isArray(serverPendingProducts) && serverPendingProducts.length > 0) {
+            setProducts((prevProducts) => {
+              const updatedList = [...prevProducts];
+              let changed = false;
+
+              serverPendingProducts.forEach((sp) => {
+                const existingIdx = updatedList.findIndex(
+                  (p) => p.id === sp.id || (sp.telegramMessageId && String(p.telegramMessageId) === String(sp.telegramMessageId))
+                );
+
+                if (existingIdx === -1) {
+                  // Add new pending item
+                  updatedList.unshift(sp);
+                  changed = true;
+                } else {
+                  // Update existing item if server status or gallery changed
+                  const existing = updatedList[existingIdx];
+                  if (
+                    existing.status !== sp.status ||
+                    (sp.gallery && sp.gallery.length !== (existing.gallery || []).length) ||
+                    existing.image !== sp.image
+                  ) {
+                    updatedList[existingIdx] = { ...existing, ...sp };
+                    changed = true;
+                  }
+                }
+              });
+
+              return changed ? updatedList : prevProducts;
             });
-            return changed ? newProducts : prevProducts;
-          });
-        }
-      })
-      .catch((err) => console.log('Import endpoint sync status:', err));
+          }
+        })
+        .catch((err) => console.log('Import endpoint sync status:', err));
+    };
+
+    fetchImports();
+    const interval = setInterval(fetchImports, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   // --- CORE UI STATE ---

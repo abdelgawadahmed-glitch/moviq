@@ -30,6 +30,9 @@ export interface Product {
   supplierPrice?: number;
   supplierName?: string;
   telegramMessageId?: string | number;
+  mediaGroupId?: string;
+  telegramSender?: string;
+  createdAt?: string;
 }
 
 export interface CartItem {

@@ -220,6 +220,186 @@ export default function AdminDashboard({
   // Success messaging triggers
   const [actionSuccess, setActionSuccess] = useState('');
 
+  // --- TELEGRAM WEBHOOK & BOT STATES ---
+  const [telegramConfig, setTelegramConfig] = useState<{
+    isConfigured: boolean;
+    botTokenMasked: string;
+    webhookUrl: string;
+    autoPublish: boolean;
+  }>({
+    isConfigured: false,
+    botTokenMasked: '',
+    webhookUrl: typeof window !== 'undefined' ? `${window.location.origin}/api/telegram-webhook` : '',
+    autoPublish: false
+  });
+
+  const [showTgConfigModal, setShowTgConfigModal] = useState(false);
+  const [botTokenInput, setBotTokenInput] = useState('');
+  const [webhookUrlInput, setWebhookUrlInput] = useState(
+    typeof window !== 'undefined' ? `${window.location.origin}/api/telegram-webhook` : ''
+  );
+  const [autoPublishInput, setAutoPublishInput] = useState(false);
+
+  // Simulation test modal
+  const [showSimulateModal, setShowSimulateModal] = useState(false);
+  const [simPhotoUrl, setSimPhotoUrl] = useState('');
+  const [simCaption, setSimCaption] = useState('Louis Vuitton Trainer Sneaker 14500 EGP - Size 40,41,42,43,44');
+
+  // Edit pending import item
+  const [editingPendingProduct, setEditingPendingProduct] = useState<Product | null>(null);
+  const [editingPendingForm, setEditingPendingForm] = useState({
+    name: '',
+    brand: '',
+    salePrice: 12500,
+    category: 'Sneakers',
+    sizes: '40,41,42,43,44',
+    description: ''
+  });
+
+  // Fetch Telegram Config on mount
+  useEffect(() => {
+    fetch('/api/telegram/config')
+      .then(res => res.json())
+      .then(data => {
+        if (data) {
+          setTelegramConfig({
+            isConfigured: !!data.hasToken,
+            botTokenMasked: data.botTokenMasked || '',
+            webhookUrl: data.webhookUrl || `${window.location.origin}/api/telegram-webhook`,
+            autoPublish: !!data.autoPublish
+          });
+          setAutoPublishInput(!!data.autoPublish);
+          if (data.webhookUrl) setWebhookUrlInput(data.webhookUrl);
+        }
+      })
+      .catch(err => console.log('Telegram config fetch status:', err));
+  }, []);
+
+  const handleSaveTelegramConfig = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const res = await fetch('/api/telegram/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          botToken: botTokenInput,
+          webhookUrl: webhookUrlInput,
+          autoPublish: autoPublishInput
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        triggerSuccess('Telegram bot configuration saved.');
+        setTelegramConfig(prev => ({
+          ...prev,
+          isConfigured: !!botTokenInput || prev.isConfigured,
+          webhookUrl: webhookUrlInput,
+          autoPublish: autoPublishInput
+        }));
+        setShowTgConfigModal(false);
+      }
+    } catch (err: any) {
+      alert('Error saving config: ' + err.message);
+    }
+  };
+
+  const handleSetWebhookUrl = async () => {
+    const targetUrl = webhookUrlInput || `${window.location.origin}/api/telegram-webhook`;
+    try {
+      const res = await fetch('/api/telegram/set-webhook', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          webhookUrl: targetUrl,
+          botToken: botTokenInput
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        triggerSuccess('Telegram Webhook set successfully with Telegram API!');
+        setTelegramConfig(prev => ({ ...prev, webhookUrl: targetUrl, isConfigured: true }));
+      } else {
+        alert('Telegram API error: ' + (data.error || 'Failed to set webhook'));
+      }
+    } catch (err: any) {
+      alert('Error setting webhook: ' + err.message);
+    }
+  };
+
+  const handleSimulatePhotoImport = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const res = await fetch('/api/telegram/test-import', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          imageUrl: simPhotoUrl,
+          caption: simCaption
+        })
+      });
+      const data = await res.json();
+      if (data.success && data.product) {
+        triggerSuccess(`Simulated Telegram photo import! New Pending Import created for "${data.product.name}".`);
+        setProducts(prev => [data.product, ...prev]);
+        setShowSimulateModal(false);
+        setSimPhotoUrl('');
+      }
+    } catch (err: any) {
+      alert('Simulation error: ' + err.message);
+    }
+  };
+
+  const handleStartEditPendingProduct = (p: Product) => {
+    setEditingPendingProduct(p);
+    setEditingPendingForm({
+      name: p.name,
+      brand: p.brand,
+      salePrice: p.salePrice,
+      category: p.category,
+      sizes: p.sizes ? p.sizes.join(',') : '40,41,42,43,44',
+      description: p.description || ''
+    });
+  };
+
+  const handleSavePendingProductUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingPendingProduct) return;
+
+    try {
+      const formattedSizes = editingPendingForm.sizes.split(',').map(s => s.trim());
+      const res = await fetch('/api/import/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: editingPendingProduct.id,
+          name: editingPendingForm.name,
+          brand: editingPendingForm.brand,
+          salePrice: Number(editingPendingForm.salePrice),
+          category: editingPendingForm.category,
+          sizes: formattedSizes,
+          description: editingPendingForm.description
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setProducts(prev => prev.map(item => item.id === editingPendingProduct.id ? {
+          ...item,
+          name: editingPendingForm.name,
+          brand: editingPendingForm.brand,
+          salePrice: Number(editingPendingForm.salePrice),
+          originalPrice: Number(editingPendingForm.salePrice),
+          category: editingPendingForm.category,
+          sizes: formattedSizes,
+          description: editingPendingForm.description
+        } : item));
+        triggerSuccess(`Updated details for pending product "${editingPendingForm.name}".`);
+        setEditingPendingProduct(null);
+      }
+    } catch (err: any) {
+      alert('Error updating pending product: ' + err.message);
+    }
+  };
+
   // --- LOAD & SEED SYSTEM ---
   useEffect(() => {
     // 1. Orders
@@ -1707,70 +1887,197 @@ export default function AdminDashboard({
                 exit={{ opacity: 0, y: -10 }}
                 className="space-y-6"
               >
-                <div className="flex flex-wrap justify-between items-end gap-4">
+                {/* Header & Controls */}
+                <div className="flex flex-wrap justify-between items-start lg:items-center gap-4 bg-neutral-900 border border-neutral-800 p-5">
                   <div>
-                    <h2 className="text-xl font-bold uppercase tracking-tight text-white">Pending Imports Queue</h2>
-                    <p className="text-xs text-neutral-400 mt-1 font-light font-sans">
-                      Verify specifications, establish pricing, and authorize staging for imported collections before publication
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-xl font-bold uppercase tracking-tight text-white">Pending Telegram Imports Queue</h2>
+                      <span className={`text-[9px] px-2 py-0.5 border font-extrabold uppercase tracking-widest ${
+                        telegramConfig.isConfigured 
+                          ? 'bg-emerald-950/60 text-emerald-400 border-emerald-800/80' 
+                          : 'bg-amber-950/60 text-amber-400 border-amber-800/80'
+                      }`}>
+                        {telegramConfig.isConfigured ? 'Bot Webhook Active' : 'Bot Config Needed'}
+                      </span>
+                    </div>
+                    <p className="text-xs text-neutral-400 mt-1 font-light">
+                      Photos sent to your Telegram bot are automatically downloaded, saved to local storage, and staged here for approval.
                     </p>
                   </div>
+
+                  <div className="flex flex-wrap items-center gap-2">
+                    <button
+                      onClick={() => setShowTgConfigModal(true)}
+                      className="px-3.5 py-2 bg-neutral-800 hover:bg-neutral-700 text-white font-extrabold text-[10px] uppercase tracking-widest transition-all cursor-pointer border border-neutral-700 flex items-center gap-1.5"
+                    >
+                      <span>Bot & Webhook Settings</span>
+                    </button>
+
+                    <button
+                      onClick={() => setShowSimulateModal(true)}
+                      className="px-3.5 py-2 bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-[10px] uppercase tracking-widest transition-all cursor-pointer flex items-center gap-1.5"
+                    >
+                      <Plus size={12} />
+                      <span>Simulate Photo Submission</span>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        fetch('/api/import')
+                          .then(res => res.json())
+                          .then(data => {
+                            if (Array.isArray(data)) {
+                              setProducts(prev => {
+                                const published = prev.filter(p => p.status !== 'pending');
+                                return [...data, ...published];
+                              });
+                              triggerSuccess('Refreshed Pending Imports queue');
+                            }
+                          });
+                      }}
+                      className="px-3 py-2 bg-neutral-950 border border-neutral-800 hover:border-neutral-700 text-neutral-300 font-bold text-[10px] uppercase tracking-widest cursor-pointer"
+                      title="Refresh Queue"
+                    >
+                      <RefreshCw size={13} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Webhook Endpoint Info Bar */}
+                <div className="bg-neutral-950 border border-neutral-800/80 p-4 text-xs font-mono text-neutral-400 flex flex-wrap justify-between items-center gap-3">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="text-[10px] uppercase font-bold text-neutral-500 shrink-0">Webhook URL:</span>
+                    <span className="text-amber-400 truncate bg-neutral-900 px-2 py-1 border border-neutral-800">
+                      {telegramConfig.webhookUrl || `${typeof window !== 'undefined' ? window.location.origin : ''}/api/telegram-webhook`}
+                    </span>
+                  </div>
+                  <span className="text-[10px] text-neutral-500 font-sans">
+                    {pendingProductsList.length} item{pendingProductsList.length !== 1 ? 's' : ''} awaiting review
+                  </span>
                 </div>
 
                 {pendingProductsList.length === 0 ? (
                   <div className="bg-neutral-900 border border-neutral-800 p-12 text-center space-y-3">
                     <RefreshCw size={24} className="mx-auto text-neutral-600 animate-pulse" />
                     <h3 className="text-xs font-black uppercase tracking-widest text-neutral-400">Queue is Clear</h3>
-                    <p className="text-xs text-neutral-500 max-w-md mx-auto">
-                      All imported shoes have been cataloged and validated. No pending creations are awaiting authorization.
+                    <p className="text-xs text-neutral-500 max-w-md mx-auto leading-relaxed">
+                      All imported items have been approved or processed. Send new photos to your Telegram bot or click &quot;Simulate Photo Submission&quot; above to test the pipeline.
                     </p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {pendingProductsList.map((p) => (
-                      <div
-                        key={p.id}
-                        className="bg-neutral-900 border border-neutral-800 p-4 flex gap-4 hover:border-neutral-700 transition-colors relative"
-                      >
-                        <div className="w-20 h-24 bg-neutral-950 border border-neutral-800 flex items-center justify-center p-1 shrink-0">
-                          <img src={p.image} alt={p.name} className="max-w-full max-h-full object-contain" />
-                        </div>
-
-                        <div className="flex-1 flex flex-col justify-between min-w-0">
-                          <div>
-                            <span className="text-[8px] uppercase tracking-wider text-amber-500 font-extrabold block">
-                              Pending Authorization
-                            </span>
-                            <h4 className="font-bold text-xs text-white truncate mt-0.5">{p.name}</h4>
-                            <div className="flex items-center gap-2 mt-1">
-                              <span className="text-[10px] text-neutral-400 uppercase tracking-widest font-semibold">{p.brand}</span>
-                              <span className="text-[9px] text-neutral-600">•</span>
-                              <span className="text-[10px] text-neutral-400">{p.category}</span>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    {pendingProductsList.map((p) => {
+                      const gallery = p.gallery && p.gallery.length > 0 ? p.gallery : [p.image];
+                      return (
+                        <div
+                          key={p.id}
+                          className="bg-neutral-900 border border-neutral-800 hover:border-neutral-700 transition-all flex flex-col justify-between overflow-hidden group"
+                        >
+                          {/* Image & Gallery Header */}
+                          <div className="relative bg-neutral-950 border-b border-neutral-800 p-3 flex flex-col items-center justify-center">
+                            <div className="w-full h-48 flex items-center justify-center relative">
+                              <img 
+                                src={p.image} 
+                                alt={p.name} 
+                                className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" 
+                              />
                             </div>
+
+                            {/* Multiple photos gallery strip if album */}
+                            {gallery.length > 1 && (
+                              <div className="w-full pt-2 flex gap-1.5 overflow-x-auto border-t border-neutral-900/80 mt-2">
+                                {gallery.map((imgUrl, gIdx) => (
+                                  <button
+                                    key={gIdx}
+                                    onClick={() => {
+                                      setProducts(prev => prev.map(item => item.id === p.id ? { ...item, image: imgUrl } : item));
+                                    }}
+                                    className={`w-10 h-10 bg-neutral-900 border shrink-0 overflow-hidden cursor-pointer ${
+                                      p.image === imgUrl ? 'border-amber-400 ring-1 ring-amber-400' : 'border-neutral-800 opacity-60 hover:opacity-100'
+                                    }`}
+                                  >
+                                    <img src={imgUrl} alt={`Thumb ${gIdx}`} className="w-full h-full object-cover" />
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+
+                            {/* Badge */}
+                            <span className="absolute top-2 left-2 bg-amber-500 text-black text-[8px] font-extrabold uppercase tracking-widest px-2 py-0.5">
+                              Pending Import ({gallery.length} Photo{gallery.length > 1 ? 's' : ''})
+                            </span>
                           </div>
 
-                          <div className="flex items-end justify-between mt-3">
-                            <span className="font-serif font-black text-xs text-neutral-200">
-                              {p.salePrice.toLocaleString()} EGP
-                            </span>
+                          {/* Content Body */}
+                          <div className="p-4 space-y-3 flex-1 flex flex-col justify-between">
+                            <div>
+                              <div className="flex justify-between items-start gap-2">
+                                <span className="text-[9px] uppercase tracking-widest text-neutral-400 font-bold block">{p.brand}</span>
+                                <span className="text-[9px] text-neutral-500 font-mono">ID: {p.id.replace('prod-tg-', '')}</span>
+                              </div>
+                              <h4 className="font-bold text-sm text-white mt-0.5">{p.name}</h4>
 
-                            <div className="flex items-center gap-1.5">
+                              <div className="flex items-center gap-2 mt-2 font-mono text-[11px] font-bold text-amber-400">
+                                <span>{p.salePrice.toLocaleString()} EGP</span>
+                                <span className="text-neutral-600">•</span>
+                                <span className="text-neutral-400 text-[10px] font-sans uppercase">{p.category}</span>
+                              </div>
+
+                              {/* Available sizes */}
+                              {p.sizes && p.sizes.length > 0 && (
+                                <div className="flex flex-wrap gap-1 mt-2.5">
+                                  {p.sizes.map(sz => (
+                                    <span key={sz} className="bg-neutral-950 border border-neutral-800 text-neutral-300 font-mono font-bold text-[8.5px] px-1.5 py-0.5">
+                                      {sz}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+
+                              {/* Caption quote */}
+                              {p.description && (
+                                <p className="text-[10px] text-neutral-400 font-light bg-neutral-950/60 p-2.5 border border-neutral-800/80 mt-3 line-clamp-3 leading-snug">
+                                  &ldquo;{p.description}&rdquo;
+                                </p>
+                              )}
+
+                              {/* Telegram Metadata */}
+                              <div className="mt-3 text-[9.5px] text-neutral-500 space-y-0.5 font-mono border-t border-neutral-800/60 pt-2">
+                                <div><span className="text-neutral-600 font-sans uppercase">Sender:</span> {p.telegramSender || p.supplierName || 'Telegram User'}</div>
+                                {p.createdAt && <div><span className="text-neutral-600 font-sans uppercase">Received:</span> {new Date(p.createdAt).toLocaleString()}</div>}
+                              </div>
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="pt-3 border-t border-neutral-800 flex flex-wrap gap-2">
                               <button
                                 onClick={() => handlePublishProduct(p.id, p.name)}
-                                className="px-3 py-1.5 bg-white hover:bg-neutral-200 text-black font-extrabold text-[9px] uppercase tracking-widest transition-all cursor-pointer"
+                                className="flex-1 px-3 py-2 bg-white hover:bg-neutral-200 text-black font-extrabold text-[10px] uppercase tracking-widest transition-all cursor-pointer flex items-center justify-center gap-1"
                               >
-                                Publish
+                                <Check size={12} />
+                                <span>Approve &amp; Publish</span>
                               </button>
+
+                              <button
+                                onClick={() => handleStartEditPendingProduct(p)}
+                                className="px-3 py-2 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 font-extrabold text-[10px] uppercase tracking-widest transition-all cursor-pointer"
+                                title="Edit specs before approving"
+                              >
+                                <Edit3 size={12} />
+                              </button>
+
                               <button
                                 onClick={() => handleDeletePendingProduct(p.id, p.name)}
-                                className="px-3 py-1.5 bg-neutral-800 hover:bg-red-950/40 border border-neutral-700 text-neutral-400 hover:text-red-400 font-extrabold text-[9px] uppercase tracking-widest transition-all cursor-pointer"
+                                className="px-3 py-2 bg-neutral-950 hover:bg-red-950/50 border border-neutral-800 hover:border-red-900 text-neutral-400 hover:text-red-400 font-extrabold text-[10px] uppercase tracking-widest transition-all cursor-pointer"
+                                title="Reject and delete import"
                               >
-                                Delete
+                                <X size={12} />
                               </button>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </motion.div>
@@ -2338,6 +2645,275 @@ export default function AdminDashboard({
                   Close Record
                 </button>
               </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* ==================== TELEGRAM BOT CONFIG MODAL ==================== */}
+      <AnimatePresence>
+        {showTgConfigModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-neutral-900 text-white w-full max-w-lg border border-neutral-800 p-6 relative space-y-5"
+            >
+              <button 
+                onClick={() => setShowTgConfigModal(false)} 
+                className="absolute top-4 right-4 text-neutral-400 hover:text-white"
+              >
+                <X size={18} />
+              </button>
+
+              <div className="border-b border-neutral-800 pb-3">
+                <span className="text-[9px] uppercase tracking-wider font-extrabold text-amber-500">Telegram Bot Integration</span>
+                <h3 className="text-sm font-black uppercase tracking-wider text-white">Bot Token &amp; Webhook Setup</h3>
+              </div>
+
+              <form onSubmit={handleSaveTelegramConfig} className="space-y-4 text-xs">
+                <div>
+                  <label className="block text-[10px] uppercase font-bold text-neutral-400 mb-1">
+                    Telegram Bot Token (from @BotFather)
+                  </label>
+                  <input
+                    type="password"
+                    placeholder={telegramConfig.botTokenMasked ? `Currently set (${telegramConfig.botTokenMasked})` : "e.g. 7123456789:AAE..."}
+                    value={botTokenInput}
+                    onChange={(e) => setBotTokenInput(e.target.value)}
+                    className="w-full bg-neutral-950 border border-neutral-800 p-2.5 text-white font-mono text-xs focus:border-amber-400 outline-none"
+                  />
+                  <p className="text-[10px] text-neutral-500 mt-1">
+                    Create a bot with @BotFather on Telegram and paste your Bot Token here.
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] uppercase font-bold text-neutral-400 mb-1">
+                    Webhook Endpoint URL
+                  </label>
+                  <input
+                    type="text"
+                    value={webhookUrlInput}
+                    onChange={(e) => setWebhookUrlInput(e.target.value)}
+                    className="w-full bg-neutral-950 border border-neutral-800 p-2.5 text-amber-400 font-mono text-xs focus:border-amber-400 outline-none"
+                  />
+                  <p className="text-[10px] text-neutral-500 mt-1">
+                    This is the public URL Telegram will send photo events to.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 pt-1">
+                  <input
+                    type="checkbox"
+                    id="autoPublishCheck"
+                    checked={autoPublishInput}
+                    onChange={(e) => setAutoPublishInput(e.target.checked)}
+                    className="accent-amber-500 w-4 h-4"
+                  />
+                  <label htmlFor="autoPublishCheck" className="text-neutral-300 font-medium text-xs cursor-pointer">
+                    Auto-Publish imports immediately to website catalog
+                  </label>
+                </div>
+
+                <div className="pt-3 border-t border-neutral-800 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={handleSetWebhookUrl}
+                    className="px-4 py-2 bg-neutral-800 hover:bg-neutral-700 text-amber-400 font-extrabold text-[10px] uppercase tracking-widest transition-all border border-neutral-700 cursor-pointer"
+                  >
+                    Set Webhook via Telegram API
+                  </button>
+
+                  <button
+                    type="submit"
+                    className="px-5 py-2 bg-white text-black font-extrabold text-[10px] uppercase tracking-widest hover:bg-neutral-200 transition-all cursor-pointer ml-auto"
+                  >
+                    Save Settings
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* ==================== SIMULATE TELEGRAM PHOTO IMPORT MODAL ==================== */}
+      <AnimatePresence>
+        {showSimulateModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-neutral-900 text-white w-full max-w-lg border border-neutral-800 p-6 relative space-y-5"
+            >
+              <button 
+                onClick={() => setShowSimulateModal(false)} 
+                className="absolute top-4 right-4 text-neutral-400 hover:text-white"
+              >
+                <X size={18} />
+              </button>
+
+              <div className="border-b border-neutral-800 pb-3">
+                <span className="text-[9px] uppercase tracking-wider font-extrabold text-amber-500">Testing &amp; Demo Mode</span>
+                <h3 className="text-sm font-black uppercase tracking-wider text-white">Simulate Telegram Photo Webhook</h3>
+              </div>
+
+              <form onSubmit={handleSimulatePhotoImport} className="space-y-4 text-xs">
+                <div>
+                  <label className="block text-[10px] uppercase font-bold text-neutral-400 mb-1">
+                    Image URL (Leave empty for default luxury sneaker sample)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="https://images.unsplash.com/photo-..."
+                    value={simPhotoUrl}
+                    onChange={(e) => setSimPhotoUrl(e.target.value)}
+                    className="w-full bg-neutral-950 border border-neutral-800 p-2.5 text-white font-mono text-xs focus:border-amber-400 outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] uppercase font-bold text-neutral-400 mb-1">
+                    Message Caption (Include Brand, Price, Size range)
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={simCaption}
+                    onChange={(e) => setSimCaption(e.target.value)}
+                    className="w-full bg-neutral-950 border border-neutral-800 p-2.5 text-white font-mono text-xs focus:border-amber-400 outline-none"
+                  />
+                  <p className="text-[10px] text-neutral-500 mt-1">
+                    Example: &quot;Louis Vuitton Trainer Sneaker 14500 EGP - Size 40,41,42,43,44&quot;
+                  </p>
+                </div>
+
+                <div className="pt-3 border-t border-neutral-800 flex justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowSimulateModal(false)}
+                    className="px-4 py-2 bg-neutral-800 text-neutral-300 font-extrabold text-[10px] uppercase tracking-widest cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-5 py-2 bg-amber-500 text-black font-extrabold text-[10px] uppercase tracking-widest hover:bg-amber-400 transition-all cursor-pointer"
+                  >
+                    Send Test Webhook
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* ==================== EDIT PENDING PRODUCT MODAL ==================== */}
+      <AnimatePresence>
+        {editingPendingProduct && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-neutral-900 text-white w-full max-w-xl border border-neutral-800 p-6 relative space-y-5"
+            >
+              <button 
+                onClick={() => setEditingPendingProduct(null)} 
+                className="absolute top-4 right-4 text-neutral-400 hover:text-white"
+              >
+                <X size={18} />
+              </button>
+
+              <div className="border-b border-neutral-800 pb-3">
+                <span className="text-[9px] uppercase tracking-wider font-extrabold text-amber-500">Pending Import Specs</span>
+                <h3 className="text-sm font-black uppercase tracking-wider text-white">Edit Product Details Before Approval</h3>
+              </div>
+
+              <form onSubmit={handleSavePendingProductUpdate} className="space-y-4 text-xs">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[10px] uppercase font-bold text-neutral-400 mb-1">Brand Name</label>
+                    <input
+                      type="text"
+                      value={editingPendingForm.brand}
+                      onChange={(e) => setEditingPendingForm({ ...editingPendingForm, brand: e.target.value })}
+                      className="w-full bg-neutral-950 border border-neutral-800 p-2 text-white font-bold outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] uppercase font-bold text-neutral-400 mb-1">Retail Price (EGP)</label>
+                    <input
+                      type="number"
+                      value={editingPendingForm.salePrice}
+                      onChange={(e) => setEditingPendingForm({ ...editingPendingForm, salePrice: Number(e.target.value) })}
+                      className="w-full bg-neutral-950 border border-neutral-800 p-2 text-amber-400 font-mono font-bold outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] uppercase font-bold text-neutral-400 mb-1">Product Title</label>
+                  <input
+                    type="text"
+                    value={editingPendingForm.name}
+                    onChange={(e) => setEditingPendingForm({ ...editingPendingForm, name: e.target.value })}
+                    className="w-full bg-neutral-950 border border-neutral-800 p-2 text-white font-bold outline-none"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[10px] uppercase font-bold text-neutral-400 mb-1">Category</label>
+                    <input
+                      type="text"
+                      value={editingPendingForm.category}
+                      onChange={(e) => setEditingPendingForm({ ...editingPendingForm, category: e.target.value })}
+                      className="w-full bg-neutral-950 border border-neutral-800 p-2 text-white outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] uppercase font-bold text-neutral-400 mb-1">Sizes (comma-separated)</label>
+                    <input
+                      type="text"
+                      value={editingPendingForm.sizes}
+                      onChange={(e) => setEditingPendingForm({ ...editingPendingForm, sizes: e.target.value })}
+                      className="w-full bg-neutral-950 border border-neutral-800 p-2 text-white font-mono outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] uppercase font-bold text-neutral-400 mb-1">Description / Notes</label>
+                  <textarea
+                    rows={3}
+                    value={editingPendingForm.description}
+                    onChange={(e) => setEditingPendingForm({ ...editingPendingForm, description: e.target.value })}
+                    className="w-full bg-neutral-950 border border-neutral-800 p-2 text-white outline-none"
+                  />
+                </div>
+
+                <div className="pt-3 border-t border-neutral-800 flex justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setEditingPendingProduct(null)}
+                    className="px-4 py-2 bg-neutral-800 text-neutral-300 font-extrabold text-[10px] uppercase tracking-widest cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-5 py-2 bg-white text-black font-extrabold text-[10px] uppercase tracking-widest hover:bg-neutral-200 transition-all cursor-pointer"
+                  >
+                    Save Changes
+                  </button>
+                </div>
+              </form>
             </motion.div>
           </div>
         )}
