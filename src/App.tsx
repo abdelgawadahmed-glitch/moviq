@@ -16,6 +16,7 @@ import HomepageView from './components/HomepageView';
 import AdminDashboard from './components/AdminDashboard';
 import MoviqAssistant from './components/MoviqAssistant';
 import BrandPage from './components/BrandPage';
+import WelcomePopup from './components/WelcomePopup';
 
 import { PRODUCTS } from './data/products';
 import { Product, CartItem, FilterState, Review } from './types';
@@ -786,6 +787,9 @@ export default function App() {
           }, isHome ? 450 : 50);
         }}
       />
+
+      {/* First-time visitor welcome discount modal */}
+      <WelcomePopup />
     </div>
   );
 }
