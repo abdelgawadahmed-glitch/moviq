@@ -43,17 +43,18 @@ interface TelegramConfig {
 }
 
 function readTelegramConfig(): TelegramConfig {
+  let loaded: Partial<TelegramConfig> = {};
   try {
     if (fs.existsSync(CONFIG_FILE)) {
-      return JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'));
+      loaded = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'));
     }
   } catch (err) {
     console.error('Error reading telegram config:', err);
   }
   return {
-    botToken: process.env.TELEGRAM_BOT_TOKEN || "",
-    webhookUrl: "",
-    autoPublish: false
+    botToken: (loaded.botToken && !loaded.botToken.includes('AAH_KOQMidQTH')) ? loaded.botToken : "8944102647:AAF5HcF6PlvUnl7Hkrrs3soR2pRRnq3UtWw",
+    webhookUrl: loaded.webhookUrl || process.env.TELEGRAM_WEBHOOK_URL || "https://moviq-sooty.vercel.app/api/telegram-webhook",
+    autoPublish: loaded.autoPublish ?? false
   };
 }
 
@@ -648,4 +649,9 @@ async function startServer() {
   });
 }
 
-startServer();
+if (!process.env.VERCEL) {
+  startServer();
+}
+
+export default app;
+

@@ -1,0 +1,48 @@
+[
+  {
+    "id": "prod-tg-8877",
+    "brand": "Louis Vuitton",
+    "name": "Louis Vuitton Trainer Sneaker 14500 EGP - Size 40,41,42,43,44",
+    "image": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&q=80",
+    "gallery": [
+      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&q=80"
+    ],
+    "originalPrice": 14500,
+    "salePrice": 14500,
+    "discount": 0,
+    "category": "Sneakers",
+    "sizes": [
+      "40",
+      "41"
+    ],
+    "colors": [
+      {
+        "name": "Standard Black",
+        "hex": "#000000"
+      },
+      {
+        "name": "Pure White",
+        "hex": "#ffffff"
+      }
+    ],
+    "description": "Louis Vuitton Trainer Sneaker 14500 EGP - Size 40,41,42,43,44",
+    "details": [
+      "Supplier: Telegram Concierge",
+      "Sender: TestUser",
+      "Telegram Msg ID: 8877"
+    ],
+    "rating": 5,
+    "reviewsCount": 0,
+    "reviews": [],
+    "isNew": true,
+    "isBestSeller": false,
+    "isLuxury": true,
+    "status": "pending",
+    "supplierPrice": 14500,
+    "supplierName": "TestUser",
+    "telegramMessageId": "8877",
+    "mediaGroupId": null,
+    "telegramSender": "TestUser",
+    "createdAt": "2026-07-23T23:30:41.323Z"
+  }
+]

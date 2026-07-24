@@ -229,15 +229,13 @@ export default function AdminDashboard({
   }>({
     isConfigured: false,
     botTokenMasked: '',
-    webhookUrl: typeof window !== 'undefined' ? `${window.location.origin}/api/telegram-webhook` : '',
+    webhookUrl: 'https://moviq-sooty.vercel.app/api/telegram-webhook',
     autoPublish: false
   });
 
   const [showTgConfigModal, setShowTgConfigModal] = useState(false);
   const [botTokenInput, setBotTokenInput] = useState('');
-  const [webhookUrlInput, setWebhookUrlInput] = useState(
-    typeof window !== 'undefined' ? `${window.location.origin}/api/telegram-webhook` : ''
-  );
+  const [webhookUrlInput, setWebhookUrlInput] = useState('https://moviq-sooty.vercel.app/api/telegram-webhook');
   const [autoPublishInput, setAutoPublishInput] = useState(false);
 
   // Simulation test modal
@@ -265,7 +263,7 @@ export default function AdminDashboard({
           setTelegramConfig({
             isConfigured: !!data.hasToken,
             botTokenMasked: data.botTokenMasked || '',
-            webhookUrl: data.webhookUrl || `${window.location.origin}/api/telegram-webhook`,
+            webhookUrl: data.webhookUrl || 'https://moviq-sooty.vercel.app/api/telegram-webhook',
             autoPublish: !!data.autoPublish
           });
           setAutoPublishInput(!!data.autoPublish);

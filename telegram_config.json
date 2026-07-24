@@ -1,0 +1,5 @@
+{
+  "botToken": "8944102647:AAF5HcF6PlvUnl7Hkrrs3soR2pRRnq3UtWw",
+  "webhookUrl": "https://moviq-sooty.vercel.app/api/telegram-webhook",
+  "autoPublish": false
+}
