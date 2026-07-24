@@ -1,5 +1,286 @@
 [
   {
+    "id": "prod-tg-tg-msg-e2e-2-1784930093813-6642",
+    "brand": "Gucci",
+    "name": "Gucci Ace Sneaker 14000 EGP - Size 42",
+    "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAARElEQVQYV2Nk+M/AAMQMDABf3AMGB6UHowAAAABJRU5ErkJggg==",
+    "gallery": [
+      "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAARElEQVQYV2Nk+M/AAMQMDABf3AMGB6UHowAAAABJRU5ErkJggg=="
+    ],
+    "originalPrice": 14000,
+    "salePrice": 14000,
+    "discount": 0,
+    "category": "Sneakers",
+    "sizes": [
+      "40",
+      "41",
+      "42",
+      "43",
+      "44"
+    ],
+    "colors": [
+      {
+        "name": "Standard Black",
+        "hex": "#000000"
+      },
+      {
+        "name": "Pure White",
+        "hex": "#ffffff"
+      }
+    ],
+    "description": "Gucci Ace Sneaker 14000 EGP - Size 42",
+    "details": [
+      "Supplier: Telegram Concierge",
+      "Sender: Telegram User",
+      "Telegram Msg ID: tg-msg-e2e-2"
+    ],
+    "rating": 5,
+    "reviewsCount": 0,
+    "reviews": [],
+    "isNew": true,
+    "isBestSeller": false,
+    "isLuxury": true,
+    "status": "published",
+    "supplierPrice": 14000,
+    "supplierName": "Telegram User",
+    "telegramMessageId": "tg-msg-e2e-2",
+    "mediaGroupId": null,
+    "telegramSender": "Telegram User",
+    "createdAt": "2026-07-24T21:54:53.813Z"
+  },
+  {
+    "id": "prod-tg-tg-msg-e2e-1-1784930091570-1892",
+    "brand": "Balenciaga",
+    "name": "Balenciaga Triple S 18500 EGP - Size 41,42",
+    "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAARElEQVQYV2P8z8AARAwMDEwAABL4AQ3+4C5fAAAAAElFTkSuQmCC",
+    "gallery": [
+      "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAARElEQVQYV2P8z8AARAwMDEwAABL4AQ3+4C5fAAAAAElFTkSuQmCC"
+    ],
+    "originalPrice": 18500,
+    "salePrice": 18500,
+    "discount": 0,
+    "category": "Sneakers",
+    "sizes": [
+      "41",
+      "42"
+    ],
+    "colors": [
+      {
+        "name": "Standard Black",
+        "hex": "#000000"
+      },
+      {
+        "name": "Pure White",
+        "hex": "#ffffff"
+      }
+    ],
+    "description": "Balenciaga Triple S 18500 EGP - Size 41,42",
+    "details": [
+      "Supplier: Telegram Concierge",
+      "Sender: Telegram User",
+      "Telegram Msg ID: tg-msg-e2e-1"
+    ],
+    "rating": 5,
+    "reviewsCount": 0,
+    "reviews": [],
+    "isNew": true,
+    "isBestSeller": false,
+    "isLuxury": true,
+    "status": "pending",
+    "supplierPrice": 18500,
+    "supplierName": "Telegram User",
+    "telegramMessageId": "tg-msg-e2e-1",
+    "mediaGroupId": null,
+    "telegramSender": "Telegram User",
+    "createdAt": "2026-07-24T21:54:51.570Z"
+  },
+  {
+    "id": "prod-tg-msg-e2e-1784929647510",
+    "brand": "Bottega Veneta",
+    "name": "Bottega Veneta Tire Boot 17500 EGP - Updated Photo B",
+    "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAARElEQVQYV2Nk+M/AAMQMDABf3AMGB6UHowAAAABJRU5ErkJggg==",
+    "gallery": [
+      "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAARElEQVQYV2Nk+M/AAMQMDABf3AMGB6UHowAAAABJRU5ErkJggg==",
+      "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAARElEQVQYV2P8z8AARAwMDEwAABL4AQ3+4C5fAAAAAElFTkSuQmCC"
+    ],
+    "originalPrice": 17500,
+    "salePrice": 17500,
+    "discount": 0,
+    "category": "Sneakers",
+    "sizes": [
+      "42",
+      "43"
+    ],
+    "colors": [
+      {
+        "name": "Standard Black",
+        "hex": "#000000"
+      },
+      {
+        "name": "Pure White",
+        "hex": "#ffffff"
+      }
+    ],
+    "description": "Bottega Veneta Tire Boot 17500 EGP - Updated Photo B",
+    "details": [
+      "Supplier: Telegram Concierge",
+      "Sender: Telegram User",
+      "Telegram Msg ID: msg-e2e-1784929647510"
+    ],
+    "rating": 5,
+    "reviewsCount": 0,
+    "reviews": [],
+    "isNew": true,
+    "isBestSeller": false,
+    "isLuxury": true,
+    "status": "published",
+    "supplierPrice": 17500,
+    "supplierName": "Telegram User",
+    "telegramMessageId": "msg-e2e-1784929647510",
+    "mediaGroupId": null,
+    "telegramSender": "Telegram User",
+    "createdAt": "2026-07-24T21:47:27.651Z"
+  },
+  {
+    "id": "prod-tg-msg-1784929621033",
+    "brand": "Bottega Veneta",
+    "name": "Bottega Veneta Tire Boot 17500 EGP - Updated Photo B",
+    "image": "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=800&q=80",
+    "gallery": [
+      "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=800&q=80"
+    ],
+    "originalPrice": 17500,
+    "salePrice": 17500,
+    "discount": 0,
+    "category": "Sneakers",
+    "sizes": [
+      "42",
+      "43"
+    ],
+    "colors": [
+      {
+        "name": "Standard Black",
+        "hex": "#000000"
+      },
+      {
+        "name": "Pure White",
+        "hex": "#ffffff"
+      }
+    ],
+    "description": "Bottega Veneta Tire Boot 17500 EGP - Updated Photo B",
+    "details": [
+      "Supplier: Telegram Concierge",
+      "Sender: Telegram User",
+      "Telegram Msg ID: msg-1784929621033"
+    ],
+    "rating": 5,
+    "reviewsCount": 0,
+    "reviews": [],
+    "isNew": true,
+    "isBestSeller": false,
+    "isLuxury": true,
+    "status": "published",
+    "supplierPrice": 17500,
+    "supplierName": "Telegram User",
+    "telegramMessageId": "msg-1784929621033",
+    "mediaGroupId": null,
+    "telegramSender": "Telegram User",
+    "createdAt": "2026-07-24T21:47:01.244Z"
+  },
+  {
+    "id": "prod-tg-sim-1784929609196",
+    "brand": "Alexander McQueen",
+    "name": "McQueen Oversized Sneaker",
+    "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAARElEQVQYV2Nk+M/AAMQMDABf3AMGB6UHowAAAABJRU5ErkJggg==",
+    "gallery": [
+      "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAARElEQVQYV2Nk+M/AAMQMDABf3AMGB6UHowAAAABJRU5ErkJggg=="
+    ],
+    "originalPrice": 16000,
+    "salePrice": 16000,
+    "discount": 0,
+    "category": "Sneakers",
+    "sizes": [
+      "40",
+      "41",
+      "42",
+      "43",
+      "44"
+    ],
+    "colors": [
+      {
+        "name": "Obsidian Black",
+        "hex": "#000000"
+      },
+      {
+        "name": "Pure White",
+        "hex": "#ffffff"
+      }
+    ],
+    "description": "Alexander McQueen Oversized Sneaker 16000 EGP - Updated Photo",
+    "details": [
+      "Supplier: Telegram Concierge Bot",
+      "Simulation Mode",
+      "Message ID: sim-1784929609196"
+    ],
+    "rating": 5,
+    "reviewsCount": 0,
+    "reviews": [],
+    "isNew": true,
+    "isBestSeller": false,
+    "isLuxury": true,
+    "status": "pending",
+    "supplierPrice": 16000,
+    "supplierName": "Telegram Concierge Bot",
+    "telegramMessageId": "sim-1784929609196",
+    "telegramSender": "Telegram Demo User",
+    "createdAt": "2026-07-24T21:46:49.197Z"
+  },
+  {
+    "id": "prod-tg-sim-1784929609167",
+    "brand": "Alexander McQueen",
+    "name": "McQueen Oversized Sneaker",
+    "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAARElEQVQYV2P8z8AARAwMDEwAABL4AQ3+4C5fAAAAAElFTkSuQmCC",
+    "gallery": [
+      "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAARElEQVQYV2P8z8AARAwMDEwAABL4AQ3+4C5fAAAAAElFTkSuQmCC"
+    ],
+    "originalPrice": 16000,
+    "salePrice": 16000,
+    "discount": 0,
+    "category": "Sneakers",
+    "sizes": [
+      "41",
+      "42"
+    ],
+    "colors": [
+      {
+        "name": "Obsidian Black",
+        "hex": "#000000"
+      },
+      {
+        "name": "Pure White",
+        "hex": "#ffffff"
+      }
+    ],
+    "description": "Alexander McQueen Oversized Sneaker 16000 EGP - Size 41,42",
+    "details": [
+      "Supplier: Telegram Concierge Bot",
+      "Simulation Mode",
+      "Message ID: sim-1784929609167"
+    ],
+    "rating": 5,
+    "reviewsCount": 0,
+    "reviews": [],
+    "isNew": true,
+    "isBestSeller": false,
+    "isLuxury": true,
+    "status": "published",
+    "supplierPrice": 16000,
+    "supplierName": "Telegram Concierge Bot",
+    "telegramMessageId": "sim-1784929609167",
+    "telegramSender": "Telegram Demo User",
+    "createdAt": "2026-07-24T21:46:49.168Z"
+  },
+  {
     "id": "prod-tg-sim-1784928601537",
     "brand": "Gucci",
     "name": "Gucci Ace Leather Sneaker",

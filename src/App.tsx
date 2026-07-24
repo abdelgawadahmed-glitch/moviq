@@ -115,7 +115,10 @@ export default function App() {
   // Synchronize newly imported pending products from the backend server
   useEffect(() => {
     const fetchImports = () => {
-      fetch('/api/import')
+      fetch(`/api/import?t=${Date.now()}`, {
+        headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache' },
+        cache: 'no-store'
+      })
         .then((res) => {
           if (!res.ok) throw new Error('Failed to fetch pending imports');
           return res.json();
@@ -127,23 +130,23 @@ export default function App() {
               let changed = false;
 
               serverPendingProducts.forEach((sp) => {
-                const existingIdx = updatedList.findIndex(
-                  (p) => p.id === sp.id || (sp.telegramMessageId && String(p.telegramMessageId) === String(sp.telegramMessageId))
-                );
+                const existingIdx = updatedList.findIndex((p) => p.id === sp.id);
 
                 if (existingIdx === -1) {
                   // Add new pending item
                   updatedList.unshift(sp);
                   changed = true;
                 } else {
-                  // Update existing item if server status or gallery changed
+                  // Update existing item if server status, image, or gallery changed
                   const existing = updatedList[existingIdx];
                   if (
                     existing.status !== sp.status ||
-                    (sp.gallery && sp.gallery.length !== (existing.gallery || []).length) ||
-                    existing.image !== sp.image
+                    existing.image !== sp.image ||
+                    existing.name !== sp.name ||
+                    existing.salePrice !== sp.salePrice ||
+                    (sp.gallery && sp.gallery.length !== (existing.gallery || []).length)
                   ) {
-                    updatedList[existingIdx] = { ...existing, ...sp };
+                    updatedList[existingIdx] = { ...existing, ...sp, image: sp.image, gallery: sp.gallery || [sp.image] };
                     changed = true;
                   }
                 }
@@ -157,7 +160,7 @@ export default function App() {
     };
 
     fetchImports();
-    const interval = setInterval(fetchImports, 5000);
+    const interval = setInterval(fetchImports, 3000);
     return () => clearInterval(interval);
   }, []);
 

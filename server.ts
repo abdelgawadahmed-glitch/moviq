@@ -2,6 +2,7 @@ import "dotenv/config";
 import express from "express";
 import path from "path";
 import fs from "fs";
+import crypto from "crypto";
 import { put } from "@vercel/blob";
 import { GoogleGenAI } from "@google/genai";
 
@@ -10,6 +11,7 @@ const PORT = 3000;
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+app.use('/uploads', express.static(path.join(process.cwd(), 'public', 'uploads')));
 
 const IMPORTS_FILE = path.join('/tmp', 'imported_products.json');
 const SEED_IMPORTS_FILE = path.join(process.cwd(), 'imported_products.json');
@@ -166,8 +168,37 @@ function writeTelegramConfig(cfg: TelegramConfig) {
   } catch (_) {}
 }
 
-// Persistent Cloud / Vercel Blob Image Storage
-async function downloadTelegramFile(fileId: string, botToken: string): Promise<string> {
+// Duplicate Update ID Tracker
+const processedUpdateIds = new Set<number>();
+
+interface TelegramFileDetails {
+  fileId: string;
+  fileUniqueId: string;
+  filePath: string;
+  fileSize: number;
+  sha256: string;
+  savedLocalPath: string;
+  imageUrl: string;
+}
+
+async function downloadTelegramFileDetails(fileId: string, botToken: string, fileUniqueId: string = 'unknown'): Promise<TelegramFileDetails> {
+  if (fileId.startsWith('data:') || fileId.startsWith('http://') || fileId.startsWith('https://')) {
+    const isData = fileId.startsWith('data:');
+    const buffer = Buffer.from(fileId);
+    const sha256 = crypto.createHash('sha256').update(buffer).digest('hex');
+    const fileSize = buffer.length;
+    const preview = isData ? fileId.slice(0, 40) + '...' : fileId;
+    return {
+      fileId,
+      fileUniqueId,
+      filePath: isData ? 'direct_data_uri' : fileId,
+      fileSize,
+      sha256,
+      savedLocalPath: preview,
+      imageUrl: fileId
+    };
+  }
+
   if (!botToken) {
     throw new Error("Telegram bot token is not configured.");
   }
@@ -178,78 +209,67 @@ async function downloadTelegramFile(fileId: string, botToken: string): Promise<s
   const data = await res.json();
 
   if (!data.ok || !data.result?.file_path) {
-    throw new Error(`Telegram getFile API failed: ${data.description || 'Unknown error'}`);
+    throw new Error(`Telegram getFile API failed for file_id=${fileId}: ${data.description || 'Unknown error'}`);
   }
 
   const filePath = data.result.file_path;
   const downloadUrl = `https://api.telegram.org/file/bot${botToken}/${filePath}`;
-  console.log(`[Telegram getFile Success]: file_path = ${filePath}`);
 
   // 2. Download binary stream
   const imgRes = await fetch(downloadUrl);
   if (!imgRes.ok) {
-    throw new Error(`Failed to download file from Telegram: ${imgRes.statusText}`);
+    throw new Error(`Failed to download file from Telegram path ${filePath}: ${imgRes.statusText}`);
   }
 
   const arrayBuffer = await imgRes.arrayBuffer();
   const buffer = Buffer.from(arrayBuffer);
+  const sha256 = crypto.createHash('sha256').update(buffer).digest('hex');
   const ext = path.extname(filePath) || '.jpg';
-  const filename = `telegram_imports/tg_${Date.now()}_${Math.floor(Math.random() * 10000)}${ext}`;
   const contentType = imgRes.headers.get('content-type') || (ext === '.png' ? 'image/png' : ext === '.webp' ? 'image/webp' : 'image/jpeg');
 
-  // 2b. Save local copy in public/uploads if accessible
+  const timestamp = Date.now();
+  const randomStr = crypto.randomUUID ? crypto.randomUUID().slice(0, 8) : Math.floor(Math.random() * 100000);
+  const localFileName = `tg_${timestamp}_${randomStr}${ext}`;
+  const savedLocalPath = `/uploads/${localFileName}`;
+  let imageUrl = `${savedLocalPath}?v=${timestamp}`;
+
+  // Save local copy in public/uploads
   try {
     const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
     if (!fs.existsSync(uploadsDir)) {
       fs.mkdirSync(uploadsDir, { recursive: true });
     }
-    const localFileName = `tg_${Date.now()}_${Math.floor(Math.random() * 10000)}${ext}`;
     fs.writeFileSync(path.join(uploadsDir, localFileName), buffer);
-    console.log(`[Telegram Photo Saved Locally]: /uploads/${localFileName}`);
+    console.log(`[Telegram Photo Saved]: ${savedLocalPath} (SHA256: ${sha256}, Bytes: ${buffer.length})`);
   } catch (localErr: any) {
     console.warn('[Local Upload Save Warning]:', localErr?.message || localErr);
+    imageUrl = `data:${contentType};base64,${buffer.toString('base64')}`;
   }
 
-  // 3. Try Vercel Blob Storage if BLOB_READ_WRITE_TOKEN is present
   if (process.env.BLOB_READ_WRITE_TOKEN) {
     try {
-      const blobResult = await put(filename, buffer, {
-        access: 'public',
-        contentType,
-      });
-      if (blobResult?.url) {
-        console.log('Saved image to Vercel Blob:', blobResult.url);
-        return blobResult.url;
-      }
-    } catch (blobErr: any) {
-      console.error('Vercel Blob upload failed, falling back to persistent Data URI:', blobErr.message);
+      const blobResult = await put(`telegram_imports/${localFileName}`, buffer, { access: 'public', contentType });
+      if (blobResult?.url) imageUrl = blobResult.url;
+    } catch (e: any) {
+      console.warn('Vercel Blob save skipped:', e.message);
     }
   }
 
-  // 4. Try Cloudinary if CLOUDINARY_CLOUD_NAME & CLOUDINARY_PRESET are set
-  if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_PRESET) {
-    try {
-      const formData = new FormData();
-      const blob = new Blob([buffer], { type: contentType });
-      formData.append('file', blob);
-      formData.append('upload_preset', process.env.CLOUDINARY_PRESET);
-      const cRes = await fetch(`https://api.cloudinary.com/v1_1/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload`, {
-        method: 'POST',
-        body: formData,
-      });
-      const cData = await cRes.json();
-      if (cData.secure_url) {
-        console.log('Saved image to Cloudinary:', cData.secure_url);
-        return cData.secure_url;
-      }
-    } catch (cErr: any) {
-      console.error('Cloudinary upload error:', cErr.message);
-    }
-  }
+  return {
+    fileId,
+    fileUniqueId,
+    filePath,
+    fileSize: buffer.length,
+    sha256,
+    savedLocalPath,
+    imageUrl
+  };
+}
 
-  // 5. Persistent Base64 Data URI - 100% cloud & serverless compatible
-  const base64Data = buffer.toString('base64');
-  return `data:${contentType};base64,${base64Data}`;
+// Persistent Cloud / Vercel Blob Image Storage
+async function downloadTelegramFile(fileId: string, botToken: string): Promise<string> {
+  const details = await downloadTelegramFileDetails(fileId, botToken);
+  return details.imageUrl;
 }
 
 // Intelligent Caption & Metadata Parser
@@ -437,7 +457,20 @@ ${catalogSummary || 'Custom luxury designer imports available upon request.'}`;
 
 // Common Webhook Handling Core Function
 async function processTelegramWebhookUpdate(update: any) {
-  console.log('[Telegram Webhook Received]: Update ID', update.update_id);
+  const updateId = update.update_id;
+  if (updateId) {
+    if (processedUpdateIds.has(updateId)) {
+      console.log(`[Telegram Webhook Audit Log] Duplicate update_id ${updateId} ignored.`);
+      return { ok: true, message: `Duplicate update_id ${updateId} already processed` };
+    }
+    processedUpdateIds.add(updateId);
+    if (processedUpdateIds.size > 2000) {
+      const first = processedUpdateIds.values().next().value;
+      if (first !== undefined) processedUpdateIds.delete(first);
+    }
+  }
+
+  console.log('[Telegram Webhook Received]: Update ID', updateId);
   const message = update.message || update.channel_post || update.edited_message || update.edited_channel_post;
   if (!message) {
     console.log('[Telegram Webhook] Non-message update received');
@@ -455,10 +488,17 @@ async function processTelegramWebhookUpdate(update: any) {
   const document = message.document;
 
   let fileId: string | null = null;
+  let fileUniqueId: string = 'unknown';
+
   if (Array.isArray(photoArray) && photoArray.length > 0) {
-    fileId = photoArray[photoArray.length - 1].file_id;
+    const largestPhoto = photoArray[photoArray.length - 1];
+    fileId = largestPhoto.file_id;
+    fileUniqueId = largestPhoto.file_unique_id || 'unknown';
+    console.log(`[Telegram Webhook Photo Received]: Total resolutions = ${photoArray.length}, Largest resolution = ${largestPhoto.width}x${largestPhoto.height} (${largestPhoto.file_size || 'unknown'} bytes), file_id = ${fileId}`);
   } else if (document && document.mime_type && document.mime_type.startsWith('image/')) {
     fileId = document.file_id;
+    fileUniqueId = document.file_unique_id || 'unknown';
+    console.log(`[Telegram Webhook Document Image Received]: file_id = ${fileId}, name = ${document.file_name}`);
   }
 
   const config = readTelegramConfig();
@@ -466,81 +506,75 @@ async function processTelegramWebhookUpdate(update: any) {
 
   // CASE 1: Photo attachment -> Process Product Import
   if (fileId) {
-    let downloadedUrl = '';
+    let details: TelegramFileDetails;
     if (botToken) {
       try {
-        downloadedUrl = await downloadTelegramFile(fileId, botToken);
+        details = await downloadTelegramFileDetails(fileId, botToken, fileUniqueId);
       } catch (err: any) {
         console.error('[Telegram Webhook] Error downloading photo:', err.message);
+        throw err;
       }
-    }
-
-    if (!downloadedUrl) {
-      console.warn('[Telegram Webhook Warning]: Could not download Telegram photo directly, using default luxury item photo.');
-      downloadedUrl = "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=800&q=80";
+    } else {
+      throw new Error("Telegram bot token missing. Unable to download Telegram photo.");
     }
 
     const parsed = parseTelegramCaption(text);
     const mediaGroupId = message.media_group_id ? String(message.media_group_id) : null;
     const telegramMessageId = messageId ? String(messageId) : `tg-${Date.now()}`;
+    const pendingImportId = `prod-tg-${telegramMessageId}-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
 
     const currentImports = await readImportedProductsAsync();
-    let targetProduct: any = null;
 
-    if (mediaGroupId) {
-      targetProduct = currentImports.find(p => p.mediaGroupId === mediaGroupId && p.status === 'pending');
-    }
+    const targetProduct = {
+      id: pendingImportId,
+      brand: parsed.brand,
+      name: parsed.name,
+      image: details.imageUrl,
+      gallery: [details.imageUrl],
+      originalPrice: parsed.supplierPrice,
+      salePrice: parsed.supplierPrice,
+      discount: 0,
+      category: parsed.category,
+      sizes: parsed.sizes,
+      colors: [{ name: 'Standard Black', hex: '#000000' }, { name: 'Pure White', hex: '#ffffff' }],
+      description: parsed.description,
+      details: [
+        `Supplier: Telegram Concierge`,
+        `Sender: ${senderName}`,
+        `Telegram Msg ID: ${telegramMessageId}`
+      ],
+      rating: 5.0,
+      reviewsCount: 0,
+      reviews: [],
+      isNew: true,
+      isBestSeller: false,
+      isLuxury: true,
+      status: config.autoPublish ? 'published' : 'pending',
+      supplierPrice: parsed.supplierPrice,
+      supplierName: senderName,
+      telegramMessageId,
+      mediaGroupId,
+      telegramSender: senderName,
+      createdAt: new Date().toISOString()
+    };
 
-    if (targetProduct) {
-      if (!targetProduct.gallery.includes(downloadedUrl)) {
-        targetProduct.gallery.push(downloadedUrl);
-      }
-      if (text && text.length > (targetProduct.description || '').length) {
-        const reParsed = parseTelegramCaption(text);
-        targetProduct.name = reParsed.name;
-        targetProduct.brand = reParsed.brand;
-        targetProduct.supplierPrice = reParsed.supplierPrice;
-        targetProduct.salePrice = reParsed.supplierPrice;
-        targetProduct.originalPrice = reParsed.supplierPrice;
-        targetProduct.description = text;
-      }
-    } else {
-      const productId = `prod-tg-${telegramMessageId}`;
-      targetProduct = {
-        id: productId,
-        brand: parsed.brand,
-        name: parsed.name,
-        image: downloadedUrl,
-        gallery: [downloadedUrl],
-        originalPrice: parsed.supplierPrice,
-        salePrice: parsed.supplierPrice,
-        discount: 0,
-        category: parsed.category,
-        sizes: parsed.sizes,
-        colors: [{ name: 'Standard Black', hex: '#000000' }, { name: 'Pure White', hex: '#ffffff' }],
-        description: parsed.description,
-        details: [
-          `Supplier: Telegram Concierge`,
-          `Sender: ${senderName}`,
-          `Telegram Msg ID: ${telegramMessageId}`
-        ],
-        rating: 5.0,
-        reviewsCount: 0,
-        reviews: [],
-        isNew: true,
-        isBestSeller: false,
-        isLuxury: true,
-        status: config.autoPublish ? 'published' : 'pending',
-        supplierPrice: parsed.supplierPrice,
-        supplierName: senderName,
-        telegramMessageId,
-        mediaGroupId,
-        telegramSender: senderName,
-        createdAt: new Date().toISOString()
-      };
+    currentImports.unshift(targetProduct);
+    await writeImportedProducts(currentImports);
 
-      currentImports.unshift(targetProduct);
-    }
+    console.log(`
+================ TELEGRAM WEBHOOK AUDIT LOG ================
+update_id:            ${updateId || 'N/A'}
+file_id:              ${fileId}
+file_unique_id:       ${fileUniqueId}
+downloaded file_path: ${details.filePath}
+downloaded file size: ${details.fileSize} bytes
+SHA256 hash:          ${details.sha256}
+saved image path:     ${details.savedLocalPath}
+pending import ID:    ${targetProduct.id}
+product.image:        ${targetProduct.image}
+product.gallery:      ${JSON.stringify(targetProduct.gallery)}
+============================================================
+`);
 
     await writeImportedProducts(currentImports);
 
@@ -596,6 +630,9 @@ async function processTelegramWebhookUpdate(update: any) {
 // 1. GET /api/import - Retrieve all imported products
 app.get("/api/import", async (req, res) => {
   try {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
     const imported = await readImportedProductsAsync();
     res.json(imported);
   } catch (err: any) {
@@ -606,6 +643,9 @@ app.get("/api/import", async (req, res) => {
 // GET /api/telegram/pending - Retrieve pending telegram imported products
 app.get("/api/telegram/pending", async (req, res) => {
   try {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
     const imported = await readImportedProductsAsync();
     const pending = imported.filter((p: any) => p.status === 'pending');
     res.json(pending);
@@ -617,6 +657,9 @@ app.get("/api/telegram/pending", async (req, res) => {
 // GET /api/telegram/imported - Retrieve all imported products
 app.get("/api/telegram/imported", async (req, res) => {
   try {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
     const imported = await readImportedProductsAsync();
     res.json(imported);
   } catch (err: any) {
@@ -914,17 +957,18 @@ app.post("/api/telegram/set-webhook", async (req, res) => {
 app.post("/api/telegram/test-import", async (req, res) => {
   try {
     const { imageUrl, caption, brand, name, price } = req.body;
-    const mockMessageId = `sim-${Date.now()}`;
-    const img = imageUrl || "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=800&q=80";
+    const mockMessageId = `sim-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+    const img = imageUrl || `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400"><rect width="400" height="400" fill="%23111"/><text x="50%" y="50%" fill="%23fff" font-size="20" text-anchor="middle">Test Item ${Date.now()}</text></svg>`;
 
+    const details = await downloadTelegramFileDetails(img, "", `sim-unique-${Date.now()}`);
     const parsed = parseTelegramCaption(caption || `${brand || 'Louis Vuitton'} Trainer ${price || 14500} EGP`);
 
     const newProduct = {
       id: `prod-tg-${mockMessageId}`,
       brand: brand || parsed.brand,
       name: name || parsed.name,
-      image: img,
-      gallery: [img],
+      image: details.imageUrl,
+      gallery: [details.imageUrl],
       originalPrice: Number(price) || parsed.supplierPrice,
       salePrice: Number(price) || parsed.supplierPrice,
       discount: 0,
@@ -950,6 +994,21 @@ app.post("/api/telegram/test-import", async (req, res) => {
     const currentImports = await readImportedProductsAsync();
     currentImports.unshift(newProduct);
     await writeImportedProducts(currentImports);
+
+    console.log(`
+================ TELEGRAM WEBHOOK AUDIT LOG (SIMULATION) ================
+update_id:            sim_update_${mockMessageId}
+file_id:              ${details.fileId}
+file_unique_id:       ${details.fileUniqueId}
+downloaded file_path: ${details.filePath}
+downloaded file size: ${details.fileSize} bytes
+SHA256 hash:          ${details.sha256}
+saved image path:     ${details.savedLocalPath}
+pending import ID:    ${newProduct.id}
+product.image:        ${newProduct.image}
+product.gallery:      ${JSON.stringify(newProduct.gallery)}
+========================================================================
+`);
 
     res.json({ success: true, product: newProduct });
   } catch (err: any) {

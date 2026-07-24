@@ -275,7 +275,10 @@ export default function AdminDashboard({
 
   // Sync pending imports whenever activeTab is set to pending-imports or on mount
   useEffect(() => {
-    fetch('/api/import')
+    fetch(`/api/import?t=${Date.now()}`, {
+      headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache' },
+      cache: 'no-store'
+    })
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {
@@ -2013,7 +2016,8 @@ export default function AdminDashboard({
                           <div className="relative bg-neutral-950 border-b border-neutral-800 p-3 flex flex-col items-center justify-center">
                             <div className="w-full h-48 flex items-center justify-center relative">
                               <img 
-                                src={p.image} 
+                                key={p.image}
+                                src={p.image && !p.image.startsWith('data:') && !p.image.includes('?t=') ? `${p.image}?t=${Date.now()}` : p.image} 
                                 alt={p.name} 
                                 className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" 
                               />
