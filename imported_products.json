@@ -1,11 +1,191 @@
 [
   {
+    "id": "prod-tg-sim-1784928601537",
+    "brand": "Gucci",
+    "name": "Gucci Ace Leather Sneaker",
+    "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
+    "gallery": [
+      "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="
+    ],
+    "originalPrice": 14500,
+    "salePrice": 14500,
+    "discount": 0,
+    "category": "Sneakers",
+    "sizes": [
+      "40",
+      "41"
+    ],
+    "colors": [
+      {
+        "name": "Obsidian Black",
+        "hex": "#000000"
+      },
+      {
+        "name": "Pure White",
+        "hex": "#ffffff"
+      }
+    ],
+    "description": "Gucci Ace Leather Sneaker 14500 EGP - Size 40,41,42",
+    "details": [
+      "Supplier: Telegram Concierge Bot",
+      "Simulation Mode",
+      "Message ID: sim-1784928601537"
+    ],
+    "rating": 5,
+    "reviewsCount": 0,
+    "reviews": [],
+    "isNew": true,
+    "isBestSeller": false,
+    "isLuxury": true,
+    "status": "published",
+    "supplierPrice": 14500,
+    "supplierName": "Telegram Concierge Bot",
+    "telegramMessageId": "sim-1784928601537",
+    "telegramSender": "Telegram Demo User",
+    "createdAt": "2026-07-24T21:30:01.538Z"
+  },
+  {
+    "id": "prod-tg-sim-1784928590454",
+    "brand": "Gucci",
+    "name": "Gucci Ace Leather Sneaker",
+    "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
+    "gallery": [
+      "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="
+    ],
+    "originalPrice": 14500,
+    "salePrice": 14500,
+    "discount": 0,
+    "category": "Sneakers",
+    "sizes": [
+      "40",
+      "41"
+    ],
+    "colors": [
+      {
+        "name": "Obsidian Black",
+        "hex": "#000000"
+      },
+      {
+        "name": "Pure White",
+        "hex": "#ffffff"
+      }
+    ],
+    "description": "Gucci Ace Leather Sneaker 14500 EGP - Size 40,41,42",
+    "details": [
+      "Supplier: Telegram Concierge Bot",
+      "Simulation Mode",
+      "Message ID: sim-1784928590454"
+    ],
+    "rating": 5,
+    "reviewsCount": 0,
+    "reviews": [],
+    "isNew": true,
+    "isBestSeller": false,
+    "isLuxury": true,
+    "status": "published",
+    "supplierPrice": 14500,
+    "supplierName": "Telegram Concierge Bot",
+    "telegramMessageId": "sim-1784928590454",
+    "telegramSender": "Telegram Demo User",
+    "createdAt": "2026-07-24T21:29:50.455Z"
+  },
+  {
+    "id": "prod-tg-sim-1784928578832",
+    "brand": "Gucci",
+    "name": "Gucci Ace Leather Sneaker",
+    "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
+    "gallery": [
+      "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="
+    ],
+    "originalPrice": 14500,
+    "salePrice": 14500,
+    "discount": 0,
+    "category": "Sneakers",
+    "sizes": [
+      "40",
+      "41"
+    ],
+    "colors": [
+      {
+        "name": "Obsidian Black",
+        "hex": "#000000"
+      },
+      {
+        "name": "Pure White",
+        "hex": "#ffffff"
+      }
+    ],
+    "description": "Gucci Ace Leather Sneaker 14500 EGP - Size 40,41,42",
+    "details": [
+      "Supplier: Telegram Concierge Bot",
+      "Simulation Mode",
+      "Message ID: sim-1784928578832"
+    ],
+    "rating": 5,
+    "reviewsCount": 0,
+    "reviews": [],
+    "isNew": true,
+    "isBestSeller": false,
+    "isLuxury": true,
+    "status": "published",
+    "supplierPrice": 14500,
+    "supplierName": "Telegram Concierge Bot",
+    "telegramMessageId": "sim-1784928578832",
+    "telegramSender": "Telegram Demo User",
+    "createdAt": "2026-07-24T21:29:38.832Z"
+  },
+  {
+    "id": "prod-tg-sim-1784928559205",
+    "brand": "Balenciaga",
+    "name": "Balenciaga Cargo Sneaker 18500 EGP",
+    "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
+    "gallery": [
+      "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="
+    ],
+    "originalPrice": 18500,
+    "salePrice": 18500,
+    "discount": 0,
+    "category": "Sneakers",
+    "sizes": [
+      "41",
+      "42"
+    ],
+    "colors": [
+      {
+        "name": "Obsidian Black",
+        "hex": "#000000"
+      },
+      {
+        "name": "Pure White",
+        "hex": "#ffffff"
+      }
+    ],
+    "description": "Balenciaga Cargo Sneaker 18500 EGP - Size 41,42,43",
+    "details": [
+      "Supplier: Telegram Concierge Bot",
+      "Simulation Mode",
+      "Message ID: sim-1784928559205"
+    ],
+    "rating": 5,
+    "reviewsCount": 0,
+    "reviews": [],
+    "isNew": true,
+    "isBestSeller": false,
+    "isLuxury": true,
+    "status": "published",
+    "supplierPrice": 18500,
+    "supplierName": "Telegram Concierge Bot",
+    "telegramMessageId": "sim-1784928559205",
+    "telegramSender": "Telegram Demo User",
+    "createdAt": "2026-07-24T21:29:19.206Z"
+  },
+  {
     "id": "prod-tg-5003",
     "brand": "Gucci",
     "name": "Gucci Ace Sneaker 13500 EGP - Size 41,42,43",
-    "image": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&q=80",
+    "image": "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=800&q=80",
     "gallery": [
-      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&q=80"
+      "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=800&q=80"
     ],
     "originalPrice": 13500,
     "salePrice": 13500,
@@ -49,9 +229,9 @@
     "id": "prod-tg-sim-1784856813735",
     "brand": "Dior",
     "name": "Dior B22 Black Trainer 16500 EGP - Size 41,42,43",
-    "image": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&q=80",
+    "image": "https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&w=800&q=80",
     "gallery": [
-      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&q=80"
+      "https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&w=800&q=80"
     ],
     "originalPrice": 16500,
     "salePrice": 16500,
@@ -94,9 +274,9 @@
     "id": "prod-tg-8877",
     "brand": "Louis Vuitton",
     "name": "Louis Vuitton Trainer Sneaker 14500 EGP - Size 40,41,42,43,44",
-    "image": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&q=80",
+    "image": "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=800&q=80",
     "gallery": [
-      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&q=80"
+      "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=800&q=80"
     ],
     "originalPrice": 14500,
     "salePrice": 14500,

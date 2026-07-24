@@ -183,6 +183,7 @@ async function downloadTelegramFile(fileId: string, botToken: string): Promise<s
 
   const filePath = data.result.file_path;
   const downloadUrl = `https://api.telegram.org/file/bot${botToken}/${filePath}`;
+  console.log(`[Telegram getFile Success]: file_path = ${filePath}`);
 
   // 2. Download binary stream
   const imgRes = await fetch(downloadUrl);
@@ -195,6 +196,19 @@ async function downloadTelegramFile(fileId: string, botToken: string): Promise<s
   const ext = path.extname(filePath) || '.jpg';
   const filename = `telegram_imports/tg_${Date.now()}_${Math.floor(Math.random() * 10000)}${ext}`;
   const contentType = imgRes.headers.get('content-type') || (ext === '.png' ? 'image/png' : ext === '.webp' ? 'image/webp' : 'image/jpeg');
+
+  // 2b. Save local copy in public/uploads if accessible
+  try {
+    const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
+    if (!fs.existsSync(uploadsDir)) {
+      fs.mkdirSync(uploadsDir, { recursive: true });
+    }
+    const localFileName = `tg_${Date.now()}_${Math.floor(Math.random() * 10000)}${ext}`;
+    fs.writeFileSync(path.join(uploadsDir, localFileName), buffer);
+    console.log(`[Telegram Photo Saved Locally]: /uploads/${localFileName}`);
+  } catch (localErr: any) {
+    console.warn('[Local Upload Save Warning]:', localErr?.message || localErr);
+  }
 
   // 3. Try Vercel Blob Storage if BLOB_READ_WRITE_TOKEN is present
   if (process.env.BLOB_READ_WRITE_TOKEN) {
@@ -233,7 +247,7 @@ async function downloadTelegramFile(fileId: string, botToken: string): Promise<s
     }
   }
 
-  // 5. Persistent Base64 Data URI - 100% cloud & serverless compatible, no local filesystem needed
+  // 5. Persistent Base64 Data URI - 100% cloud & serverless compatible
   const base64Data = buffer.toString('base64');
   return `data:${contentType};base64,${base64Data}`;
 }
@@ -462,7 +476,8 @@ async function processTelegramWebhookUpdate(update: any) {
     }
 
     if (!downloadedUrl) {
-      downloadedUrl = "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&q=80";
+      console.warn('[Telegram Webhook Warning]: Could not download Telegram photo directly, using default luxury item photo.');
+      downloadedUrl = "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=800&q=80";
     }
 
     const parsed = parseTelegramCaption(text);
@@ -656,8 +671,8 @@ async function handleImportProductReq(req: express.Request, res: express.Respons
       id: importedId,
       brand: brand || "Imported Luxury",
       name,
-      image: imageUrl || "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&q=80",
-      gallery: [imageUrl || "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&q=80"],
+      image: imageUrl || "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=800&q=80",
+      gallery: [imageUrl || "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=800&q=80"],
       originalPrice: price,
       salePrice: price,
       discount: 0,
@@ -714,14 +729,16 @@ app.post("/api/import/publish", async (req, res) => {
     if (!id) return res.status(400).json({ error: "Missing product id" });
 
     let currentImports = await readImportedProductsAsync();
+    let publishedItem: any = null;
     currentImports = currentImports.map(p => {
-      if (p.id === id) {
-        return { ...p, status: 'published' };
+      if (String(p.id) === String(id)) {
+        publishedItem = { ...p, status: 'published' };
+        return publishedItem;
       }
       return p;
     });
     await writeImportedProducts(currentImports);
-    res.json({ success: true });
+    res.json({ success: true, product: publishedItem });
   } catch (err: any) {
     res.status(500).json({ error: err?.message || "Failed to publish product" });
   }
@@ -898,7 +915,7 @@ app.post("/api/telegram/test-import", async (req, res) => {
   try {
     const { imageUrl, caption, brand, name, price } = req.body;
     const mockMessageId = `sim-${Date.now()}`;
-    const img = imageUrl || "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&q=80";
+    const img = imageUrl || "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=800&q=80";
 
     const parsed = parseTelegramCaption(caption || `${brand || 'Louis Vuitton'} Trainer ${price || 14500} EGP`);
 
