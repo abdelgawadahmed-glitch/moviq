@@ -2016,8 +2016,7 @@ export default function AdminDashboard({
                           <div className="relative bg-neutral-950 border-b border-neutral-800 p-3 flex flex-col items-center justify-center">
                             <div className="w-full h-48 flex items-center justify-center relative">
                               <img 
-                                key={p.image}
-                                src={p.image && !p.image.startsWith('data:') && !p.image.includes('?t=') ? `${p.image}?t=${Date.now()}` : p.image} 
+                                src={p.image} 
                                 alt={p.name} 
                                 className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300" 
                               />

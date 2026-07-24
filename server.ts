@@ -231,9 +231,12 @@ async function downloadTelegramFileDetails(fileId: string, botToken: string, fil
   const randomStr = crypto.randomUUID ? crypto.randomUUID().slice(0, 8) : Math.floor(Math.random() * 100000);
   const localFileName = `tg_${timestamp}_${randomStr}${ext}`;
   const savedLocalPath = `/uploads/${localFileName}`;
-  let imageUrl = `${savedLocalPath}?v=${timestamp}`;
 
-  // Save local copy in public/uploads
+  const base64Data = buffer.toString('base64');
+  const persistentDataUri = `data:${contentType};base64,${base64Data}`;
+  let imageUrl = persistentDataUri;
+
+  // Save local copy in public/uploads if filesystem is writable
   try {
     const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
     if (!fs.existsSync(uploadsDir)) {
@@ -243,15 +246,31 @@ async function downloadTelegramFileDetails(fileId: string, botToken: string, fil
     console.log(`[Telegram Photo Saved]: ${savedLocalPath} (SHA256: ${sha256}, Bytes: ${buffer.length})`);
   } catch (localErr: any) {
     console.warn('[Local Upload Save Warning]:', localErr?.message || localErr);
-    imageUrl = `data:${contentType};base64,${buffer.toString('base64')}`;
   }
 
   if (process.env.BLOB_READ_WRITE_TOKEN) {
     try {
       const blobResult = await put(`telegram_imports/${localFileName}`, buffer, { access: 'public', contentType });
-      if (blobResult?.url) imageUrl = blobResult.url;
+      if (blobResult?.url) imageUrl = `${blobResult.url}?v=${timestamp}`;
     } catch (e: any) {
       console.warn('Vercel Blob save skipped:', e.message);
+    }
+  } else if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_PRESET) {
+    try {
+      const formData = new FormData();
+      const blob = new Blob([buffer], { type: contentType });
+      formData.append('file', blob);
+      formData.append('upload_preset', process.env.CLOUDINARY_PRESET);
+      const cRes = await fetch(`https://api.cloudinary.com/v1_1/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload`, {
+        method: 'POST',
+        body: formData,
+      });
+      const cData = await cRes.json();
+      if (cData.secure_url) {
+        imageUrl = `${cData.secure_url}?v=${timestamp}`;
+      }
+    } catch (cErr: any) {
+      console.error('Cloudinary upload error:', cErr.message);
     }
   }
 
