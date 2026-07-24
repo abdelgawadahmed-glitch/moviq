@@ -86,7 +86,15 @@ export default function App() {
   const [products, setProducts] = useState<Product[]>(() => {
     // Attempt to load products from session state to keep posted reviews persistent across clicks
     const saved = localStorage.getItem('moviq_products');
-    return saved ? JSON.parse(saved) : PRODUCTS;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          return parsed.filter(p => p && p.image && !p.image.startsWith('/uploads/'));
+        }
+      } catch (_) {}
+    }
+    return PRODUCTS;
   });
 
   const [cartItems, setCartItems] = useState<CartItem[]>(() => {

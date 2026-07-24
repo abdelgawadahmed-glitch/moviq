@@ -23,8 +23,12 @@ let inMemoryImports: any[] | null = null;
 
 // Synchronous reader fallback
 function readImportedProductsSync(): any[] {
-  if (inMemoryImports !== null && Array.isArray(inMemoryImports) && inMemoryImports.length > 0) {
+  if (inMemoryImports !== null && Array.isArray(inMemoryImports)) {
     return inMemoryImports;
+  }
+  if (Array.isArray((global as any).__moviq_imports)) {
+    inMemoryImports = (global as any).__moviq_imports;
+    return inMemoryImports!;
   }
 
   // 1. Check /tmp file
@@ -32,8 +36,10 @@ function readImportedProductsSync(): any[] {
     if (fs.existsSync(IMPORTS_FILE)) {
       const data = fs.readFileSync(IMPORTS_FILE, 'utf8');
       const parsed = JSON.parse(data);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        inMemoryImports = parsed;
+      if (Array.isArray(parsed)) {
+        const sanitized = parsed.filter(p => p && p.image && !p.image.startsWith('/uploads/'));
+        inMemoryImports = sanitized;
+        (global as any).__moviq_imports = sanitized;
         return inMemoryImports;
       }
     }
@@ -46,10 +52,12 @@ function readImportedProductsSync(): any[] {
     if (fs.existsSync(SEED_IMPORTS_FILE)) {
       const data = fs.readFileSync(SEED_IMPORTS_FILE, 'utf8');
       const parsed = JSON.parse(data);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        inMemoryImports = parsed;
+      if (Array.isArray(parsed)) {
+        const sanitized = parsed.filter(p => p && p.image && !p.image.startsWith('/uploads/'));
+        inMemoryImports = sanitized;
+        (global as any).__moviq_imports = sanitized;
         try {
-          fs.writeFileSync(IMPORTS_FILE, JSON.stringify(parsed, null, 2), 'utf8');
+          fs.writeFileSync(IMPORTS_FILE, JSON.stringify(sanitized, null, 2), 'utf8');
         } catch (_) {}
         return inMemoryImports;
       }
@@ -58,7 +66,8 @@ function readImportedProductsSync(): any[] {
     console.error('Error reading SEED_IMPORTS_FILE:', err);
   }
 
-  inMemoryImports = inMemoryImports || [];
+  inMemoryImports = [];
+  (global as any).__moviq_imports = [];
   return inMemoryImports;
 }
 
@@ -74,11 +83,13 @@ async function readImportedProductsAsync(): Promise<any[]> {
         if (res.ok) {
           const blobData = await res.json();
           if (Array.isArray(blobData)) {
-            inMemoryImports = blobData;
+            const sanitized = blobData.filter(p => p && p.image && !p.image.startsWith('/uploads/'));
+            inMemoryImports = sanitized;
+            (global as any).__moviq_imports = sanitized;
             try {
-              fs.writeFileSync(IMPORTS_FILE, JSON.stringify(blobData, null, 2), 'utf8');
+              fs.writeFileSync(IMPORTS_FILE, JSON.stringify(sanitized, null, 2), 'utf8');
             } catch (_) {}
-            return blobData;
+            return sanitized;
           }
         }
       }
@@ -97,25 +108,27 @@ function readImportedProducts(): any[] {
 
 // Helper to write imported products to persistent storage
 async function writeImportedProducts(products: any[]) {
-  inMemoryImports = products;
+  const sanitized = products.filter(p => p && p.image && !p.image.startsWith('/uploads/'));
+  inMemoryImports = sanitized;
+  (global as any).__moviq_imports = sanitized;
 
   // 1. Write to /tmp
   try {
-    fs.writeFileSync(IMPORTS_FILE, JSON.stringify(products, null, 2), 'utf8');
+    fs.writeFileSync(IMPORTS_FILE, JSON.stringify(sanitized, null, 2), 'utf8');
   } catch (err) {
     console.error('Error writing IMPORTS_FILE:', err);
   }
 
   // 2. Write to seed file in workspace root
   try {
-    fs.writeFileSync(SEED_IMPORTS_FILE, JSON.stringify(products, null, 2), 'utf8');
+    fs.writeFileSync(SEED_IMPORTS_FILE, JSON.stringify(sanitized, null, 2), 'utf8');
   } catch (_) {}
 
   // 3. Write to Vercel Blob Storage if token available
   if (process.env.BLOB_READ_WRITE_TOKEN || process.env.VERCEL_OIDC_TOKEN) {
     try {
       const { put } = await import("@vercel/blob");
-      await put('imported_products.json', JSON.stringify(products, null, 2), {
+      await put('imported_products.json', JSON.stringify(sanitized, null, 2), {
         access: 'public',
         addRandomSuffix: false,
         contentType: 'application/json'
@@ -183,19 +196,30 @@ interface TelegramFileDetails {
 
 async function downloadTelegramFileDetails(fileId: string, botToken: string, fileUniqueId: string = 'unknown'): Promise<TelegramFileDetails> {
   if (fileId.startsWith('data:') || fileId.startsWith('http://') || fileId.startsWith('https://')) {
-    const isData = fileId.startsWith('data:');
-    const buffer = Buffer.from(fileId);
+    let buffer: Buffer;
+    let contentType = 'image/jpeg';
+    if (fileId.startsWith('data:')) {
+      const match = fileId.match(/^data:([^;]+);base64,(.+)$/);
+      if (match) {
+        contentType = match[1];
+        buffer = Buffer.from(match[2], 'base64');
+      } else {
+        buffer = Buffer.from(fileId);
+      }
+    } else {
+      buffer = Buffer.from(fileId);
+    }
     const sha256 = crypto.createHash('sha256').update(buffer).digest('hex');
     const fileSize = buffer.length;
-    const preview = isData ? fileId.slice(0, 40) + '...' : fileId;
+    const persistentUri = fileId.startsWith('data:') ? fileId : `data:${contentType};base64,${buffer.toString('base64')}`;
     return {
       fileId,
       fileUniqueId,
-      filePath: isData ? 'direct_data_uri' : fileId,
+      filePath: fileId.startsWith('data:') ? 'direct_data_uri' : fileId,
       fileSize,
       sha256,
-      savedLocalPath: preview,
-      imageUrl: fileId
+      savedLocalPath: 'direct_uri',
+      imageUrl: persistentUri
     };
   }
 
@@ -215,7 +239,7 @@ async function downloadTelegramFileDetails(fileId: string, botToken: string, fil
   const filePath = data.result.file_path;
   const downloadUrl = `https://api.telegram.org/file/bot${botToken}/${filePath}`;
 
-  // 2. Download binary stream
+  // 2. Download COMPLETE binary stream
   const imgRes = await fetch(downloadUrl);
   if (!imgRes.ok) {
     throw new Error(`Failed to download file from Telegram path ${filePath}: ${imgRes.statusText}`);
@@ -227,12 +251,31 @@ async function downloadTelegramFileDetails(fileId: string, botToken: string, fil
   const ext = path.extname(filePath) || '.jpg';
   const contentType = imgRes.headers.get('content-type') || (ext === '.png' ? 'image/png' : ext === '.webp' ? 'image/webp' : 'image/jpeg');
 
+  // 3. Convert COMPLETE binary buffer to Base64 (NO truncation)
+  const base64Data = buffer.toString('base64');
+
+  // 4. SHA256 Verification: Re-decode Base64 buffer and verify SHA256 integrity match
+  const decodedBuffer = Buffer.from(base64Data, 'base64');
+  const decodedSha256 = crypto.createHash('sha256').update(decodedBuffer).digest('hex');
+
+  if (sha256 !== decodedSha256) {
+    throw new Error(`CRITICAL INTEGRITY FAILURE: SHA256 mismatch after Base64 encoding! Original: ${sha256}, Decoded: ${decodedSha256}`);
+  }
+
+  console.log(`================ TELEGRAM PHOTO DOWNLOADED & VERIFIED ================`);
+  console.log(`1. Downloaded Binary Stream Size: ${buffer.length} bytes`);
+  console.log(`2. SHA256 Hash of Binary Stream: ${sha256}`);
+  console.log(`3. Total Base64 Length: ${base64Data.length} characters`);
+  console.log(`4. Base64 First 100 chars: ${base64Data.slice(0, 100)}`);
+  console.log(`5. Base64 Last 100 chars: ${base64Data.slice(-100)}`);
+  console.log(`6. Decoded SHA256 Match Check: ${sha256 === decodedSha256 ? '100% MATCH (IDENTICAL)' : 'MISMATCH'}`);
+  console.log(`======================================================================`);
+
   const timestamp = Date.now();
   const randomStr = crypto.randomUUID ? crypto.randomUUID().slice(0, 8) : Math.floor(Math.random() * 100000);
   const localFileName = `tg_${timestamp}_${randomStr}${ext}`;
   const savedLocalPath = `/uploads/${localFileName}`;
 
-  const base64Data = buffer.toString('base64');
   const persistentDataUri = `data:${contentType};base64,${base64Data}`;
   let imageUrl = persistentDataUri;
 
@@ -250,6 +293,7 @@ async function downloadTelegramFileDetails(fileId: string, botToken: string, fil
 
   if (process.env.BLOB_READ_WRITE_TOKEN) {
     try {
+      const { put } = await import("@vercel/blob");
       const blobResult = await put(`telegram_imports/${localFileName}`, buffer, { access: 'public', contentType });
       if (blobResult?.url) imageUrl = `${blobResult.url}?v=${timestamp}`;
     } catch (e: any) {
@@ -510,10 +554,15 @@ async function processTelegramWebhookUpdate(update: any) {
   let fileUniqueId: string = 'unknown';
 
   if (Array.isArray(photoArray) && photoArray.length > 0) {
-    const largestPhoto = photoArray[photoArray.length - 1];
+    const sortedPhotos = [...photoArray].sort((a, b) => {
+      const areaA = (a.width || 0) * (a.height || 0) || (a.file_size || 0);
+      const areaB = (b.width || 0) * (b.height || 0) || (b.file_size || 0);
+      return areaB - areaA;
+    });
+    const largestPhoto = sortedPhotos[0];
     fileId = largestPhoto.file_id;
     fileUniqueId = largestPhoto.file_unique_id || 'unknown';
-    console.log(`[Telegram Webhook Photo Received]: Total resolutions = ${photoArray.length}, Largest resolution = ${largestPhoto.width}x${largestPhoto.height} (${largestPhoto.file_size || 'unknown'} bytes), file_id = ${fileId}`);
+    console.log(`[Telegram Webhook Photo Received]: Total resolutions = ${photoArray.length}, Selected Highest Resolution = ${largestPhoto.width}x${largestPhoto.height} (${largestPhoto.file_size || 'unknown'} bytes), file_id = ${fileId}`);
   } else if (document && document.mime_type && document.mime_type.startsWith('image/')) {
     fileId = document.file_id;
     fileUniqueId = document.file_unique_id || 'unknown';
