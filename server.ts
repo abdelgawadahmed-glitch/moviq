@@ -2,6 +2,7 @@ import express from "express";
 import path from "path";
 import fs from "fs";
 import { put } from "@vercel/blob";
+import { GoogleGenAI } from "@google/genai";
 
 const app = express();
 const PORT = 3000;
@@ -227,132 +228,251 @@ function parseTelegramCaption(text: string = '') {
   };
 }
 
+// Telegram API helper with automatic exponential retries
+async function sendTelegramApiWithRetry(methodName: string, payload: any, maxRetries = 3): Promise<any> {
+  const config = readTelegramConfig();
+  const token = payload.botToken || config.botToken || process.env.TELEGRAM_BOT_TOKEN || "8944102647:AAF5HcF6PlvUnl7Hkrrs3soR2pRRnq3UtWw";
+  const bodyPayload = { ...payload };
+  delete bodyPayload.botToken;
+
+  let attempt = 0;
+  let lastError: any = null;
+
+  while (attempt < maxRetries) {
+    attempt++;
+    try {
+      const res = await fetch(`https://api.telegram.org/bot${token}/${methodName}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bodyPayload)
+      });
+      const data = await res.json();
+      if (data.ok) {
+        console.log(`[Telegram API Success] ${methodName} succeeded on attempt ${attempt}`);
+        return data;
+      }
+      console.warn(`[Telegram API Warning] ${methodName} returned ok:false on attempt ${attempt}: ${data.description}`);
+      lastError = new Error(data.description || 'Telegram API returned ok: false');
+    } catch (err: any) {
+      console.error(`[Telegram API Error] Network error calling ${methodName} on attempt ${attempt}:`, err?.message || err);
+      lastError = err;
+    }
+
+    if (attempt < maxRetries) {
+      await new Promise(resolve => setTimeout(resolve, attempt * 600));
+    }
+  }
+
+  throw lastError;
+}
+
+// AI Assistant Response Generator using Gemini
+let aiClientInstance: GoogleGenAI | null = null;
+function getAiClient(): GoogleGenAI | null {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    console.warn('[Gemini AI Warning] GEMINI_API_KEY is not defined in environment.');
+    return null;
+  }
+  if (!aiClientInstance) {
+    aiClientInstance = new GoogleGenAI({ apiKey });
+  }
+  return aiClientInstance;
+}
+
+async function generateAiAssistantReply(userText: string, senderName: string = 'Customer'): Promise<string> {
+  const ai = getAiClient();
+  if (!ai) {
+    return `Hello ${senderName}! Welcome to MOVIQ Luxury Store & Concierge. How can we assist you with our designer collection today?`;
+  }
+
+  try {
+    const products = readImportedProducts();
+    const catalogSummary = products.slice(0, 6).map(p => `- ${p.brand} ${p.name}: ${p.supplierPrice} EGP (${p.category})`).join('\n');
+
+    const systemPrompt = `You are MOVIQ AI Concierge, the official personal shopping assistant for MOVIQ (Moviq Store), an exclusive high-end luxury store based in Cairo, Egypt.
+Customer Name: ${senderName}.
+
+Your Role & Persona:
+- Respond in a refined, polite, luxury style.
+- Match the user's language (Arabic or English).
+- Answer questions regarding designer sneakers, handbags, apparel, or watches (Louis Vuitton, Dior, Rolex, Gucci, Balenciaga, YSL, Chanel, etc.).
+- Inform customers that they can send photos of designer items directly to this Telegram chat to inquire about pricing or import them into our catalog queue!
+- Keep responses concise, helpful, clear, and well-formatted.
+
+Sample available catalog items:
+${catalogSummary || 'Custom luxury designer import available.'}`;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: userText,
+      config: {
+        systemInstruction: systemPrompt,
+        temperature: 0.7,
+        maxOutputTokens: 500
+      }
+    });
+
+    return response.text || `Welcome to MOVIQ Luxury Store, ${senderName}! How can we assist with your designer request today?`;
+  } catch (err: any) {
+    console.error('[Gemini AI Concierge Error]:', err?.message || err);
+    return `Hello ${senderName}! Welcome to MOVIQ Luxury Concierge. How can we assist you with your luxury designer request today?`;
+  }
+}
+
 // Common Webhook Handling Core Function
 async function processTelegramWebhookUpdate(update: any) {
+  console.log('[Telegram Webhook Received]: Update ID', update.update_id);
   const message = update.message || update.channel_post || update.edited_message || update.edited_channel_post;
   if (!message) {
+    console.log('[Telegram Webhook] Non-message update received');
     return { ok: true, message: 'No processable message found in update' };
   }
+
+  const senderName = message.from 
+    ? `${message.from.first_name || ''} ${message.from.last_name || ''}`.trim() 
+    : (message.chat?.title || 'Telegram User');
+  const chatId = message.chat?.id;
+  const messageId = message.message_id;
+  const text = (message.text || message.caption || '').trim();
 
   const photoArray = message.photo;
   const document = message.document;
 
   let fileId: string | null = null;
   if (Array.isArray(photoArray) && photoArray.length > 0) {
-    // Pick highest resolution photo
     fileId = photoArray[photoArray.length - 1].file_id;
   } else if (document && document.mime_type && document.mime_type.startsWith('image/')) {
     fileId = document.file_id;
   }
 
-  if (!fileId) {
-    return { ok: true, message: 'Message received without photo attachments' };
-  }
-
   const config = readTelegramConfig();
-  const botToken = config.botToken || process.env.TELEGRAM_BOT_TOKEN || "";
+  const botToken = config.botToken || process.env.TELEGRAM_BOT_TOKEN || "8944102647:AAF5HcF6PlvUnl7Hkrrs3soR2pRRnq3UtWw";
 
-  let downloadedUrl = '';
-  if (botToken) {
+  // CASE 1: Photo attachment -> Process Product Import
+  if (fileId) {
+    let downloadedUrl = '';
+    if (botToken) {
+      try {
+        downloadedUrl = await downloadTelegramFile(fileId, botToken);
+      } catch (err: any) {
+        console.error('[Telegram Webhook] Error downloading photo:', err.message);
+      }
+    }
+
+    if (!downloadedUrl) {
+      downloadedUrl = "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&q=80";
+    }
+
+    const parsed = parseTelegramCaption(text);
+    const mediaGroupId = message.media_group_id ? String(message.media_group_id) : null;
+    const telegramMessageId = messageId ? String(messageId) : `tg-${Date.now()}`;
+
+    const currentImports = readImportedProducts();
+    let targetProduct: any = null;
+
+    if (mediaGroupId) {
+      targetProduct = currentImports.find(p => p.mediaGroupId === mediaGroupId && p.status === 'pending');
+    }
+
+    if (targetProduct) {
+      if (!targetProduct.gallery.includes(downloadedUrl)) {
+        targetProduct.gallery.push(downloadedUrl);
+      }
+      if (text && text.length > (targetProduct.description || '').length) {
+        const reParsed = parseTelegramCaption(text);
+        targetProduct.name = reParsed.name;
+        targetProduct.brand = reParsed.brand;
+        targetProduct.supplierPrice = reParsed.supplierPrice;
+        targetProduct.salePrice = reParsed.supplierPrice;
+        targetProduct.originalPrice = reParsed.supplierPrice;
+        targetProduct.description = text;
+      }
+    } else {
+      const productId = `prod-tg-${telegramMessageId}`;
+      targetProduct = {
+        id: productId,
+        brand: parsed.brand,
+        name: parsed.name,
+        image: downloadedUrl,
+        gallery: [downloadedUrl],
+        originalPrice: parsed.supplierPrice,
+        salePrice: parsed.supplierPrice,
+        discount: 0,
+        category: parsed.category,
+        sizes: parsed.sizes,
+        colors: [{ name: 'Standard Black', hex: '#000000' }, { name: 'Pure White', hex: '#ffffff' }],
+        description: parsed.description,
+        details: [
+          `Supplier: Telegram Concierge`,
+          `Sender: ${senderName}`,
+          `Telegram Msg ID: ${telegramMessageId}`
+        ],
+        rating: 5.0,
+        reviewsCount: 0,
+        reviews: [],
+        isNew: true,
+        isBestSeller: false,
+        isLuxury: true,
+        status: config.autoPublish ? 'published' : 'pending',
+        supplierPrice: parsed.supplierPrice,
+        supplierName: senderName,
+        telegramMessageId,
+        mediaGroupId,
+        telegramSender: senderName,
+        createdAt: new Date().toISOString()
+      };
+
+      currentImports.unshift(targetProduct);
+    }
+
+    writeImportedProducts(currentImports);
+
+    // Send confirmation reply back to Telegram
+    if (chatId) {
+      try {
+        await sendTelegramApiWithRetry('sendMessage', {
+          chat_id: chatId,
+          text: `✅ *Photo received and saved!*\n\n📌 *${targetProduct.brand} - ${targetProduct.name}*\n💰 Price: ${targetProduct.supplierPrice} EGP\n📂 Status: ${targetProduct.status.toUpperCase()}\n\nItem has been added to the Pending Import queue.`,
+          reply_to_message_id: messageId,
+          parse_mode: 'Markdown'
+        });
+      } catch (replyErr: any) {
+        console.error('[Telegram Webhook] Error sending photo confirmation reply:', replyErr?.message || replyErr);
+      }
+    }
+
+    return { success: true, product: targetProduct };
+  }
+
+  // CASE 2: Text message (No photo) -> Route to Gemini AI Assistant
+  if (text && chatId) {
+    console.log(`[Telegram Text Message] From: ${senderName}, Message: "${text}"`);
+
+    let replyText = '';
+
+    if (text === '/start' || text === '/help') {
+      replyText = `✨ *Welcome to MOVIQ Luxury Concierge, ${senderName}!* ✨\n\nI am your AI Concierge Assistant.\n\n🔹 *Ask Questions*: Ask about prices, designer items, or luxury shoes in our store.\n🔹 *Import Products*: Send a photo of any luxury item (with price/details) directly to this chat, and I'll import it into our store queue!\n\nHow can I assist you today?`;
+    } else {
+      replyText = await generateAiAssistantReply(text, senderName);
+    }
+
     try {
-      downloadedUrl = await downloadTelegramFile(fileId, botToken);
-    } catch (err: any) {
-      console.error('Error downloading Telegram photo:', err.message);
+      await sendTelegramApiWithRetry('sendMessage', {
+        chat_id: chatId,
+        text: replyText,
+        reply_to_message_id: messageId,
+        parse_mode: 'Markdown'
+      });
+      console.log(`[Telegram AI Reply Sent] Successfully replied to chat ${chatId}`);
+    } catch (replyErr: any) {
+      console.error('[Telegram Webhook] Failed to send AI reply to Telegram:', replyErr?.message || replyErr);
     }
+
+    return { success: true, aiReply: replyText };
   }
 
-  // Fallback to placeholder if token is missing or download failed
-  if (!downloadedUrl) {
-    downloadedUrl = "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&q=80";
-  }
-
-  const caption = message.caption || message.text || '';
-  const parsed = parseTelegramCaption(caption);
-  const mediaGroupId = message.media_group_id ? String(message.media_group_id) : null;
-  const telegramMessageId = message.message_id ? String(message.message_id) : `tg-${Date.now()}`;
-  const senderName = message.from 
-    ? `${message.from.first_name || ''} ${message.from.last_name || ''}`.trim() 
-    : (message.chat?.title || 'Telegram User');
-
-  const currentImports = readImportedProducts();
-
-  let targetProduct: any = null;
-
-  // Handle album / media_group_id
-  if (mediaGroupId) {
-    targetProduct = currentImports.find(p => p.mediaGroupId === mediaGroupId && p.status === 'pending');
-  }
-
-  if (targetProduct) {
-    // Append photo to gallery if not present
-    if (!targetProduct.gallery.includes(downloadedUrl)) {
-      targetProduct.gallery.push(downloadedUrl);
-    }
-    // Update caption if longer
-    if (caption && caption.length > (targetProduct.description || '').length) {
-      const reParsed = parseTelegramCaption(caption);
-      targetProduct.name = reParsed.name;
-      targetProduct.brand = reParsed.brand;
-      targetProduct.supplierPrice = reParsed.supplierPrice;
-      targetProduct.salePrice = reParsed.supplierPrice;
-      targetProduct.originalPrice = reParsed.supplierPrice;
-      targetProduct.description = caption;
-    }
-  } else {
-    // Create new pending import
-    const productId = `prod-tg-${telegramMessageId}`;
-    targetProduct = {
-      id: productId,
-      brand: parsed.brand,
-      name: parsed.name,
-      image: downloadedUrl,
-      gallery: [downloadedUrl],
-      originalPrice: parsed.supplierPrice,
-      salePrice: parsed.supplierPrice,
-      discount: 0,
-      category: parsed.category,
-      sizes: parsed.sizes,
-      colors: [{ name: 'Standard Black', hex: '#000000' }, { name: 'Pure White', hex: '#ffffff' }],
-      description: parsed.description,
-      details: [
-        `Supplier: Telegram Concierge`,
-        `Sender: ${senderName}`,
-        `Telegram Msg ID: ${telegramMessageId}`
-      ],
-      rating: 5.0,
-      reviewsCount: 0,
-      reviews: [],
-      isNew: true,
-      isBestSeller: false,
-      isLuxury: true,
-      status: config.autoPublish ? 'published' : 'pending',
-      supplierPrice: parsed.supplierPrice,
-      supplierName: senderName,
-      telegramMessageId,
-      mediaGroupId,
-      telegramSender: senderName,
-      createdAt: new Date().toISOString()
-    };
-
-    currentImports.unshift(targetProduct);
-  }
-
-  writeImportedProducts(currentImports);
-
-  // Send confirmation reply back to Telegram if bot token is valid
-  if (botToken && message.chat?.id) {
-    fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: message.chat.id,
-        text: `✅ Photo received and saved! Pending Import created: ${targetProduct.name}`,
-        reply_to_message_id: message.message_id
-      })
-    }).catch(err => console.error('Error sending Telegram reply:', err));
-  }
-
-  return { success: true, product: targetProduct };
+  return { ok: true, message: 'Message received without text or photo attachments' };
 }
 
 // ==================== BACKEND API ROUTES ====================

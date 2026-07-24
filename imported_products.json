@@ -1,5 +1,51 @@
 [
   {
+    "id": "prod-tg-5003",
+    "brand": "Gucci",
+    "name": "Gucci Ace Sneaker 13500 EGP - Size 41,42,43",
+    "image": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&q=80",
+    "gallery": [
+      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&q=80"
+    ],
+    "originalPrice": 13500,
+    "salePrice": 13500,
+    "discount": 0,
+    "category": "Sneakers",
+    "sizes": [
+      "41",
+      "42"
+    ],
+    "colors": [
+      {
+        "name": "Standard Black",
+        "hex": "#000000"
+      },
+      {
+        "name": "Pure White",
+        "hex": "#ffffff"
+      }
+    ],
+    "description": "Gucci Ace Sneaker 13500 EGP - Size 41,42,43",
+    "details": [
+      "Supplier: Telegram Concierge",
+      "Sender: Omar",
+      "Telegram Msg ID: 5003"
+    ],
+    "rating": 5,
+    "reviewsCount": 0,
+    "reviews": [],
+    "isNew": true,
+    "isBestSeller": false,
+    "isLuxury": true,
+    "status": "pending",
+    "supplierPrice": 13500,
+    "supplierName": "Omar",
+    "telegramMessageId": "5003",
+    "mediaGroupId": null,
+    "telegramSender": "Omar",
+    "createdAt": "2026-07-24T17:44:58.357Z"
+  },
+  {
     "id": "prod-tg-sim-1784856813735",
     "brand": "Dior",
     "name": "Dior B22 Black Trainer 16500 EGP - Size 41,42,43",
