@@ -1,7 +1,6 @@
 import express from "express";
 import path from "path";
 import fs from "fs";
-import { createServer as createViteServer } from "vite";
 import { put } from "@vercel/blob";
 
 const app = express();
@@ -10,8 +9,8 @@ const PORT = 3000;
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-const IMPORTS_FILE = path.join(process.cwd(), 'imported_products.json');
-const CONFIG_FILE = path.join(process.cwd(), 'telegram_config.json');
+const IMPORTS_FILE = process.env.VERCEL ? path.join('/tmp', 'imported_products.json') : path.join(process.cwd(), 'imported_products.json');
+const CONFIG_FILE = process.env.VERCEL ? path.join('/tmp', 'telegram_config.json') : path.join(process.cwd(), 'telegram_config.json');
 
 let inMemoryImports: any[] | null = null;
 
@@ -648,10 +647,20 @@ app.post("/api/telegram/test-import", async (req, res) => {
   }
 });
 
+// Global Express Error Handler to ensure valid JSON responses
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error('Unhandled Server Error:', err);
+  res.status(500).json({
+    success: false,
+    error: err?.message || 'An internal server error occurred'
+  });
+});
+
 // ==================== VITE SERVER INTEGRATION ====================
 
 async function startServer() {
   if (process.env.NODE_ENV !== "production") {
+    const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
