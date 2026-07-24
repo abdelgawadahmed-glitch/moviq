@@ -13,21 +13,27 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 const IMPORTS_FILE = path.join(process.cwd(), 'imported_products.json');
 const CONFIG_FILE = path.join(process.cwd(), 'telegram_config.json');
 
+let inMemoryImports: any[] | null = null;
+
 // Helper to read imported products from JSON
 function readImportedProducts(): any[] {
+  if (inMemoryImports !== null) return inMemoryImports;
   try {
     if (fs.existsSync(IMPORTS_FILE)) {
       const data = fs.readFileSync(IMPORTS_FILE, 'utf8');
-      return JSON.parse(data);
+      inMemoryImports = JSON.parse(data);
+      return inMemoryImports || [];
     }
   } catch (err) {
     console.error('Error reading imports file:', err);
   }
-  return [];
+  inMemoryImports = [];
+  return inMemoryImports;
 }
 
 // Helper to write imported products to JSON
 function writeImportedProducts(products: any[]) {
+  inMemoryImports = products;
   try {
     fs.writeFileSync(IMPORTS_FILE, JSON.stringify(products, null, 2), 'utf8');
   } catch (err) {
@@ -42,7 +48,10 @@ interface TelegramConfig {
   autoPublish: boolean;
 }
 
+let inMemoryConfig: TelegramConfig | null = null;
+
 function readTelegramConfig(): TelegramConfig {
+  if (inMemoryConfig !== null) return inMemoryConfig;
   let loaded: Partial<TelegramConfig> = {};
   try {
     if (fs.existsSync(CONFIG_FILE)) {
@@ -51,14 +60,16 @@ function readTelegramConfig(): TelegramConfig {
   } catch (err) {
     console.error('Error reading telegram config:', err);
   }
-  return {
+  inMemoryConfig = {
     botToken: (loaded.botToken && !loaded.botToken.includes('AAH_KOQMidQTH')) ? loaded.botToken : "8944102647:AAF5HcF6PlvUnl7Hkrrs3soR2pRRnq3UtWw",
     webhookUrl: loaded.webhookUrl || process.env.TELEGRAM_WEBHOOK_URL || "https://moviq-sooty.vercel.app/api/telegram-webhook",
     autoPublish: loaded.autoPublish ?? false
   };
+  return inMemoryConfig;
 }
 
 function writeTelegramConfig(cfg: TelegramConfig) {
+  inMemoryConfig = cfg;
   try {
     fs.writeFileSync(CONFIG_FILE, JSON.stringify(cfg, null, 2), 'utf8');
   } catch (err) {
@@ -518,36 +529,46 @@ app.post("/api/telegram/webhook", async (req, res) => {
 
 // GET Telegram Config
 app.get("/api/telegram/config", (req, res) => {
-  const config = readTelegramConfig();
-  const botToken = config.botToken || process.env.TELEGRAM_BOT_TOKEN || "";
-  const maskedToken = botToken ? `${botToken.substring(0, 6)}...${botToken.substring(botToken.length - 4)}` : "";
+  try {
+    const config = readTelegramConfig();
+    const botToken = config.botToken || process.env.TELEGRAM_BOT_TOKEN || "";
+    const maskedToken = botToken ? `${botToken.substring(0, 6)}...${botToken.substring(botToken.length - 4)}` : "";
 
-  res.json({
-    isConfigured: !!botToken,
-    botTokenMasked: maskedToken,
-    hasToken: !!botToken,
-    webhookUrl: config.webhookUrl,
-    autoPublish: config.autoPublish
-  });
+    res.json({
+      isConfigured: !!botToken,
+      botTokenMasked: maskedToken,
+      hasToken: !!botToken,
+      webhookUrl: config.webhookUrl,
+      autoPublish: config.autoPublish
+    });
+  } catch (err: any) {
+    console.error('Error in GET /api/telegram/config:', err);
+    res.status(500).json({ success: false, error: err?.message || 'Failed to get Telegram config' });
+  }
 });
 
 // POST Telegram Config
 app.post("/api/telegram/config", (req, res) => {
-  const { botToken, webhookUrl, autoPublish } = req.body;
-  const current = readTelegramConfig();
+  try {
+    const { botToken, webhookUrl, autoPublish } = req.body || {};
+    const current = readTelegramConfig();
 
-  if (typeof botToken === 'string') {
-    current.botToken = botToken.trim();
-  }
-  if (typeof webhookUrl === 'string') {
-    current.webhookUrl = webhookUrl.trim();
-  }
-  if (typeof autoPublish === 'boolean') {
-    current.autoPublish = autoPublish;
-  }
+    if (typeof botToken === 'string' && botToken.trim()) {
+      current.botToken = botToken.trim();
+    }
+    if (typeof webhookUrl === 'string' && webhookUrl.trim()) {
+      current.webhookUrl = webhookUrl.trim();
+    }
+    if (typeof autoPublish === 'boolean') {
+      current.autoPublish = autoPublish;
+    }
 
-  writeTelegramConfig(current);
-  res.json({ success: true, config: current });
+    writeTelegramConfig(current);
+    res.json({ success: true, config: current });
+  } catch (err: any) {
+    console.error('Error in POST /api/telegram/config:', err);
+    res.status(500).json({ success: false, error: err?.message || 'Failed to update Telegram configuration' });
+  }
 });
 
 // Set Webhook Endpoint via Telegram API

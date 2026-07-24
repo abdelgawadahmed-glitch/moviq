@@ -1,5 +1,50 @@
 [
   {
+    "id": "prod-tg-sim-1784856813735",
+    "brand": "Dior",
+    "name": "Dior B22 Black Trainer 16500 EGP - Size 41,42,43",
+    "image": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&q=80",
+    "gallery": [
+      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&q=80"
+    ],
+    "originalPrice": 16500,
+    "salePrice": 16500,
+    "discount": 0,
+    "category": "Sneakers",
+    "sizes": [
+      "41",
+      "42"
+    ],
+    "colors": [
+      {
+        "name": "Obsidian Black",
+        "hex": "#000000"
+      },
+      {
+        "name": "Pure White",
+        "hex": "#ffffff"
+      }
+    ],
+    "description": "Dior B22 Black Trainer 16500 EGP - Size 41,42,43",
+    "details": [
+      "Supplier: Telegram Concierge Bot",
+      "Simulation Mode",
+      "Message ID: sim-1784856813735"
+    ],
+    "rating": 5,
+    "reviewsCount": 0,
+    "reviews": [],
+    "isNew": true,
+    "isBestSeller": false,
+    "isLuxury": true,
+    "status": "pending",
+    "supplierPrice": 16500,
+    "supplierName": "Telegram Concierge Bot",
+    "telegramMessageId": "sim-1784856813735",
+    "telegramSender": "Telegram Demo User",
+    "createdAt": "2026-07-24T01:33:33.736Z"
+  },
+  {
     "id": "prod-tg-8877",
     "brand": "Louis Vuitton",
     "name": "Louis Vuitton Trainer Sneaker 14500 EGP - Size 40,41,42,43,44",

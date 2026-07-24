@@ -285,7 +285,14 @@ export default function AdminDashboard({
           autoPublish: autoPublishInput
         })
       });
-      const data = await res.json();
+      const text = await res.text();
+      let data: any = {};
+      try {
+        data = JSON.parse(text);
+      } catch (pErr) {
+        throw new Error(text || 'Server returned invalid non-JSON response');
+      }
+
       if (data.success) {
         triggerSuccess('Telegram bot configuration saved.');
         setTelegramConfig(prev => ({
@@ -295,6 +302,8 @@ export default function AdminDashboard({
           autoPublish: autoPublishInput
         }));
         setShowTgConfigModal(false);
+      } else {
+        alert('Error saving config: ' + (data.error || 'Failed to save configuration'));
       }
     } catch (err: any) {
       alert('Error saving config: ' + err.message);
@@ -302,7 +311,7 @@ export default function AdminDashboard({
   };
 
   const handleSetWebhookUrl = async () => {
-    const targetUrl = webhookUrlInput || `${window.location.origin}/api/telegram-webhook`;
+    const targetUrl = webhookUrlInput || 'https://moviq-sooty.vercel.app/api/telegram-webhook';
     try {
       const res = await fetch('/api/telegram/set-webhook', {
         method: 'POST',
@@ -312,7 +321,14 @@ export default function AdminDashboard({
           botToken: botTokenInput
         })
       });
-      const data = await res.json();
+      const text = await res.text();
+      let data: any = {};
+      try {
+        data = JSON.parse(text);
+      } catch (pErr) {
+        throw new Error(text || 'Server returned invalid non-JSON response');
+      }
+
       if (data.success) {
         triggerSuccess('Telegram Webhook set successfully with Telegram API!');
         setTelegramConfig(prev => ({ ...prev, webhookUrl: targetUrl, isConfigured: true }));
