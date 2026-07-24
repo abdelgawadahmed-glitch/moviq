@@ -273,6 +273,28 @@ export default function AdminDashboard({
       .catch(err => console.log('Telegram config fetch status:', err));
   }, []);
 
+  // Sync pending imports whenever activeTab is set to pending-imports or on mount
+  useEffect(() => {
+    fetch('/api/import')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setProducts(prev => {
+            const published = prev.filter(p => p.status !== 'pending');
+            const mergedMap = new Map<string, any>();
+            // Add server items first
+            data.forEach((p: any) => mergedMap.set(p.id, p));
+            // Retain local published items
+            published.forEach((p: any) => {
+              if (!mergedMap.has(p.id)) mergedMap.set(p.id, p);
+            });
+            return Array.from(mergedMap.values());
+          });
+        }
+      })
+      .catch(err => console.error('Error fetching pending imports:', err));
+  }, [activeTab]);
+
   const handleSaveTelegramConfig = async (e: React.FormEvent) => {
     e.preventDefault();
     try {

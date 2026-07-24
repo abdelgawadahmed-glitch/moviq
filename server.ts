@@ -1,3 +1,4 @@
+import "dotenv/config";
 import express from "express";
 import path from "path";
 import fs from "fs";
@@ -10,34 +11,117 @@ const PORT = 3000;
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-const IMPORTS_FILE = process.env.VERCEL ? path.join('/tmp', 'imported_products.json') : path.join(process.cwd(), 'imported_products.json');
-const CONFIG_FILE = process.env.VERCEL ? path.join('/tmp', 'telegram_config.json') : path.join(process.cwd(), 'telegram_config.json');
+const IMPORTS_FILE = path.join('/tmp', 'imported_products.json');
+const SEED_IMPORTS_FILE = path.join(process.cwd(), 'imported_products.json');
+
+const CONFIG_FILE = path.join('/tmp', 'telegram_config.json');
+const SEED_CONFIG_FILE = path.join(process.cwd(), 'telegram_config.json');
 
 let inMemoryImports: any[] | null = null;
 
-// Helper to read imported products from JSON
-function readImportedProducts(): any[] {
-  if (inMemoryImports !== null) return inMemoryImports;
+// Synchronous reader fallback
+function readImportedProductsSync(): any[] {
+  if (inMemoryImports !== null && Array.isArray(inMemoryImports) && inMemoryImports.length > 0) {
+    return inMemoryImports;
+  }
+
+  // 1. Check /tmp file
   try {
     if (fs.existsSync(IMPORTS_FILE)) {
       const data = fs.readFileSync(IMPORTS_FILE, 'utf8');
-      inMemoryImports = JSON.parse(data);
-      return inMemoryImports || [];
+      const parsed = JSON.parse(data);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        inMemoryImports = parsed;
+        return inMemoryImports;
+      }
     }
   } catch (err) {
-    console.error('Error reading imports file:', err);
+    console.error('Error reading IMPORTS_FILE:', err);
   }
-  inMemoryImports = [];
+
+  // 2. Fall back to repository seed file (process.cwd()/imported_products.json)
+  try {
+    if (fs.existsSync(SEED_IMPORTS_FILE)) {
+      const data = fs.readFileSync(SEED_IMPORTS_FILE, 'utf8');
+      const parsed = JSON.parse(data);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        inMemoryImports = parsed;
+        try {
+          fs.writeFileSync(IMPORTS_FILE, JSON.stringify(parsed, null, 2), 'utf8');
+        } catch (_) {}
+        return inMemoryImports;
+      }
+    }
+  } catch (err) {
+    console.error('Error reading SEED_IMPORTS_FILE:', err);
+  }
+
+  inMemoryImports = inMemoryImports || [];
   return inMemoryImports;
 }
 
-// Helper to write imported products to JSON
-function writeImportedProducts(products: any[]) {
+// Asynchronous persistent reader (checks Vercel Blob if token available, then fallback)
+async function readImportedProductsAsync(): Promise<any[]> {
+  if (process.env.BLOB_READ_WRITE_TOKEN || process.env.VERCEL_OIDC_TOKEN) {
+    try {
+      const { list } = await import("@vercel/blob");
+      const { blobs } = await list({ prefix: 'imported_products.json' });
+      if (blobs && blobs.length > 0) {
+        const targetBlob = blobs.find(b => b.pathname === 'imported_products.json') || blobs[0];
+        const res = await fetch(targetBlob.url, { cache: 'no-store' });
+        if (res.ok) {
+          const blobData = await res.json();
+          if (Array.isArray(blobData)) {
+            inMemoryImports = blobData;
+            try {
+              fs.writeFileSync(IMPORTS_FILE, JSON.stringify(blobData, null, 2), 'utf8');
+            } catch (_) {}
+            return blobData;
+          }
+        }
+      }
+    } catch (blobErr: any) {
+      console.warn('[Vercel Blob Read Warning]:', blobErr?.message || blobErr);
+    }
+  }
+
+  return readImportedProductsSync();
+}
+
+// Helper to read imported products synchronously
+function readImportedProducts(): any[] {
+  return readImportedProductsSync();
+}
+
+// Helper to write imported products to persistent storage
+async function writeImportedProducts(products: any[]) {
   inMemoryImports = products;
+
+  // 1. Write to /tmp
   try {
     fs.writeFileSync(IMPORTS_FILE, JSON.stringify(products, null, 2), 'utf8');
   } catch (err) {
-    console.error('Error writing imports file:', err);
+    console.error('Error writing IMPORTS_FILE:', err);
+  }
+
+  // 2. Write to seed file in workspace root
+  try {
+    fs.writeFileSync(SEED_IMPORTS_FILE, JSON.stringify(products, null, 2), 'utf8');
+  } catch (_) {}
+
+  // 3. Write to Vercel Blob Storage if token available
+  if (process.env.BLOB_READ_WRITE_TOKEN || process.env.VERCEL_OIDC_TOKEN) {
+    try {
+      const { put } = await import("@vercel/blob");
+      await put('imported_products.json', JSON.stringify(products, null, 2), {
+        access: 'public',
+        addRandomSuffix: false,
+        contentType: 'application/json'
+      });
+      console.log('[Vercel Blob Sync] Saved imported_products.json to Vercel Blob storage');
+    } catch (blobErr: any) {
+      console.error('[Vercel Blob Write Error]:', blobErr?.message || blobErr);
+    }
   }
 }
 
@@ -56,6 +140,8 @@ function readTelegramConfig(): TelegramConfig {
   try {
     if (fs.existsSync(CONFIG_FILE)) {
       loaded = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'));
+    } else if (fs.existsSync(SEED_CONFIG_FILE)) {
+      loaded = JSON.parse(fs.readFileSync(SEED_CONFIG_FILE, 'utf8'));
     }
   } catch (err) {
     console.error('Error reading telegram config:', err);
@@ -75,6 +161,9 @@ function writeTelegramConfig(cfg: TelegramConfig) {
   } catch (err) {
     console.error('Error writing telegram config:', err);
   }
+  try {
+    fs.writeFileSync(SEED_CONFIG_FILE, JSON.stringify(cfg, null, 2), 'utf8');
+  } catch (_) {}
 }
 
 // Persistent Cloud / Vercel Blob Image Storage
@@ -286,38 +375,50 @@ async function generateAiAssistantReply(userText: string, senderName: string = '
     return `Hello ${senderName}! Welcome to MOVIQ Luxury Store & Concierge. How can we assist you with our designer collection today?`;
   }
 
-  try {
-    const products = readImportedProducts();
-    const catalogSummary = products.slice(0, 6).map(p => `- ${p.brand} ${p.name}: ${p.supplierPrice} EGP (${p.category})`).join('\n');
+  // Model cascade: primary gemini-3.6-flash, fallback to gemini-2.5-flash
+  const candidateModels = ['gemini-3.6-flash', 'gemini-2.5-flash'];
 
-    const systemPrompt = `You are MOVIQ AI Concierge, the official personal shopping assistant for MOVIQ (Moviq Store), an exclusive high-end luxury store based in Cairo, Egypt.
+  for (const modelName of candidateModels) {
+    try {
+      const products = readImportedProducts();
+      const catalogSummary = products.slice(0, 10).map(p => `- ${p.brand} ${p.name}: ${p.supplierPrice} EGP (${p.category})`).join('\n');
+
+      const systemPrompt = `You are MOVIQ AI Concierge, the official personal shopping assistant for MOVIQ (Moviq Store), an exclusive luxury fashion boutique located in Cairo, Egypt.
 Customer Name: ${senderName}.
 
-Your Role & Persona:
-- Respond in a refined, polite, luxury style.
-- Match the user's language (Arabic or English).
-- Answer questions regarding designer sneakers, handbags, apparel, or watches (Louis Vuitton, Dior, Rolex, Gucci, Balenciaga, YSL, Chanel, etc.).
-- Inform customers that they can send photos of designer items directly to this Telegram chat to inquire about pricing or import them into our catalog queue!
-- Keep responses concise, helpful, clear, and well-formatted.
+Your Mission & Persona:
+- Automatically detect the user's language (Arabic or English) and reply in the same language.
+- If the user writes in Arabic, reply in polished, polite, helpful Arabic. If in English, reply in refined English.
+- Answer questions regarding luxury designer sneakers, apparel, handbags, watches (Louis Vuitton, Dior, Nike, Gucci, Rolex, Balenciaga, YSL, Chanel, etc.), pricing, sizing, or stock.
+- Check the available store sample catalog items provided below when answering.
+- Mention that customers can send photos of designer items directly to this Telegram chat to inquire about pricing or import them into our catalog queue!
+- Keep replies clear, well-structured, elegant, and concise.
 
-Sample available catalog items:
-${catalogSummary || 'Custom luxury designer import available.'}`;
+Sample Available Store Catalog Items:
+${catalogSummary || 'Custom luxury designer imports available upon request.'}`;
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: userText,
-      config: {
-        systemInstruction: systemPrompt,
-        temperature: 0.7,
-        maxOutputTokens: 500
+      console.log(`[Gemini AI] Requesting response from model '${modelName}' for text: "${userText}"`);
+
+      const response = await ai.models.generateContent({
+        model: modelName,
+        contents: userText,
+        config: {
+          systemInstruction: systemPrompt,
+          temperature: 0.7,
+          maxOutputTokens: 600
+        }
+      });
+
+      if (response.text && response.text.trim().length > 0) {
+        console.log(`[Gemini AI Success] Model '${modelName}' generated response successfully.`);
+        return response.text.trim();
       }
-    });
-
-    return response.text || `Welcome to MOVIQ Luxury Store, ${senderName}! How can we assist with your designer request today?`;
-  } catch (err: any) {
-    console.error('[Gemini AI Concierge Error]:', err?.message || err);
-    return `Hello ${senderName}! Welcome to MOVIQ Luxury Concierge. How can we assist you with your luxury designer request today?`;
+    } catch (err: any) {
+      console.error(`[Gemini AI Error] Model '${modelName}' failed:`, err?.message || err);
+    }
   }
+
+  return `Hello ${senderName}! Welcome to MOVIQ Luxury Concierge. How can we assist you with your luxury designer request today?`;
 }
 
 // Common Webhook Handling Core Function
@@ -368,7 +469,7 @@ async function processTelegramWebhookUpdate(update: any) {
     const mediaGroupId = message.media_group_id ? String(message.media_group_id) : null;
     const telegramMessageId = messageId ? String(messageId) : `tg-${Date.now()}`;
 
-    const currentImports = readImportedProducts();
+    const currentImports = await readImportedProductsAsync();
     let targetProduct: any = null;
 
     if (mediaGroupId) {
@@ -426,7 +527,7 @@ async function processTelegramWebhookUpdate(update: any) {
       currentImports.unshift(targetProduct);
     }
 
-    writeImportedProducts(currentImports);
+    await writeImportedProducts(currentImports);
 
     // Send confirmation reply back to Telegram
     if (chatId) {
@@ -478,13 +579,38 @@ async function processTelegramWebhookUpdate(update: any) {
 // ==================== BACKEND API ROUTES ====================
 
 // 1. GET /api/import - Retrieve all imported products
-app.get("/api/import", (req, res) => {
-  const imported = readImportedProducts();
-  res.json(imported);
+app.get("/api/import", async (req, res) => {
+  try {
+    const imported = await readImportedProductsAsync();
+    res.json(imported);
+  } catch (err: any) {
+    res.status(500).json({ error: err?.message || "Failed to fetch imported products" });
+  }
 });
 
-// 2. POST /api/import - Import a single product into Pending status
-app.post("/api/import", (req, res) => {
+// GET /api/telegram/pending - Retrieve pending telegram imported products
+app.get("/api/telegram/pending", async (req, res) => {
+  try {
+    const imported = await readImportedProductsAsync();
+    const pending = imported.filter((p: any) => p.status === 'pending');
+    res.json(pending);
+  } catch (err: any) {
+    res.status(500).json({ error: err?.message || "Failed to fetch pending telegram imports" });
+  }
+});
+
+// GET /api/telegram/imported - Retrieve all imported products
+app.get("/api/telegram/imported", async (req, res) => {
+  try {
+    const imported = await readImportedProductsAsync();
+    res.json(imported);
+  } catch (err: any) {
+    res.status(500).json({ error: err?.message || "Failed to fetch telegram imports" });
+  }
+});
+
+// Helper handler for importing products
+async function handleImportProductReq(req: express.Request, res: express.Response) {
   try {
     const {
       name,
@@ -556,7 +682,7 @@ app.post("/api/import", (req, res) => {
       createdAt: new Date().toISOString()
     };
 
-    const currentImports = readImportedProducts();
+    const currentImports = await readImportedProductsAsync();
     if (telegramMessageId) {
       const existsIdx = currentImports.findIndex(p => String(p.telegramMessageId) === String(telegramMessageId));
       if (existsIdx > -1) {
@@ -568,61 +694,108 @@ app.post("/api/import", (req, res) => {
       currentImports.unshift(newProduct);
     }
 
-    writeImportedProducts(currentImports);
+    await writeImportedProducts(currentImports);
     res.json({ success: true, product: newProduct });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
-});
+}
+
+// 2. POST /api/import - Import a single product into Pending status
+app.post("/api/import", handleImportProductReq);
+
+// Alias for POST /api/telegram/import
+app.post("/api/telegram/import", handleImportProductReq);
 
 // 3. POST /api/import/publish - Mark imported product as published
-app.post("/api/import/publish", (req, res) => {
-  const { id } = req.body;
-  if (!id) return res.status(400).json({ error: "Missing product id" });
+app.post("/api/import/publish", async (req, res) => {
+  try {
+    const { id } = req.body;
+    if (!id) return res.status(400).json({ error: "Missing product id" });
 
-  let currentImports = readImportedProducts();
-  currentImports = currentImports.map(p => {
-    if (p.id === id) {
-      return { ...p, status: 'published' };
-    }
-    return p;
-  });
-  writeImportedProducts(currentImports);
-  res.json({ success: true });
+    let currentImports = await readImportedProductsAsync();
+    currentImports = currentImports.map(p => {
+      if (p.id === id) {
+        return { ...p, status: 'published' };
+      }
+      return p;
+    });
+    await writeImportedProducts(currentImports);
+    res.json({ success: true });
+  } catch (err: any) {
+    res.status(500).json({ error: err?.message || "Failed to publish product" });
+  }
 });
 
 // 4. POST /api/import/delete - Delete imported product from queue
-app.post("/api/import/delete", (req, res) => {
-  const { id } = req.body;
-  if (!id) return res.status(400).json({ error: "Missing product id" });
+app.post("/api/import/delete", async (req, res) => {
+  try {
+    const { id } = req.body;
+    if (!id) return res.status(400).json({ error: "Missing product id" });
 
-  let currentImports = readImportedProducts();
-  currentImports = currentImports.filter(p => p.id !== id);
-  writeImportedProducts(currentImports);
-  res.json({ success: true });
+    let currentImports = await readImportedProductsAsync();
+    currentImports = currentImports.filter(p => p.id !== id);
+    await writeImportedProducts(currentImports);
+    res.json({ success: true });
+  } catch (err: any) {
+    res.status(500).json({ error: err?.message || "Failed to delete product" });
+  }
+});
+
+// Alias POST /api/import/reject and DELETE /api/import/:id
+app.post("/api/import/reject", async (req, res) => {
+  try {
+    const { id } = req.body;
+    if (!id) return res.status(400).json({ error: "Missing product id" });
+
+    let currentImports = await readImportedProductsAsync();
+    currentImports = currentImports.filter(p => p.id !== id);
+    await writeImportedProducts(currentImports);
+    res.json({ success: true });
+  } catch (err: any) {
+    res.status(500).json({ error: err?.message || "Failed to reject product" });
+  }
+});
+
+app.delete("/api/import/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) return res.status(400).json({ error: "Missing product id" });
+
+    let currentImports = await readImportedProductsAsync();
+    currentImports = currentImports.filter(p => p.id !== id);
+    await writeImportedProducts(currentImports);
+    res.json({ success: true });
+  } catch (err: any) {
+    res.status(500).json({ error: err?.message || "Failed to delete product" });
+  }
 });
 
 // 5. POST /api/import/update - Update details of pending import
-app.post("/api/import/update", (req, res) => {
-  const { id, name, brand, salePrice, category, sizes, description } = req.body;
-  if (!id) return res.status(400).json({ error: "Missing product id" });
+app.post("/api/import/update", async (req, res) => {
+  try {
+    const { id, name, brand, salePrice, category, sizes, description } = req.body;
+    if (!id) return res.status(400).json({ error: "Missing product id" });
 
-  let currentImports = readImportedProducts();
-  const idx = currentImports.findIndex(p => p.id === id);
-  if (idx === -1) return res.status(404).json({ error: "Pending product not found" });
+    let currentImports = await readImportedProductsAsync();
+    const idx = currentImports.findIndex(p => p.id === id);
+    if (idx === -1) return res.status(404).json({ error: "Pending product not found" });
 
-  currentImports[idx] = {
-    ...currentImports[idx],
-    ...(name ? { name } : {}),
-    ...(brand ? { brand } : {}),
-    ...(salePrice ? { salePrice: Number(salePrice), originalPrice: Number(salePrice), supplierPrice: Number(salePrice) } : {}),
-    ...(category ? { category } : {}),
-    ...(sizes ? { sizes: Array.isArray(sizes) ? sizes : String(sizes).split(',').map(s => s.trim()) } : {}),
-    ...(description ? { description } : {})
-  };
+    currentImports[idx] = {
+      ...currentImports[idx],
+      ...(name ? { name } : {}),
+      ...(brand ? { brand } : {}),
+      ...(salePrice ? { salePrice: Number(salePrice), originalPrice: Number(salePrice), supplierPrice: Number(salePrice) } : {}),
+      ...(category ? { category } : {}),
+      ...(sizes ? { sizes: Array.isArray(sizes) ? sizes : String(sizes).split(',').map(s => s.trim()) } : {}),
+      ...(description ? { description } : {})
+    };
 
-  writeImportedProducts(currentImports);
-  res.json({ success: true, product: currentImports[idx] });
+    await writeImportedProducts(currentImports);
+    res.json({ success: true, product: currentImports[idx] });
+  } catch (err: any) {
+    res.status(500).json({ error: err?.message || "Failed to update pending import" });
+  }
 });
 
 // ==================== TELEGRAM WEBHOOK ENDPOINTS ====================
@@ -757,9 +930,9 @@ app.post("/api/telegram/test-import", async (req, res) => {
       createdAt: new Date().toISOString()
     };
 
-    const currentImports = readImportedProducts();
+    const currentImports = await readImportedProductsAsync();
     currentImports.unshift(newProduct);
-    writeImportedProducts(currentImports);
+    await writeImportedProducts(currentImports);
 
     res.json({ success: true, product: newProduct });
   } catch (err: any) {
